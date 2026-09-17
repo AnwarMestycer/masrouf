@@ -36,6 +36,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
   build_runner: ^2.15.1
   drift_dev: ^2.31.0
   riverpod_generator: ^4.0.0+1
@@ -46,3 +47,14 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+
+# `dart run flutter_launcher_icons` regenerates android/app/src/main/res/mipmap-*
+# from the sources in assets/icon/. iOS is untouched: icon: false.
+flutter_launcher_icons:
+  image_path: "assets/icon/masrouf_icon.png"
+  adaptive_icon_background: "assets/icon/masrouf_background.png"
+  adaptive_icon_foreground: "assets/icon/masrouf_foreground.png"
+  adaptive_icon_monochrome: "assets/icon/masrouf_monochrome.png"
+  min_sdk_android: 21
+  android: true
+  ios: false
