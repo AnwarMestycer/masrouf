@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+ counterpart to allowBackup="false".
+
+  The ledger lives in an unencrypted SQLite file, and its authority is the
+  user's Supabase account, not the device. Excluding it from cloud backup and
+  device transfer means a restored phone re-pulls from the server rather than
+  carrying a plaintext copy of someone's finances through Google Drive.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="file" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="file" />
+    </device-transfer>
+</data-extraction-rules>

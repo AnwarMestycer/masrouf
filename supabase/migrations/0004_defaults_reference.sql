@@ -1,0 +1,27 @@
+-- Default accounts/categories are seeded CLIENT-SIDE, not by a trigger here.
+--
+-- Rationale: the client must have categories in its local drift db the instant the
+-- first session opens, and bootstrap already performs a full pull before deciding to
+-- seed (pull -> if zero live categories -> seed from the Dart constant -> enqueue push).
+-- A server trigger would race that pull and produce a duplicate category set on
+-- reinstall. Keeping one source of truth (lib/data/local/seed/default_categories.dart)
+-- makes the operation idempotent.
+--
+-- This file exists so the seed set is reviewable alongside the schema. If you ever
+-- want server-side seeding instead, uncomment the block at the bottom AND disable
+-- SeedDefaults in the client, never both.
+--
+--   accounts   : Cash (cash, TND)
+--   income     : Salary, Freelance, Reimbursement, Gift, Other
+--   expense    : Groceries, Eating Out, Transport, Rent, Utilities, Subscriptions,
+--                Health, Family, Shopping, Gym, Savings/Zakat, Other
+--
+-- create or replace function public.seed_defaults_for_new_user() returns trigger
+-- language plpgsql security definer set search_path = public as $$
+-- begin
+--   insert into public.user_settings (user_id) values (new.id);
+--   return new;
+-- end $$;
+--
+-- create trigger on_auth_user_created after insert on auth.users
+--   for each row execute function public.seed_defaults_for_new_user();
