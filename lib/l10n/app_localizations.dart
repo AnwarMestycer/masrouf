@@ -1436,6 +1436,66 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Sync failed — will retry'**
   String get syncFailed;
+
+  /// No description provided for @historySelectedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 selected} other{{count} selected}}'**
+  String historySelectedCount(int count);
+
+  /// No description provided for @historySelectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get historySelectAll;
+
+  /// No description provided for @historyDuplicated.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction duplicated'**
+  String get historyDuplicated;
+
+  /// No description provided for @bulkPickCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a category'**
+  String get bulkPickCategory;
+
+  /// No description provided for @bulkTagHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag name'**
+  String get bulkTagHint;
+
+  /// No description provided for @bulkRecategorize.
+  ///
+  /// In en, this message translates to:
+  /// **'Recategorize'**
+  String get bulkRecategorize;
+
+  /// No description provided for @bulkAddTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Add tag'**
+  String get bulkAddTag;
+
+  /// No description provided for @bulkDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get bulkDelete;
+
+  /// No description provided for @bulkUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No matching transaction} =1{1 transaction updated} other{{count} transactions updated}}'**
+  String bulkUpdated(int count);
+
+  /// No description provided for @bulkDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 transaction deleted} other{{count} transactions deleted}}'**
+  String bulkDeleted(int count);
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

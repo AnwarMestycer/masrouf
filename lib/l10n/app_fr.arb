@@ -1,7 +1,6 @@
 {
   "@@locale": "fr",
   "appTitle": "Masrouf",
-
   "@_seed": {},
   "seedSalary": "Salaire",
   "seedFreelance": "Freelance",
@@ -20,7 +19,6 @@
   "seedGym": "Sport",
   "seedSavingsZakat": "Épargne/Zakat",
   "seedCash": "Espèces",
-
   "actionSave": "Enregistrer",
   "actionCancel": "Annuler",
   "actionDelete": "Supprimer",
@@ -31,18 +29,16 @@
   "actionClose": "Fermer",
   "actionToday": "Aujourd'hui",
   "actionYesterday": "Hier",
-
   "navHome": "Accueil",
   "navHistory": "Historique",
   "navAdd": "Ajouter",
   "navAnalytics": "Analyses",
   "navSettings": "Réglages",
-
   "authSignIn": "Se connecter",
   "authSignUp": "S'inscrire",
   "authSignOut": "Se déconnecter",
-  "authSignOutTitle": "Se d\u00e9connecter ?",
-  "authSignOutBody": "Vos donn\u00e9es restent sur le serveur. Cet appareil sera vid\u00e9 puis retélé\u00e9charg\u00e9 \u00e0 la prochaine connexion.",
+  "authSignOutTitle": "Se déconnecter ?",
+  "authSignOutBody": "Vos données restent sur le serveur. Cet appareil sera vidé puis retélééchargé à la prochaine connexion.",
   "authSignOutPending": "{count, plural, =1{1 modification n'a pas encore atteint le serveur et sera perdue.} other{{count} modifications n'ont pas encore atteint le serveur et seront perdues.}}",
   "authSignOutSyncFirst": "Synchroniser d'abord",
   "authEmail": "E-mail",
@@ -61,7 +57,6 @@
   "authCheckEmailBody": "Nous avons envoyé un lien de confirmation à {email}. Ouvrez-le pour activer votre compte.",
   "authResendEmail": "Renvoyer l'e-mail",
   "authBackToSignIn": "Retour à la connexion",
-
   "validationEmailRequired": "L'e-mail est obligatoire",
   "validationEmailInvalid": "Saisissez une adresse e-mail valide",
   "validationPasswordRequired": "Le mot de passe est obligatoire",
@@ -73,7 +68,6 @@
   "validationCategoryRequired": "Choisissez une catégorie",
   "validationAccountRequired": "Choisissez un compte",
   "validationRatePositive": "Le taux doit être supérieur à zéro",
-
   "errorInvalidCredentials": "E-mail ou mot de passe incorrect.",
   "errorEmailAlreadyRegistered": "Cet e-mail est déjà enregistré.",
   "errorWeakPassword": "Mot de passe trop faible. Utilisez au moins 8 caractères.",
@@ -82,7 +76,6 @@
   "errorRateLimited": "Trop de tentatives. Patientez un instant.",
   "errorUnknown": "Une erreur est survenue. Réessayez.",
   "errorSessionExpired": "Votre session a expiré. Reconnectez-vous.",
-
   "txnIncome": "Revenu",
   "txnExpense": "Dépense",
   "txnTransfer": "Virement",
@@ -91,11 +84,11 @@
   "txnNoteHint": "Ajouter une note (facultatif)",
   "txnDate": "Date",
   "txnAccount": "Compte",
-  "txnRateMissing": "Aucun taux de change d\u00e9fini pour {currency}",
-  "txnRateMissingHint": "D\u00e9finissez-le dans R\u00e9glages \u2192 Taux de change, pour que ce montant soit compt\u00e9 correctement.",
+  "txnRateMissing": "Aucun taux de change défini pour {currency}",
+  "txnRateMissingHint": "Définissez-le dans Réglages → Taux de change, pour que ce montant soit compté correctement.",
   "txnCategory": "Catégorie",
   "txnTags": "Étiquettes",
-  "txnTagsHint": "Ajouter une \u00e9tiquette (facultatif)",
+  "txnTagsHint": "Ajouter une étiquette (facultatif)",
   "txnSaved": "Enregistré",
   "txnDeleted": "Supprimé",
   "txnUndo": "Annuler",
@@ -103,7 +96,6 @@
   "txnAll": "Tout",
   "txnEmpty": "Aucune transaction",
   "txnEmptyHint": "Touchez + pour enregistrer la première.",
-
   "accountsTitle": "Comptes",
   "accountsDeleteWarning": "Supprimer ce compte ? Ses transactions restent dans l'historique mais ne compteront plus dans aucun solde.",
   "accountsAdd": "Nouveau compte",
@@ -116,7 +108,6 @@
   "accountTypeSavings": "Épargne",
   "accountTypeForeign": "Devise",
   "accountsTotalBalance": "Solde total",
-
   "categoriesTitle": "Catégories",
   "categoriesAdd": "Nouvelle catégorie",
   "categoriesName": "Nom de la catégorie",
@@ -126,7 +117,6 @@
   "categoriesKindIncome": "Catégories de revenus",
   "categoriesKindExpense": "Catégories de dépenses",
   "categoriesDeleteWarning": "Les transactions de cette catégorie gardent leur historique mais perdent son libellé.",
-
   "dashboardThisMonth": "Ce mois-ci",
   "dashboardIn": "Entrées",
   "dashboardOut": "Sorties",
@@ -135,24 +125,21 @@
   "dashboardSafeToSpendHint": "Solde moins les factures connues avant le {date}",
   "dashboardUpcomingBills": "Factures à venir",
   "dashboardNoUpcoming": "Rien de prévu avant la prochaine paie.",
-
   "analyticsTitle": "Analyses",
   "analyticsByCategory": "Dépenses par catégorie",
-  "analyticsIncomeByCategory": "Revenus par cat\u00e9gorie",
-  "analyticsBurnRate": "{percent} des revenus d\u00e9pens\u00e9s",
-  "analyticsBurnRateNoIncome": "Aucun revenu enregistr\u00e9 ce mois-ci",
-
+  "analyticsIncomeByCategory": "Revenus par catégorie",
+  "analyticsBurnRate": "{percent} des revenus dépensés",
+  "analyticsBurnRateNoIncome": "Aucun revenu enregistré ce mois-ci",
   "budgetsTitle": "Budgets",
   "budgetsEmpty": "Aucun budget",
-  "budgetsEmptyHint": "D\u00e9finissez un plafond mensuel sur une cat\u00e9gorie pour suivre vos d\u00e9penses.",
+  "budgetsEmptyHint": "Définissez un plafond mensuel sur une catégorie pour suivre vos dépenses.",
   "budgetCap": "Plafond mensuel",
   "budgetOptional": "Facultatif",
   "budgetNone": "Sans plafond",
   "budgetRemaining": "{amount} restants",
-  "budgetOver": "{amount} de d\u00e9passement",
+  "budgetOver": "{amount} de dépassement",
   "budgetSpentOfCap": "{spent} sur {cap}",
   "budgetRemoveConfirm": "Supprimer ce budget ? Rien d'autre ne change.",
-
   "plannedTitle": "Prévu",
   "plannedAdd": "Nouvelle dépense prévue",
   "plannedEmpty": "Rien de prévu",
@@ -165,7 +152,6 @@
   "plannedWhen": "Quand",
   "plannedNotCounted": "Non compté dans votre solde tant que vous ne l’enregistrez pas",
   "plannedRemoveConfirm": "Supprimer ce plan ? Rien d’autre ne change.",
-
   "forecastTitle": "Mois à venir",
   "forecastSavings": "Environ {amount} économisés",
   "forecastShortfall": "Environ {amount} manquants",
@@ -186,7 +172,6 @@
   "goalsBehind": "En retard — vos prévisions épargnent moins que nécessaire",
   "goalsAccount": "Détenu sur",
   "goalsRemoveConfirm": "Supprimer cet objectif ? Le compte et son solde ne changent pas.",
-
   "calendarTitle": "Calendrier de trésorerie",
   "calendarEmpty": "Rien de prévu ce mois-ci",
   "calendarDayTotal": "{amount} attendus",
@@ -205,23 +190,20 @@
   "analyticsDaily": "Par jour",
   "analyticsWeekly": "Par semaine",
   "analyticsVsPrevious": "{percent} vs le mois dernier",
-
   "historyTitle": "Historique",
   "historySearchHint": "Rechercher notes, étiquettes, montants",
   "historyFilter": "Filtrer",
   "historyFilterAll": "Tout",
   "historyNoResults": "Aucune transaction ne correspond aux filtres",
   "historyClearFilters": "Effacer les filtres",
-
   "recurringTitle": "Récurrent",
   "recurringAdd": "Nouvelle règle récurrente",
-  "recurringDeleteConfirm": "Supprimer cette r\u00e8gle ? Les transactions d\u00e9j\u00e0 cr\u00e9\u00e9es sont conserv\u00e9es.",
+  "recurringDeleteConfirm": "Supprimer cette règle ? Les transactions déjà créées sont conservées.",
   "recurringCadenceMonthly": "Mensuel",
   "recurringCadenceWeekly": "Hebdomadaire",
   "recurringNextRun": "Prochaine le {date}",
   "recurringActive": "Active",
   "recurringGenerated": "{count, plural, =0{Aucune transaction générée} =1{1 transaction générée} other{{count} transactions générées}}",
-
   "settingsTitle": "Réglages",
   "settingsLanguage": "Langue",
   "settingsTheme": "Thème",
@@ -237,10 +219,19 @@
   "settingsExportDone": "{count} transactions exportées",
   "settingsAccount": "Compte",
   "settingsSyncStatus": "Synchronisation",
-
   "syncIdle": "À jour",
   "syncSyncing": "Synchronisation…",
   "syncOffline": "Hors ligne — modifications enregistrées localement",
   "syncPending": "{count, plural, =1{1 modification en attente} other{{count} modifications en attente}}",
-  "syncFailed": "Échec de la synchronisation — nouvelle tentative"
+  "syncFailed": "Échec de la synchronisation — nouvelle tentative",
+  "historySelectedCount": "{count, plural, =1{1 sélectionnée} other{{count} sélectionnées}}",
+  "historySelectAll": "Tout sélectionner",
+  "historyDuplicated": "Transaction dupliquée",
+  "bulkPickCategory": "Choisir une catégorie",
+  "bulkTagHint": "Nom du tag",
+  "bulkRecategorize": "Reclasser",
+  "bulkAddTag": "Ajouter un tag",
+  "bulkDelete": "Supprimer",
+  "bulkUpdated": "{count, plural, =0{Aucune transaction correspondante} =1{1 transaction mise à jour} other{{count} transactions mises à jour}}",
+  "bulkDeleted": "{count, plural, =1{1 transaction supprimée} other{{count} transactions supprimées}}"
 }

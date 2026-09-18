@@ -769,4 +769,59 @@ class L10nAr extends L10n {
 
   @override
   String get syncFailed => 'فشلت المزامنة — ستُعاد المحاولة';
+
+  @override
+  String historySelectedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count عناصر محددة',
+      one: 'عنصر واحد محدد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get historySelectAll => 'تحديد الكل';
+
+  @override
+  String get historyDuplicated => 'تم تكرار الحركة';
+
+  @override
+  String get bulkPickCategory => 'اختر فئة';
+
+  @override
+  String get bulkTagHint => 'اسم الوسم';
+
+  @override
+  String get bulkRecategorize => 'إعادة التصنيف';
+
+  @override
+  String get bulkAddTag => 'إضافة وسم';
+
+  @override
+  String get bulkDelete => 'حذف';
+
+  @override
+  String bulkUpdated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تحديث $count حركات',
+      one: 'تم تحديث حركة واحدة',
+      zero: 'لا حركة مطابقة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bulkDeleted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم حذف $count حركات',
+      one: 'تم حذف حركة واحدة',
+    );
+    return '$_temp0';
+  }
 }

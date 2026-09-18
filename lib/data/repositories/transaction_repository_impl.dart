@@ -2,6 +2,7 @@ import 'package:csv/csv.dart';
 import 'package:masrouf/core/config/app_config.dart';
 import 'package:masrouf/core/error/auth_error_mapper.dart';
 import 'package:masrouf/core/error/failure.dart';
+import 'package:masrouf/core/ids.dart';
 import 'package:masrouf/core/money/currency.dart';
 import 'package:masrouf/core/result/result.dart';
 import 'package:masrouf/core/time/date_x.dart';
@@ -11,6 +12,7 @@ import 'package:masrouf/data/sync/sync_engine.dart';
 import 'package:masrouf/domain/entities/history_filter.dart';
 import 'package:masrouf/domain/entities/txn.dart';
 import 'package:masrouf/domain/enums/sync_enums.dart';
+import 'package:masrouf/domain/enums/txn_type.dart';
 import 'package:masrouf/domain/repositories/repositories.dart';
 
 class TransactionRepositoryImpl implements TransactionRepository {
@@ -114,6 +116,170 @@ class TransactionRepositoryImpl implements TransactionRepository {
           await _db.syncQueueDao
               .enqueue(SyncEntity.transactions, id, SyncOp.upsert);
           _sync.requestSync();
+        },
+        mapDataError,
+      );
+
+  @override
+  Future<Result<Txn>> duplicate(String id) => guard(
+        () async {
+          final original = await _db.transactionDao.getById(id);
+          if (original == null) {
+            throw const Failure(FailureCode.notFound);
+          }
+          final now = DateTime.now();
+          final copy = Txn(
+            id: Ids.newId(),
+            type: original.type,
+            amount: original.amount,
+            fxRateToBase: original.fxRateToBase,
+            categoryId: original.categoryId,
+            accountId: original.accountId,
+            transferAccountId: original.transferAccountId,
+            date: original.date,
+            note: original.note,
+            tags: original.tags,
+            // The copy was typed by hand, not generated: keeping the source's
+            // rule link would make it look like a materialised occurrence.
+            recurringRuleId: null,
+            createdAt: now,
+            updatedAt: now,
+          );
+          await _db.transactionDao.insertTxn(userId, copy, base);
+          await _db.syncQueueDao
+              .enqueue(SyncEntity.transactions, copy.id, SyncOp.upsert);
+          _sync.requestSync();
+          return copy;
+        },
+        mapDataError,
+      );
+
+  /// Runs [action] over each listed transaction inside one drift transaction.
+  ///
+  /// Row-by-row rather than a bulk UPDATE because the DAO's aggregate tables are
+  /// maintained incrementally per write, and one transaction keeps the ledger
+  /// and the aggregates consistent even if the process dies midway. [action]
+  /// receives whether the row is currently tombstoned — the domain [Txn] does
+  /// not carry that, and applying a delete/restore delta twice would corrupt
+  /// the aggregates. It returns false to skip a row; the count is the rows
+  /// changed.
+  Future<int> _forEachId(
+    List<String> ids,
+    Future<bool> Function(Txn txn, bool deleted) action,
+  ) =>
+      _db.transaction(() async {
+        var changed = 0;
+        for (final id in ids) {
+          final txn = await _db.transactionDao.getById(id);
+          if (txn == null) continue;
+          final row = await (_db.select(_db.transactions)
+                ..where((t) => t.id.equals(id)))
+              .getSingle();
+          if (await action(txn, row.deletedAt != null)) changed++;
+        }
+        return changed;
+      });
+
+  @override
+  Future<Result<int>> recategorize(List<String> ids, String categoryId) =>
+      guard(
+        () async {
+          final row = await (_db.select(_db.categories)
+                ..where((t) => t.id.equals(categoryId)))
+              .getSingleOrNull();
+          if (row == null) {
+            throw const Failure(
+              FailureCode.notFound,
+              debugMessage: 'Category does not exist',
+            );
+          }
+          final kind = CategoryKind.fromWire(row.kind);
+
+          final changed = await _forEachId(ids, (txn, deleted) async {
+            // An expense category on an income row would poison every
+            // per-kind aggregate, so mismatched rows are left untouched.
+            final matches = switch (kind) {
+              CategoryKind.expense => txn.type == TxnType.expense,
+              CategoryKind.income => txn.type == TxnType.income,
+            };
+            if (deleted || !matches || txn.categoryId == categoryId) {
+              return false;
+            }
+            final stamped = txn.copyWith(
+              categoryId: categoryId,
+              updatedAt: DateTime.now(),
+            );
+            await _db.transactionDao.updateTxn(userId, txn, stamped, base);
+            await _db.syncQueueDao
+                .enqueue(SyncEntity.transactions, txn.id, SyncOp.upsert);
+            return true;
+          });
+
+          _sync.requestSync();
+          return changed;
+        },
+        mapDataError,
+      );
+
+  @override
+  Future<Result<int>> addTag(List<String> ids, String tag) => guard(
+        () async {
+          final normalised = tag.trim().toLowerCase();
+          if (normalised.isEmpty) {
+            throw const Failure(
+              FailureCode.validation,
+              debugMessage: 'Tag is blank',
+            );
+          }
+
+          final changed = await _forEachId(ids, (txn, deleted) async {
+            if (deleted || txn.tags.contains(normalised)) return false;
+            final stamped = txn.copyWith(
+              tags: [...txn.tags, normalised],
+              updatedAt: DateTime.now(),
+            );
+            await _db.transactionDao.updateTxn(userId, txn, stamped, base);
+            await _db.syncQueueDao
+                .enqueue(SyncEntity.transactions, txn.id, SyncOp.upsert);
+            return true;
+          });
+
+          _sync.requestSync();
+          return changed;
+        },
+        mapDataError,
+      );
+
+  @override
+  Future<Result<int>> deleteMany(List<String> ids) => guard(
+        () async {
+          final changed = await _forEachId(ids, (txn, deleted) async {
+            if (deleted) return false;
+            await _db.transactionDao.softDeleteTxn(userId, txn, base);
+            await _db.syncQueueDao
+                .enqueue(SyncEntity.transactions, txn.id, SyncOp.delete);
+            return true;
+          });
+
+          _sync.requestSync();
+          return changed;
+        },
+        mapDataError,
+      );
+
+  @override
+  Future<Result<int>> restoreMany(List<String> ids) => guard(
+        () async {
+          final changed = await _forEachId(ids, (txn, deleted) async {
+            if (!deleted) return false;
+            await _db.transactionDao.restoreTxn(userId, txn, base);
+            await _db.syncQueueDao
+                .enqueue(SyncEntity.transactions, txn.id, SyncOp.upsert);
+            return true;
+          });
+
+          _sync.requestSync();
+          return changed;
         },
         mapDataError,
       );

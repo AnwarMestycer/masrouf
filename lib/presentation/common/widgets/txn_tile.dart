@@ -18,6 +18,8 @@ class TxnTile extends StatelessWidget {
     required this.formatter,
     required this.onTap,
     this.onLongPress,
+    this.selecting = false,
+    this.selected = false,
     super.key,
   });
 
@@ -25,6 +27,11 @@ class TxnTile extends StatelessWidget {
   final MoneyFormatter formatter;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
+
+  /// Selection-mode visuals: the leading icon swaps for a check circle so a
+  /// long-press multi-select has an obvious state to toggle.
+  final bool selecting;
+  final bool selected;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +71,15 @@ class TxnTile extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         onLongPress: onLongPress,
-        leading: Container(
+        leading: selecting
+            ? Icon(
+                selected ? Icons.check_circle : Icons.radio_button_unchecked,
+                size: 26,
+                color: selected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.outline,
+              )
+            : Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(

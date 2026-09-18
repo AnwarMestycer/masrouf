@@ -773,4 +773,59 @@ class L10nFr extends L10n {
 
   @override
   String get syncFailed => 'Échec de la synchronisation — nouvelle tentative';
+
+  @override
+  String historySelectedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sélectionnées',
+      one: '1 sélectionnée',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get historySelectAll => 'Tout sélectionner';
+
+  @override
+  String get historyDuplicated => 'Transaction dupliquée';
+
+  @override
+  String get bulkPickCategory => 'Choisir une catégorie';
+
+  @override
+  String get bulkTagHint => 'Nom du tag';
+
+  @override
+  String get bulkRecategorize => 'Reclasser';
+
+  @override
+  String get bulkAddTag => 'Ajouter un tag';
+
+  @override
+  String get bulkDelete => 'Supprimer';
+
+  @override
+  String bulkUpdated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count transactions mises à jour',
+      one: '1 transaction mise à jour',
+      zero: 'Aucune transaction correspondante',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bulkDeleted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count transactions supprimées',
+      one: '1 transaction supprimée',
+    );
+    return '$_temp0';
+  }
 }

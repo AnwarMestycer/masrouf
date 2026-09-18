@@ -76,6 +76,20 @@ abstract interface class TransactionRepository {
   /// Reinstates a deleted transaction — the undo path.
   Future<Result<void>> restore(String id);
 
+  /// Copies a transaction as a brand-new row dated as the original — the
+  /// history list's swipe-to-duplicate. The copy is never linked to a recurring
+  /// rule: it is a manual row even when its source was materialised.
+  Future<Result<Txn>> duplicate(String id);
+
+  /// Bulk edits for the history list's selection mode. Each runs row-by-row
+  /// inside one local transaction and returns how many rows actually changed.
+  Future<Result<int>> recategorize(List<String> ids, String categoryId);
+  Future<Result<int>> addTag(List<String> ids, String tag);
+  Future<Result<int>> deleteMany(List<String> ids);
+
+  /// Undoes [deleteMany] for a batch.
+  Future<Result<int>> restoreMany(List<String> ids);
+
   Future<Result<String>> exportCsv();
 }
 

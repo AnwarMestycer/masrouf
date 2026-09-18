@@ -33,6 +33,23 @@ class _FakeTransactionRepository implements TransactionRepository {
   Future<Result<void>> restore(String id) async => const Ok<void>(null);
 
   @override
+  Future<Result<Txn>> duplicate(String id) async => throw UnimplementedError();
+
+  @override
+  Future<Result<int>> recategorize(List<String> ids, String categoryId) async =>
+      const Ok<int>(0);
+
+  @override
+  Future<Result<int>> addTag(List<String> ids, String tag) async =>
+      const Ok<int>(0);
+
+  @override
+  Future<Result<int>> deleteMany(List<String> ids) async => const Ok<int>(0);
+
+  @override
+  Future<Result<int>> restoreMany(List<String> ids) async => const Ok<int>(0);
+
+  @override
   Future<Result<String>> exportCsv() async => const Ok<String>('');
 
   @override
