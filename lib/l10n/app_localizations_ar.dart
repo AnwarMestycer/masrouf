@@ -824,4 +824,71 @@ class L10nAr extends L10n {
     );
     return '$_temp0';
   }
+
+  @override
+  String get channelDigestName => 'الملخص الأسبوعي';
+
+  @override
+  String get channelDigestDescription => 'ملخص أسبوعي لما أنفقته.';
+
+  @override
+  String get channelRemindersName => 'تذكير بالفواتير';
+
+  @override
+  String get channelRemindersDescription =>
+      'المصروفات المخططة التي يحين موعدها.';
+
+  @override
+  String get channelBudgetsName => 'تنبيهات الميزانية';
+
+  @override
+  String get channelBudgetsDescription => 'الفئات التي تقارب سقفها أو تجاوزته.';
+
+  @override
+  String get settingsNotifications => 'الإشعارات';
+
+  @override
+  String get remindersEnable => 'تذكير بالفواتير';
+
+  @override
+  String get remindersHint => 'إشعار صباح يوم استحقاق المصروف المخطط.';
+
+  @override
+  String get budgetAlertsEnable => 'تنبيهات الميزانية';
+
+  @override
+  String get budgetAlertsHint => 'إشعار عندما تبلغ الفئة ٨٠٪ ثم ١٠٠٪ من سقفها.';
+
+  @override
+  String get reminderTitle => 'مستحق اليوم';
+
+  @override
+  String reminderBody(String amount) {
+    return '$amount مخطط لليوم.';
+  }
+
+  @override
+  String reminderBodyWithCategory(String category, String amount) {
+    return '$category: $amount مخطط لليوم.';
+  }
+
+  @override
+  String budgetAlertNearTitle(String category) {
+    return '$category على وشك النفاد';
+  }
+
+  @override
+  String budgetAlertNearBody(String spent, String cap, String remaining) {
+    return 'تم استخدام $spent من $cap — بقي $remaining هذا الشهر.';
+  }
+
+  @override
+  String budgetAlertOverTitle(String category) {
+    return '$category تجاوزت الميزانية';
+  }
+
+  @override
+  String budgetAlertOverBody(String spent, String cap, String overspend) {
+    return 'تم استخدام $spent من $cap — بزيادة $overspend.';
+  }
 }

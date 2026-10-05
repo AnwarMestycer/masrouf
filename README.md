@@ -107,7 +107,7 @@ rather than failing on the first request.
 
 ```bash
 flutter analyze   # clean
-flutter test      # 82 tests (2 skip without the config file)
+flutter test      # 244 tests (2 skip without the config file)
 ```
 
 ---
@@ -119,7 +119,7 @@ lib/
 ├── core/          money, time, validation, errors, theme, router, config
 ├── domain/        entities, enums, repository interfaces, use cases
 ├── data/
-│   ├── local/     drift schema, DAOs, mappers, seed
+│   ├── local/     drift schema, DAOs, mappers, seed, row writer
 │   ├── remote/    Supabase APIs and DTO mapping
 │   ├── sync/      pull, push, conflict resolution
 │   └── repositories/
@@ -179,6 +179,44 @@ rather than every analytics widget.
 `test/unit/aggregates_test.dart` pins the invariant that matters: after any
 sequence of writes, the incrementally maintained tables must equal what a full
 rebuild produces. Both bugs that test caught during development were real.
+
+---
+
+## Notifications
+
+Three kinds, each its own Android channel so one can be silenced without the
+others, and each off until the user turns it on. The permission is requested at
+that moment rather than at launch.
+
+Everything is composed **while the app is open**, from data already on the
+device — the notification carries a finished string. Nothing wakes up to query
+anything, so there is no background worker to keep alive or get wrong.
+
+| | When | How it is decided |
+|---|---|---|
+| Weekly summary | Sunday 20:00 | Recomputed and rescheduled every launch |
+| Bill reminders | 08:00 on a plan's due date | `ReminderSchedule`, capped at 30 |
+| Budget alerts | Immediately, on crossing 80% or 100% | `BudgetAlerts`, deduped per budget/month/level |
+
+Both decision rules are pure functions with no plugin or clock in them, so they
+are unit-tested directly.
+
+Bill reminders and budget alerts are driven by **listeners on the streams they
+care about** rather than calls at each write site. Every ledger write updates
+`monthly_category_totals` in the same transaction, and every plan mutation writes
+`planned_expenses` — so an edit, a bulk re-categorise, a restore or a pull all
+reach the right watcher without five call sites each having to remember.
+
+A budget alert is a *crossing*, not a threshold: falling back under a level
+clears its flag, so raising a cap after being warned re-arms the alert instead of
+silencing it for the rest of the month. Only the highest newly-crossed level
+fires — one write taking a budget from 50% to 130% says "over budget" once.
+
+Scheduling needs two receivers declared in `AndroidManifest.xml`
+(`ScheduledNotificationReceiver` and `ScheduledNotificationBootReceiver`);
+`flutter_local_notifications` bundles neither. Without the first, an alarm fires
+and nothing appears. Without the second, every pending reminder is lost on reboot
+or app update. `release_config_test.dart` asserts both are present.
 
 ---
 

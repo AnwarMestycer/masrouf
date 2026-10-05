@@ -828,4 +828,75 @@ class L10nFr extends L10n {
     );
     return '$_temp0';
   }
+
+  @override
+  String get channelDigestName => 'Résumé hebdomadaire';
+
+  @override
+  String get channelDigestDescription =>
+      'Un récapitulatif hebdomadaire de vos dépenses.';
+
+  @override
+  String get channelRemindersName => 'Rappels de factures';
+
+  @override
+  String get channelRemindersDescription =>
+      'Dépenses prévues arrivant à échéance.';
+
+  @override
+  String get channelBudgetsName => 'Alertes de budget';
+
+  @override
+  String get channelBudgetsDescription =>
+      'Catégories proches de leur plafond ou au-delà.';
+
+  @override
+  String get settingsNotifications => 'Notifications';
+
+  @override
+  String get remindersEnable => 'Rappels de factures';
+
+  @override
+  String get remindersHint =>
+      'Une notification le matin de l’échéance d’une dépense prévue.';
+
+  @override
+  String get budgetAlertsEnable => 'Alertes de budget';
+
+  @override
+  String get budgetAlertsHint =>
+      'Une notification quand une catégorie atteint 80 % puis 100 % de son plafond.';
+
+  @override
+  String get reminderTitle => 'À payer aujourd’hui';
+
+  @override
+  String reminderBody(String amount) {
+    return '$amount est prévu pour aujourd’hui.';
+  }
+
+  @override
+  String reminderBodyWithCategory(String category, String amount) {
+    return '$category : $amount est prévu pour aujourd’hui.';
+  }
+
+  @override
+  String budgetAlertNearTitle(String category) {
+    return '$category est presque épuisé';
+  }
+
+  @override
+  String budgetAlertNearBody(String spent, String cap, String remaining) {
+    return '$spent sur $cap utilisés — il reste $remaining ce mois-ci.';
+  }
+
+  @override
+  String budgetAlertOverTitle(String category) {
+    return '$category dépasse le budget';
+  }
+
+  @override
+  String budgetAlertOverBody(String spent, String cap, String overspend) {
+    return '$spent sur $cap utilisés — $overspend de dépassement.';
+  }
 }

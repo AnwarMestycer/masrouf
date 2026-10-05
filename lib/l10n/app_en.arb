@@ -438,5 +438,80 @@
         "type": "int"
       }
     }
+  },
+  "channelDigestName": "Weekly summary",
+  "channelDigestDescription": "A weekly recap of what you spent.",
+  "channelRemindersName": "Bill reminders",
+  "channelRemindersDescription": "Planned expenses falling due.",
+  "channelBudgetsName": "Budget alerts",
+  "channelBudgetsDescription": "Categories approaching or over their cap.",
+  "settingsNotifications": "Notifications",
+  "remindersEnable": "Bill reminders",
+  "remindersHint": "A notification on the morning a planned expense is due.",
+  "budgetAlertsEnable": "Budget alerts",
+  "budgetAlertsHint": "A notification when a category reaches 80% and 100% of its cap.",
+  "reminderTitle": "Due today",
+  "reminderBody": "{amount} is planned for today.",
+  "@reminderBody": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderBodyWithCategory": "{category}: {amount} is planned for today.",
+  "@reminderBodyWithCategory": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetAlertNearTitle": "{category} is nearly spent",
+  "@budgetAlertNearTitle": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetAlertNearBody": "{spent} of {cap} used — {remaining} left this month.",
+  "@budgetAlertNearBody": {
+    "placeholders": {
+      "spent": {
+        "type": "String"
+      },
+      "cap": {
+        "type": "String"
+      },
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetAlertOverTitle": "{category} is over budget",
+  "@budgetAlertOverTitle": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetAlertOverBody": "{spent} of {cap} used — {overspend} over.",
+  "@budgetAlertOverBody": {
+    "placeholders": {
+      "spent": {
+        "type": "String"
+      },
+      "cap": {
+        "type": "String"
+      },
+      "overspend": {
+        "type": "String"
+      }
+    }
   }
 }

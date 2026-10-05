@@ -5,6 +5,7 @@ import 'package:masrouf/core/router/app_router.dart';
 import 'package:masrouf/core/theme/app_theme.dart';
 import 'package:masrouf/l10n/app_localizations.dart';
 import 'package:masrouf/presentation/providers/data_providers.dart';
+import 'package:masrouf/presentation/providers/notification_providers.dart';
 import 'package:masrouf/presentation/providers/session_providers.dart';
 
 class MasroufApp extends ConsumerWidget {
@@ -12,11 +13,14 @@ class MasroufApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Instantiating these here starts the session lifecycle and the resume
-    // watcher for the lifetime of the app, without giving either a place in the
-    // widget tree where a rebuild could restart them.
+    // Instantiating these here starts the session lifecycle, the resume watcher
+    // and the two notification watchers for the lifetime of the app, without
+    // giving any of them a place in the widget tree where a rebuild could
+    // restart them.
     ref.watch(sessionLifecycleProvider);
     ref.watch(appLifecycleProvider);
+    ref.watch(plannedReminderWatcherProvider);
+    ref.watch(budgetAlertWatcherProvider);
 
     final settings = ref.watch(settingsProvider);
     final router = ref.watch(routerProvider);

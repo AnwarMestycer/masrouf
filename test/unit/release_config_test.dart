@@ -31,6 +31,37 @@ void main() {
       expect(text, contains('android.permission.RECEIVE_BOOT_COMPLETED'));
     });
 
+    /// The permissions alone deliver nothing. flutter_local_notifications
+    /// bundles no receivers, so without these two declared here every scheduled
+    /// notification is composed, handed to AlarmManager, and then silently
+    /// dropped when the alarm fires — which is exactly what the weekly summary
+    /// did before they were added. Nothing logs, and it cannot be reproduced in
+    /// a widget test.
+    test('the receivers that deliver scheduled notifications are declared', () {
+      final text = manifest.readAsStringSync();
+      expect(
+        text,
+        contains(
+          'com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver',
+        ),
+        reason: 'without this an alarm fires and no notification appears',
+      );
+      expect(
+        text,
+        contains(
+          'com.dexterous.flutterlocalnotifications'
+          '.ScheduledNotificationBootReceiver',
+        ),
+        reason: 'without this every pending reminder is lost on reboot',
+      );
+      expect(text, contains('android.intent.action.BOOT_COMPLETED'));
+      expect(
+        text,
+        contains('android.intent.action.MY_PACKAGE_REPLACED'),
+        reason: 'an app update drops pending alarms just as a reboot does',
+      );
+    });
+
     test('the unencrypted ledger stays out of cloud backup', () {
       expect(
         manifest.readAsStringSync(),

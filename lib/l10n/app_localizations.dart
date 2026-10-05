@@ -1496,6 +1496,114 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 transaction deleted} other{{count} transactions deleted}}'**
   String bulkDeleted(int count);
+
+  /// No description provided for @channelDigestName.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly summary'**
+  String get channelDigestName;
+
+  /// No description provided for @channelDigestDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'A weekly recap of what you spent.'**
+  String get channelDigestDescription;
+
+  /// No description provided for @channelRemindersName.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill reminders'**
+  String get channelRemindersName;
+
+  /// No description provided for @channelRemindersDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned expenses falling due.'**
+  String get channelRemindersDescription;
+
+  /// No description provided for @channelBudgetsName.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget alerts'**
+  String get channelBudgetsName;
+
+  /// No description provided for @channelBudgetsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories approaching or over their cap.'**
+  String get channelBudgetsDescription;
+
+  /// No description provided for @settingsNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get settingsNotifications;
+
+  /// No description provided for @remindersEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill reminders'**
+  String get remindersEnable;
+
+  /// No description provided for @remindersHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A notification on the morning a planned expense is due.'**
+  String get remindersHint;
+
+  /// No description provided for @budgetAlertsEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget alerts'**
+  String get budgetAlertsEnable;
+
+  /// No description provided for @budgetAlertsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A notification when a category reaches 80% and 100% of its cap.'**
+  String get budgetAlertsHint;
+
+  /// No description provided for @reminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Due today'**
+  String get reminderTitle;
+
+  /// No description provided for @reminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} is planned for today.'**
+  String reminderBody(String amount);
+
+  /// No description provided for @reminderBodyWithCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'{category}: {amount} is planned for today.'**
+  String reminderBodyWithCategory(String category, String amount);
+
+  /// No description provided for @budgetAlertNearTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{category} is nearly spent'**
+  String budgetAlertNearTitle(String category);
+
+  /// No description provided for @budgetAlertNearBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{spent} of {cap} used — {remaining} left this month.'**
+  String budgetAlertNearBody(String spent, String cap, String remaining);
+
+  /// No description provided for @budgetAlertOverTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{category} is over budget'**
+  String budgetAlertOverTitle(String category);
+
+  /// No description provided for @budgetAlertOverBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{spent} of {cap} used — {overspend} over.'**
+  String budgetAlertOverBody(String spent, String cap, String overspend);
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

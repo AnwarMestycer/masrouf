@@ -8,7 +8,7 @@ import 'package:masrouf/presentation/providers/analytics_providers.dart';
 import 'package:masrouf/presentation/providers/auth_providers.dart';
 import 'package:masrouf/presentation/providers/core_providers.dart';
 import 'package:masrouf/presentation/providers/data_providers.dart';
-import 'package:masrouf/presentation/providers/digest_providers.dart';
+import 'package:masrouf/presentation/providers/notification_providers.dart';
 
 /// Everything that has to happen when a user signs in, and be undone when they
 /// sign out.

@@ -11,7 +11,7 @@ import 'package:masrouf/presentation/common/l10n_x.dart';
 import 'package:masrouf/presentation/providers/auth_providers.dart';
 import 'package:masrouf/presentation/providers/core_providers.dart';
 import 'package:masrouf/presentation/providers/data_providers.dart';
-import 'package:masrouf/presentation/providers/digest_providers.dart';
+import 'package:masrouf/presentation/providers/notification_providers.dart';
 import 'package:masrouf/presentation/settings/export_service.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -163,8 +163,36 @@ class SettingsPage extends ConsumerWidget {
           ),
           const Divider(),
 
+          _SectionHeader(title: l10n.settingsNotifications),
+          _NotificationToggle(
+            icon: Icons.summarize_outlined,
+            title: l10n.digestEnable,
+            subtitle: l10n.digestHint,
+            flag: digestEnabledProvider,
+            onChanged: (ref, enabled) =>
+                ref.read(digestControllerProvider).setEnabled(enabled: enabled),
+          ),
+          _NotificationToggle(
+            icon: Icons.notifications_active_outlined,
+            title: l10n.remindersEnable,
+            subtitle: l10n.remindersHint,
+            flag: remindersEnabledProvider,
+            onChanged: (ref, enabled) => ref
+                .read(reminderControllerProvider)
+                .setEnabled(enabled: enabled),
+          ),
+          _NotificationToggle(
+            icon: Icons.warning_amber_outlined,
+            title: l10n.budgetAlertsEnable,
+            subtitle: l10n.budgetAlertsHint,
+            flag: budgetAlertsEnabledProvider,
+            onChanged: (ref, enabled) => ref
+                .read(budgetAlertControllerProvider)
+                .setEnabled(enabled: enabled),
+          ),
+          const Divider(),
+
           _SectionHeader(title: l10n.settingsTitle),
-          const _DigestToggle(),
           ListTile(
             leading: const Icon(Icons.language),
             title: Text(l10n.settingsLanguage),
@@ -384,44 +412,56 @@ class _PaydayPicker extends StatelessWidget {
 /// "sync first" branch cannot be confused with a plain cancel.
 enum _SignOutChoice { cancel, sync, signOut }
 
-/// The weekly summary switch.
+/// One notification switch.
 ///
-/// Asks for the notification permission at the moment the user turns it on,
-/// rather than at launch: a permission prompt makes sense when it is attached
-/// to something the user just asked for, and is refused out of hand when it is
-/// not. If they decline, the switch goes back off and says why — silently
-/// staying on while nothing ever arrives would be worse.
-class _DigestToggle extends ConsumerWidget {
-  const _DigestToggle();
+/// Asks for the notification permission at the moment the user turns something
+/// on, rather than at launch: a permission prompt makes sense when it is
+/// attached to something the user just asked for, and is refused out of hand
+/// when it is not. If they decline, the switch goes back off and says why —
+/// silently staying on while nothing ever arrives would be worse.
+class _NotificationToggle extends ConsumerWidget {
+  const _NotificationToggle({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.flag,
+    required this.onChanged,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final FutureProvider<bool> flag;
+
+  /// Takes the ref rather than closing over one, so each tile's callback can be
+  /// written at the call site without capturing a stale reader.
+  final Future<void> Function(WidgetRef ref, bool enabled) onChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final enabled = ref.watch(digestEnabledProvider).value ?? false;
+    final enabled = ref.watch(flag).value ?? false;
 
     return SwitchListTile(
-      secondary: const Icon(Icons.notifications_outlined),
-      title: Text(l10n.digestEnable),
-      subtitle: Text(l10n.digestHint),
+      secondary: Icon(icon),
+      title: Text(title),
+      subtitle: Text(subtitle),
       value: enabled,
       onChanged: (next) async {
-        final controller = ref.read(digestControllerProvider);
         if (!next) {
-          await controller.setEnabled(enabled: false);
+          await onChanged(ref, false);
           return;
         }
         final granted =
-            await ref.read(digestSchedulerProvider).requestPermission();
+            await ref.read(notificationServiceProvider).requestPermission();
         if (!context.mounted) return;
         if (!granted) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(content: Text(l10n.digestPermission)),
-            );
+            ..showSnackBar(SnackBar(content: Text(l10n.digestPermission)));
           return;
         }
-        await controller.setEnabled(enabled: true);
+        await onChanged(ref, true);
       },
     );
   }

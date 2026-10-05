@@ -17,10 +17,12 @@ class KvDao extends DatabaseAccessor<AppDatabase> with _$KvDaoMixin {
   static const String lastAccountId = 'last_account_id';
   static const String lastCategoryIdPrefix = 'last_category_id.';
 
-  /// Whether the weekly summary notification is on. Device-local rather than
-  /// synced: a notification schedule belongs to the phone it fires on, not to
-  /// the account.
+  /// The notification switches. Device-local rather than synced: a notification
+  /// schedule belongs to the phone it fires on, not to the account.
   static const String weeklyDigest = 'weekly_digest_enabled';
+  static const String plannedReminders = 'planned_reminders_enabled';
+  static const String budgetAlerts = 'budget_alerts_enabled';
+
   static String pullCursor(String entity) => 'pull_cursor.$entity';
 
   Future<String?> get(String key) async {

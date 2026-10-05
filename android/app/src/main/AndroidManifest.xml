@@ -45,6 +45,34 @@
                 <data android:scheme="io.masrouf" android:host="auth-callback"/>
             </intent-filter>
         </activity>
+        <!-- flutter_local_notifications ships no receivers of its own: its
+             bundled manifest declares permissions only, so both of these have to
+             be registered here or nothing scheduled is ever delivered.
+
+             ScheduledNotificationReceiver is what AlarmManager actually wakes.
+             Without it the alarm fires, the broadcast reaches nothing, and no
+             notification appears — which is why the weekly summary never showed
+             up on a device despite being scheduled correctly.
+
+             ScheduledNotificationBootReceiver re-registers pending alarms after
+             a restart; Android drops every alarm on reboot. MY_PACKAGE_REPLACED
+             covers an app update, which clears them the same way. The two
+             QUICKBOOT actions are the HTC/Samsung fast-boot equivalents of
+             BOOT_COMPLETED, which those devices send instead. -->
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
@@ -59,13 +87,14 @@
          user is told "something went wrong" while logging in. -->
     <uses-permission android:name="android.permission.INTERNET"/>
 
-    <!-- The weekly summary is a local notification. POST_NOTIFICATIONS is the
-         Android 13+ runtime permission; it is requested at the moment the user
-         switches the summary on, not at launch. RECEIVE_BOOT_COMPLETED lets the
-         schedule survive a restart, which a weekly notification otherwise would
-         not. No exact-alarm permission: the summary is scheduled inexactly, so
-         a few minutes' drift on a Sunday evening costs nothing and the app
-         avoids a permission users are right to refuse. -->
+    <!-- The weekly summary, bill reminders and budget alerts are all local
+         notifications. POST_NOTIFICATIONS is the Android 13+ runtime permission;
+         it is requested at the moment the user switches one of them on, not at
+         launch. RECEIVE_BOOT_COMPLETED lets the schedule survive a restart,
+         which a weekly or dated notification otherwise would not. No
+         exact-alarm permission: everything is scheduled inexactly, so a few
+         minutes' drift on a Sunday evening or a due-date morning costs nothing
+         and the app avoids a permission users are right to refuse. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 

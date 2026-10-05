@@ -64,7 +64,7 @@ void main() {
         name: 'Bank',
         type: AccountType.bank,
         currency: Currency.tnd,
-        openingBalance: Money.zero(Currency.tnd),
+        openingBalance: const Money.zero(Currency.tnd),
         sortOrder: 1,
         archived: false,
         updatedAt: DateTime.now(),
@@ -97,7 +97,7 @@ void main() {
       final source = expense(id: 't1', milli: 25000, ruleId: 'rule-1');
       await repository.add(source);
 
-      final copy = (await repository.duplicate('t1'));
+      final copy = await repository.duplicate('t1');
       expect(copy, isA<Ok<Txn>>());
 
       final created = (copy as Ok<Txn>).value;
