@@ -107,7 +107,7 @@ rather than failing on the first request.
 
 ```bash
 flutter analyze   # clean
-flutter test      # 257 tests (2 skip without the config file)
+flutter test      # 306 tests (2 skip without the config file)
 ```
 
 ---
@@ -243,6 +243,46 @@ than nudged.
 This is a second line of defence, not a replacement for sync: an account can be
 locked out, and a user on a bad connection may have weeks of rows that have never
 left the phone.
+
+---
+
+## Analytics windows
+
+The tab reads over a chosen window, not a fixed calendar month: this month,
+last month, last 30 days, 3 or 6 months, year to date, the **pay period**, or a
+custom span. The choice is remembered on the device.
+
+Two rules do most of the work.
+
+**"This month" stops at today.** A window containing days that have not happened
+dilutes every per-day figure read from it.
+
+**What a window is compared against depends on what kind of window it is.** A
+rolling or custom span compares against the equal-length span immediately before
+it. A calendar or pay cycle compares against the *same stretch of the previous
+cycle* — five days into October against the first five days of September, not
+against 26–30 September. Spending has a monthly shape (rent at the turn, payday
+on the 28th), and only lining the cycles up answers "am I spending more than
+usual". The old month view compared five days against thirty and reported a 78%
+fall during a month of heavier spending.
+
+The headline also separates **everyday spending from large payments**. A window
+holding a long tail of small purchases and one big bill has a total that
+describes no week and a per-day rate no day resembles. A payment is set aside
+when it is a tenth of the window *and* several times the median — the share
+alone called ten identical payments ten outliers and left nothing as everyday
+spending. Set-aside payments are named, not silently subtracted.
+
+A window that is not a whole calendar month cannot be answered from
+`monthly_category_totals`: that table is keyed by month and a month cannot be
+sliced. Those windows read the ledger directly, in one pass that spans the
+comparison window too — deliberately, like the forecast baseline, rather than
+adding a fourth maintained aggregate that would pay on every write to speed up a
+screen opened occasionally.
+
+Budgets and the income trend stay monthly throughout: a cap is a monthly
+commitment and the trend is a month-by-month series, so neither means anything
+read over an arbitrary span.
 
 ---
 

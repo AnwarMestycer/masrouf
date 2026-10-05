@@ -26,7 +26,7 @@ dart run flutter_launcher_icons     # regenerates android mipmap-* from assets/i
 the app shows a configuration screen rather than failing on first request, and
 two tests in `test/unit/env_test.dart` self-skip.
 
-Baseline as of the last check: `flutter test` is 257 passing / 2 skipped and
+Baseline as of the last check: `flutter test` is 306 passing / 2 skipped and
 `flutter analyze` is clean.
 
 Codegen is **drift only**. `riverpod_annotation` / `riverpod_generator` are in
@@ -208,6 +208,32 @@ routes declare the root navigator key so they cover the bottom bar.
 Locale comes from the user's own setting (so it syncs across devices), not the
 device. Arabic RTL is handled entirely by Flutter's directionality — never mirror
 anything by hand. UI strings go in all three `lib/l10n/app_*.arb` files.
+
+## Analytics windows
+
+`DateRange` + `Ranges.resolve` (`domain/entities/analytics/date_range.dart`) are
+pure and fully unit-tested — resolve a preset against a clock and a payday, and
+decide what "the previous window" means. Keep new range rules there.
+
+`RangeReport` comes from `AnalyticsDao.watchRangeReport`, one ledger pass
+spanning both the selected and the comparison window. **A range that is not a
+whole calendar month cannot use `monthly_category_totals`** — it is keyed by
+month and a month cannot be sliced — so this scans, deliberately, as the
+forecast baseline does. Don't add a `daily_category_totals` aggregate to avoid
+it: that moves cost onto the add flow, which has a strict instant-feel budget.
+
+`DateRange.previous` is preset-aware: rolling and custom windows compare against
+the span immediately before them; calendar and pay cycles compare against the
+same stretch of the previous cycle. Changing that silently changes what every
+figure on the tab claims.
+
+Large payments are set aside from "everyday" when they clear **both** a share of
+the window and a multiple of the median (`AppConfig.analyticsLargePayment*`).
+The share alone flags all of ten identical payments, since each is a tenth of
+the window — there is a regression test for exactly that.
+
+Budgets and the income trend remain monthly on both the dashboard and Analytics;
+they use the month the range ends in.
 
 ## Tests
 
