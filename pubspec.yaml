@@ -50,6 +50,17 @@ flutter:
 
 # `dart run flutter_launcher_icons` regenerates android/app/src/main/res/mipmap-*
 # from the sources in assets/icon/. iOS is untouched: icon: false.
+#
+# masrouf_icon.svg is the drawing everything else is rendered from. The three
+# adaptive layers are derived from it, not drawn separately:
+#   background  flat #1d5b4a, full bleed — no corner radius, the launcher mask
+#               owns the silhouette and a baked-in one shows as a dark corner
+#   foreground  the mark alone, scaled to fill its own 108-unit canvas
+#   monochrome  the same geometry with every fill forced opaque; Android tints
+#               this layer by alpha, so only the union of the shapes matters
+# The generated ic_launcher.xml wraps foreground and monochrome in a 16% inset,
+# which is what lands them in the 72dp safe zone. Pre-shrinking the artwork to
+# that zone as well compounds the two and leaves the mark adrift in the middle.
 flutter_launcher_icons:
   image_path: "assets/icon/masrouf_icon.png"
   adaptive_icon_background: "assets/icon/masrouf_background.png"
