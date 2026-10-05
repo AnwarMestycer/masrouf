@@ -18,7 +18,7 @@ flutter run --dart-define-from-file=masrouf.env
 flutter analyze
 flutter test
 flutter test test/unit/money_test.dart                      # one file
-flutter test test/unit/sync_test.dart -n 'substring of name' # one test
+flutter test test/unit/sync_test.dart --plain-name "substring"   # one test
 dart run flutter_launcher_icons     # regenerates android mipmap-* from assets/icon/
 ```
 

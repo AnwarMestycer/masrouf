@@ -269,5 +269,6 @@
   "backupAuto": "Sauvegarde hebdomadaire automatique",
   "backupAutoHint": "Conserve les quatre dernières sauvegardes sur cet appareil.",
   "budgetAlertSpentTitle": "{category} est entièrement dépensé",
-  "budgetAlertSpentBody": "Les {cap} sont utilisés. C’est tout le budget du mois."
+  "budgetAlertSpentBody": "Les {cap} sont utilisés. C’est tout le budget du mois.",
+  "analyticsShowLess": "Afficher moins"
 }

@@ -954,4 +954,7 @@ class L10nAr extends L10n {
   String budgetAlertSpentBody(String cap) {
     return 'تم استخدام $cap كاملة. هذه ميزانية الشهر بأكملها.';
   }
+
+  @override
+  String get analyticsShowLess => 'عرض أقل';
 }

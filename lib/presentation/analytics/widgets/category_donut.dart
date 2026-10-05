@@ -51,31 +51,60 @@ class CategoryDonut extends StatefulWidget {
 }
 
 class _CategoryDonutState extends State<CategoryDonut> {
-  /// Index of the slice under the finger, or null. Drives both the ring
-  /// highlight and the centre readout — the touch equivalent of a hover tooltip.
+  /// Which ring arc the finger is on, and which list row was tapped. Exactly one
+  /// is ever set — a ring touch clears the row and vice versa — so the centre
+  /// readout has a single unambiguous source.
   ///
-  /// Only ever holds a valid index. fl_chart reports -1 for a touch that landed
-  /// in the centre hole or in the gap between two arcs, which is a real thing to
-  /// do on a donut with a 62px hole — storing it and indexing with it later is
-  /// what threw `RangeError: not in inclusive range 0..6: -1`.
-  int? _touched;
+  /// Both are indices rather than slices because the lists are rebuilt on every
+  /// build; holding a slice would go stale the moment the month changed.
+  /// Both are bounds-checked on read: fl_chart reports -1 for a touch that
+  /// landed in the centre hole or the gap between two arcs, which is a real
+  /// thing to do on a donut with a 62px hole, and the row count shrinks when
+  /// the tail collapses under a held selection.
+  int? _focusedArc;
+  int? _focusedRow;
+
+  /// Whether the tail is listed category by category.
+  ///
+  /// Only the list expands. The ring stays capped at [CategoryDonut._maxSlices]
+  /// because a categorical palette is separable for a handful of hues at most —
+  /// the tail is folded for legibility of the *ring*, and showing fifteen named
+  /// rows underneath costs none of that.
+  bool _expanded = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final brightness = theme.brightness;
 
-    if (widget.slices.isEmpty) {
+    // A category with nothing spent against it has nothing to say about
+    // composition: it rounds to 0%, draws an arc of no width, and pushes the
+    // rows that do carry spending further down the list.
+    final slices = widget.slices
+        .where((slice) => slice.total.milli != 0)
+        .toList(growable: false);
+
+    if (slices.isEmpty) {
       return _EmptyChart(message: widget.l10n.analyticsNoData);
     }
 
-    final grouped = _group(widget.slices, brightness, theme);
-    // Bounds-checked on both sides: the slice count also shrinks when the month
-    // changes under a held selection.
-    final touched = _touched;
-    final focused = touched != null && touched >= 0 && touched < grouped.length
-        ? grouped[touched]
-        : null;
+    final head = slices.take(CategoryDonut._maxSlices).toList(growable: false);
+    final tail = slices.skip(CategoryDonut._maxSlices).toList(growable: false);
+
+    final ring = _ringSlices(head, tail, brightness, theme);
+    final rows = _rowSlices(head, tail, brightness, theme);
+
+    final rowIndex = _focusedRow;
+    final arcIndex = _focusedArc;
+    final _Slice? focused;
+    if (rowIndex != null && rowIndex >= 0 && rowIndex < rows.length) {
+      focused = rows[rowIndex];
+    } else if (arcIndex != null && arcIndex >= 0 && arcIndex < ring.length) {
+      focused = ring[arcIndex];
+    } else {
+      focused = null;
+    }
+    final highlightedArc = focused?.ringIndex;
 
     return Column(
       children: <Widget>[
@@ -86,7 +115,7 @@ class _CategoryDonutState extends State<CategoryDonut> {
           label: <String>[
             widget.totalLabel ?? widget.l10n.dashboardOut,
             widget.formatter.format(widget.total),
-            for (final slice in grouped)
+            for (final slice in ring)
               '${slice.label} ${(slice.share * 100).round()}%',
           ].join(', '),
           excludeSemantics: true,
@@ -105,7 +134,8 @@ class _CategoryDonutState extends State<CategoryDonut> {
                         final index =
                             response?.touchedSection?.touchedSectionIndex;
                         setState(() {
-                          _touched =
+                          _focusedRow = null;
+                          _focusedArc =
                               event.isInterestedForInteractions &&
                                   index != null &&
                                   index >= 0
@@ -115,11 +145,11 @@ class _CategoryDonutState extends State<CategoryDonut> {
                       },
                     ),
                     sections: <PieChartSectionData>[
-                      for (var i = 0; i < grouped.length; i++)
+                      for (var i = 0; i < ring.length; i++)
                         PieChartSectionData(
-                          value: grouped[i].total.milli.toDouble(),
-                          color: grouped[i].color,
-                          radius: _touched == i ? 34 : 28,
+                          value: ring[i].total.milli.toDouble(),
+                          color: ring[i].color,
+                          radius: highlightedArc == i ? 34 : 28,
                           showTitle: false,
                           // A 2px surface ring keeps touching arcs separate even
                           // when two neighbours are close in hue.
@@ -147,60 +177,125 @@ class _CategoryDonutState extends State<CategoryDonut> {
           ),
         ),
         const SizedBox(height: Gap.lg),
-        for (var i = 0; i < grouped.length; i++)
+        for (var i = 0; i < rows.length; i++)
           _RankRow(
-            entry: grouped[i],
-            budget: widget.budgets[grouped[i].categoryId],
+            entry: rows[i],
+            budget: widget.budgets[rows[i].categoryId],
             formatter: widget.formatter,
-            highlighted: _touched == i,
-            onTap: () => setState(() => _touched = _touched == i ? null : i),
+            highlighted: _focusedRow == i,
+            onTap: rows[i].expands
+                ? () => setState(() {
+                      _expanded = true;
+                      _focusedRow = null;
+                      _focusedArc = null;
+                    })
+                : () => setState(() {
+                      _focusedArc = null;
+                      _focusedRow = _focusedRow == i ? null : i;
+                    }),
+          ),
+        if (_expanded && tail.isNotEmpty)
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: Gap.sm),
+              child: TextButton.icon(
+                onPressed: () => setState(() {
+                  _expanded = false;
+                  _focusedRow = null;
+                  _focusedArc = null;
+                }),
+                icon: const Icon(Icons.expand_less, size: 18),
+                label: Text(widget.l10n.analyticsShowLess),
+              ),
+            ),
           ),
       ],
     );
   }
 
-  /// Top slices verbatim, remainder aggregated.
-  List<_Slice> _group(
-    List<CategorySlice> slices,
+  /// The arcs. Top slices verbatim, remainder aggregated into one.
+  List<_Slice> _ringSlices(
+    List<CategorySlice> head,
+    List<CategorySlice> tail,
     Brightness brightness,
     ThemeData theme,
   ) {
-    final head = slices.take(CategoryDonut._maxSlices).toList(growable: false);
-    final tail = slices.skip(CategoryDonut._maxSlices).toList(growable: false);
-
     final result = <_Slice>[
-      for (final slice in head)
-        _Slice(
-          label: slice.category?.name ?? widget.l10n.txnAll,
-          icon: CategoryIcons.resolve(slice.category?.icon ?? 'category'),
-          color: AppColors.resolveCategoryColor(
-            slice.category?.color ?? theme.colorScheme.outline.toARGB32(),
-            brightness,
-          ),
-          total: slice.total,
-          share: slice.share,
-          changeRatio: slice.changeRatio,
-          categoryId: slice.category?.id,
-        ),
+      for (var i = 0; i < head.length; i++)
+        _named(head[i], brightness, theme, ringIndex: i),
     ];
-
     if (tail.isNotEmpty) {
-      final total = tail.map((s) => s.total).reduce((a, b) => a + b);
-      result.add(
-        _Slice(
-          label: '${widget.l10n.txnAll} (+${tail.length})',
-          icon: Icons.more_horiz,
-          color: brightness == Brightness.dark
-              ? AppColors.otherSliceDark
-              : AppColors.otherSliceLight,
-          total: total,
-          share: tail.fold<double>(0, (sum, s) => sum + s.share),
-          changeRatio: null,
-        ),
-      );
+      result.add(_aggregate(tail, head.length, brightness, expands: false));
     }
     return result;
   }
+
+  /// The list. Identical to the ring until the tail is expanded, at which point
+  /// the aggregated row is replaced by the categories it stands for.
+  ///
+  /// Those rows keep the arc index of the aggregate, so tapping one lights the
+  /// arc its spending is actually inside rather than nothing at all.
+  List<_Slice> _rowSlices(
+    List<CategorySlice> head,
+    List<CategorySlice> tail,
+    Brightness brightness,
+    ThemeData theme,
+  ) {
+    final result = <_Slice>[
+      for (var i = 0; i < head.length; i++)
+        _named(head[i], brightness, theme, ringIndex: i),
+    ];
+    if (tail.isEmpty) return result;
+
+    if (!_expanded) {
+      result.add(_aggregate(tail, head.length, brightness, expands: true));
+      return result;
+    }
+    for (final slice in tail) {
+      result.add(_named(slice, brightness, theme, ringIndex: head.length));
+    }
+    return result;
+  }
+
+  _Slice _named(
+    CategorySlice slice,
+    Brightness brightness,
+    ThemeData theme, {
+    required int ringIndex,
+  }) =>
+      _Slice(
+        label: slice.category?.name ?? widget.l10n.txnAll,
+        icon: CategoryIcons.resolve(slice.category?.icon ?? 'category'),
+        color: AppColors.resolveCategoryColor(
+          slice.category?.color ?? theme.colorScheme.outline.toARGB32(),
+          brightness,
+        ),
+        total: slice.total,
+        share: slice.share,
+        changeRatio: slice.changeRatio,
+        categoryId: slice.category?.id,
+        ringIndex: ringIndex,
+      );
+
+  _Slice _aggregate(
+    List<CategorySlice> tail,
+    int ringIndex,
+    Brightness brightness, {
+    required bool expands,
+  }) =>
+      _Slice(
+        label: '${widget.l10n.txnAll} (+${tail.length})',
+        icon: Icons.more_horiz,
+        color: brightness == Brightness.dark
+            ? AppColors.otherSliceDark
+            : AppColors.otherSliceLight,
+        total: tail.map((s) => s.total).reduce((a, b) => a + b),
+        share: tail.fold<double>(0, (sum, s) => sum + s.share),
+        changeRatio: null,
+        ringIndex: ringIndex,
+        expands: expands,
+      );
 }
 
 class _Slice {
@@ -211,7 +306,9 @@ class _Slice {
     required this.total,
     required this.share,
     required this.changeRatio,
+    required this.ringIndex,
     this.categoryId,
+    this.expands = false,
   });
 
   final String label;
@@ -221,9 +318,15 @@ class _Slice {
   final double share;
   final double? changeRatio;
 
+  /// Which arc this row belongs to. Tail rows share the aggregate's index.
+  final int ringIndex;
+
   /// Null for the aggregated "Other" row, which spans several categories and so
   /// cannot carry one cap.
   final String? categoryId;
+
+  /// Whether tapping this row opens the tail rather than focusing it.
+  final bool expands;
 }
 
 class _CentreReadout extends StatelessWidget {
@@ -330,6 +433,14 @@ class _RankRow extends StatelessWidget {
             if (change != null) ...<Widget>[
               ChangeChip(ratio: change),
               const SizedBox(width: Gap.sm),
+            ],
+            if (entry.expands) ...<Widget>[
+              Icon(
+                Icons.expand_more,
+                size: 18,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: Gap.xs),
             ],
             Text(
               formatter.format(entry.total),

@@ -559,5 +559,6 @@
         "type": "String"
       }
     }
-  }
+  },
+  "analyticsShowLess": "Show less"
 }

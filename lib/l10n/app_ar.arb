@@ -269,5 +269,6 @@
   "backupAuto": "نسخة احتياطية أسبوعية تلقائية",
   "backupAutoHint": "يحتفظ بآخر أربع نسخ احتياطية على هذا الجهاز.",
   "budgetAlertSpentTitle": "استُهلكت {category} بالكامل",
-  "budgetAlertSpentBody": "تم استخدام {cap} كاملة. هذه ميزانية الشهر بأكملها."
+  "budgetAlertSpentBody": "تم استخدام {cap} كاملة. هذه ميزانية الشهر بأكملها.",
+  "analyticsShowLess": "عرض أقل"
 }

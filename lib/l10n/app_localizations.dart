@@ -1712,6 +1712,12 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'All {cap} is used. That is the whole budget for this month.'**
   String budgetAlertSpentBody(String cap);
+
+  /// No description provided for @analyticsShowLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get analyticsShowLess;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {
