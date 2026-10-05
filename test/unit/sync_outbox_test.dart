@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masrouf/data/local/app_database.dart';
+import 'package:masrouf/data/sync/pull_worker.dart';
 import 'package:masrouf/data/sync/push_worker.dart';
 import 'package:masrouf/domain/enums/sync_enums.dart';
 
@@ -25,6 +26,33 @@ void main() {
       PushWorker.pushOrder.length,
       SyncEntity.values.length,
       reason: 'no duplicates',
+    );
+  });
+
+  /// The counterpart check, and the one that was missing. `budgets`,
+  /// `planned_expenses` and `savings_goals` were in the push order but not the
+  /// pull order, so they reached the server and never came back: a reinstall
+  /// restored every transaction and silently lost every cap, plan and goal.
+  /// Nothing failed — the rows simply were not asked for.
+  test('every synced entity has a place in the pull order', () {
+    expect(
+      PullWorker.order.toSet(),
+      SyncEntity.values.toSet(),
+      reason: 'an entity missing from the pull order is never pulled back',
+    );
+    expect(PullWorker.order.length, SyncEntity.values.length, reason: 'no duplicates');
+  });
+
+  test('a row cannot be pulled before the row it points at', () {
+    const order = PullWorker.order;
+    expect(
+      order.indexOf(SyncEntity.categories),
+      lessThan(order.indexOf(SyncEntity.budgets)),
+      reason: 'a budget carries a category_id foreign key',
+    );
+    expect(
+      order.indexOf(SyncEntity.accounts),
+      lessThan(order.indexOf(SyncEntity.transactions)),
     );
   });
 
