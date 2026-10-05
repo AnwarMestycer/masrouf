@@ -8,6 +8,27 @@ abstract final class AppConfig {
   /// so this is a *reach* budget rather than a completeness one.
   static const int quickCategoryCount = 8;
 
+  /// How large a single payment has to be, as a share of a window's spending,
+  /// before it is set aside from the everyday figure.
+  ///
+  /// A share rather than a percentile or a fixed amount: it scales with the
+  /// window, it is meaningful at low transaction counts where a percentile is
+  /// not, and it states exactly what it means — this one payment is a tenth of
+  /// everything spent. A ledger of 2 DT coffees and one 322 DT tuition bill has
+  /// a mean nobody ever spent, and an unqualified total that answers the wrong
+  /// question.
+  static const double analyticsLargePaymentShare = 0.10;
+
+  /// …and it must also dwarf a typical purchase by this much.
+  ///
+  /// The share alone is not enough. Ten identical payments are each a tenth of
+  /// the window, so a share test on its own calls every one of them large and
+  /// reports that nothing was everyday spending. Requiring a multiple of the
+  /// median as well says what is actually meant: this payment is unlike the
+  /// ones around it. A window of evenly sized purchases has no outlier, however
+  /// few purchases there are.
+  static const int analyticsLargePaymentMedianMultiple = 3;
+
   /// Months of history the analytics screens keep in memory at once.
   static const int analyticsMonthWindow = 6;
 

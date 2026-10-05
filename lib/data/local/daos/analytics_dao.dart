@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:masrouf/core/config/app_config.dart';
 import 'package:masrouf/core/money/currency.dart';
 import 'package:masrouf/core/money/money.dart';
 import 'package:masrouf/core/time/date_x.dart';
@@ -9,6 +10,8 @@ import 'package:masrouf/data/local/tables/local_tables.dart';
 import 'package:masrouf/data/local/tables/tables.dart';
 import 'package:masrouf/domain/entities/analytics/analytics.dart';
 import 'package:masrouf/domain/entities/category.dart';
+import 'package:masrouf/domain/entities/analytics/date_range.dart';
+import 'package:masrouf/domain/entities/analytics/range_report.dart';
 import 'package:masrouf/domain/enums/txn_type.dart';
 
 part 'analytics_dao.g.dart';
@@ -345,6 +348,147 @@ class AnalyticsDao extends DatabaseAccessor<AppDatabase>
     return row.read(total) ?? 0;
   }
 
+  /// Everything the range view needs, from one pass over the window.
+  ///
+  /// A range that is not a whole calendar month cannot be answered from
+  /// `monthly_category_totals`: that table is keyed by month, and a month cannot
+  /// be sliced. So this reads the ledger — deliberately, like the forecast
+  /// baseline above, and for the same reason. A personal ledger is a few hundred
+  /// rows, and the alternative is a fourth maintained aggregate paying on every
+  /// write to speed up a screen that is opened occasionally.
+  ///
+  /// The scan spans the comparable window as well as the selected one, so the
+  /// comparison costs no second pass.
+  Stream<RangeReport> watchRangeReport(
+    String userId,
+    DateRange range,
+    Currency base, {
+    TxnType sliceType = TxnType.expense,
+  }) {
+    final previous = range.previous;
+    final query = select(transactions).join(<Join<HasResultSet, dynamic>>[
+      leftOuterJoin(categories, categories.id.equalsExp(transactions.categoryId)),
+    ])
+      ..where(
+        transactions.userId.equals(userId) &
+            transactions.deletedAt.isNull() &
+            // Transfers move money between the user's own accounts. Letting them
+            // in would inflate both sides of every figure here.
+            transactions.type.equals(TxnType.transfer.wire).not() &
+            transactions.dateYmd.isBiggerOrEqualValue(previous.from.ymd) &
+            transactions.dateYmd.isSmallerOrEqualValue(range.to.ymd),
+      );
+
+    return query.watch().map((rows) {
+      final zero = Money.zero(base);
+      var income = 0;
+      var expense = 0;
+      var previousIncome = 0;
+      var previousExpense = 0;
+      final amounts = <int>[];
+      final current = <String, _Bucket>{};
+      final before = <String, int>{};
+      final categoriesById = <String, Category>{};
+      final payments = <LargePayment>[];
+
+      for (final row in rows) {
+        final txn = row.readTable(transactions);
+        final category = row.readTableOrNull(categories);
+        if (category != null && category.deletedAt == null) {
+          categoriesById[category.id] = category.toEntity();
+        }
+
+        final milli = txn.baseMilliIn(base);
+        final date = ymdToDate(txn.dateYmd);
+        final inRange = range.contains(date);
+        final isExpense = txn.type == TxnType.expense.wire;
+
+        if (inRange) {
+          if (isExpense) {
+            expense += milli;
+          } else {
+            income += milli;
+          }
+        } else if (previous.contains(date)) {
+          if (isExpense) {
+            previousExpense += milli;
+          } else {
+            previousIncome += milli;
+          }
+        }
+
+        // A range and its comparable window can only overlap when the caller
+        // built one by hand; `contains` is checked rather than assumed.
+        if (!inRange && !previous.contains(date)) continue;
+
+        final matchesSlice = txn.type == sliceType.wire;
+        if (!matchesSlice) continue;
+
+        final key = txn.categoryId ?? '';
+        if (inRange) {
+          final bucket = current.putIfAbsent(key, _Bucket.new);
+          bucket.total += milli;
+          bucket.count += 1;
+          amounts.add(milli);
+          payments.add(
+            LargePayment(
+              id: txn.id,
+              label: categoriesById[key]?.name ?? txn.note?.trim() ?? '',
+              amount: Money(milli, base),
+              date: date,
+            ),
+          );
+        } else {
+          before[key] = (before[key] ?? 0) + milli;
+        }
+      }
+
+      final sliceTotal =
+          current.values.fold<int>(0, (sum, b) => sum + b.total);
+      final slices = current.entries.map((entry) {
+        return CategorySlice(
+          category: categoriesById[entry.key],
+          total: Money(entry.value.total, base),
+          txnCount: entry.value.count,
+          share: sliceTotal == 0 ? 0 : entry.value.total / sliceTotal,
+          previousTotal: Money(before[entry.key] ?? 0, base),
+        );
+      }).toList()
+        ..sort((a, b) => b.total.milli.compareTo(a.total.milli));
+
+      amounts.sort();
+      final median = amounts.isEmpty
+          ? zero
+          : Money(amounts[amounts.length ~/ 2], base);
+
+      // Large enough to move the total on its own *and* unlike its neighbours.
+      // A share of the window scales with how much was spent and needs no
+      // distribution to be meaningful at small counts; the median multiple is
+      // what stops ten identical payments — each a tenth of the window — from
+      // all counting as outliers and leaving nothing as everyday spending.
+      final floor = <int>[
+        (expense * AppConfig.analyticsLargePaymentShare).round(),
+        median.milli * AppConfig.analyticsLargePaymentMedianMultiple,
+      ].reduce((a, b) => a > b ? a : b);
+      final large = payments
+          .where((p) => floor > 0 && p.amount.milli >= floor)
+          .toList(growable: false)
+        ..sort((a, b) => b.amount.milli.compareTo(a.amount.milli));
+
+      return RangeReport(
+        range: range,
+        income: Money(income, base),
+        expense: Money(expense, base),
+        previousIncome: Money(previousIncome, base),
+        previousExpense: Money(previousExpense, base),
+        txnCount: amounts.length,
+        medianTxn: median,
+        large: large,
+        slices: slices,
+      );
+    });
+  }
+
   /// Non-streaming summary, for the month-over-month comparison strip.
   Future<List<MonthSummary>> summariesFor(
     String userId,
@@ -392,4 +536,10 @@ class AnalyticsDao extends DatabaseAccessor<AppDatabase>
         )
         .toList(growable: false);
   }
+}
+
+/// Mutable while one pass accumulates into it; never escapes this file.
+class _Bucket {
+  int total = 0;
+  int count = 0;
 }
