@@ -270,5 +270,22 @@
   "backupAutoHint": "Conserve les quatre dernières sauvegardes sur cet appareil.",
   "budgetAlertSpentTitle": "{category} est entièrement dépensé",
   "budgetAlertSpentBody": "Les {cap} sont utilisés. C’est tout le budget du mois.",
-  "analyticsShowLess": "Afficher moins"
+  "analyticsShowLess": "Afficher moins",
+  "rangeThisMonth": "Ce mois-ci",
+  "rangeLastMonth": "Le mois dernier",
+  "rangeLast30Days": "30 derniers jours",
+  "rangeLast3Months": "3 derniers mois",
+  "rangeLast6Months": "6 derniers mois",
+  "rangeYearToDate": "Depuis janvier",
+  "rangePayPeriod": "Période de paie",
+  "rangeCustom": "Personnalisé",
+  "rangePickDates": "Choisir les dates",
+  "analyticsEveryday": "Courant",
+  "analyticsPerDay": "{amount}/jour",
+  "analyticsSetAside": "{count, plural, =1{1 gros paiement mis à part} other{{count} gros paiements mis à part}}",
+  "analyticsTypicalPurchase": "Achat typique {amount}",
+  "analyticsTopMovers": "Plus fortes variations",
+  "analyticsRangeDays": "{count, plural, =1{1 jour} other{{count} jours}}",
+  "analyticsComparedTo": "vs {days} précédents",
+  "analyticsBurnRateNoIncomeRange": "Aucun revenu sur cette période"
 }

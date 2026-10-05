@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:masrouf/core/money/money.dart';
 import 'package:masrouf/core/theme/spacing.dart';
 import 'package:masrouf/domain/entities/analytics/analytics.dart';
+import 'package:masrouf/core/time/ym.dart';
 import 'package:masrouf/domain/entities/budget.dart';
 import 'package:masrouf/domain/enums/txn_type.dart';
 import 'package:masrouf/presentation/analytics/widgets/cashflow_chart.dart';
 import 'package:masrouf/presentation/analytics/widgets/category_donut.dart';
+import 'package:masrouf/presentation/analytics/widgets/range_headline.dart';
+import 'package:masrouf/presentation/analytics/widgets/range_selector.dart';
 import 'package:masrouf/presentation/common/feedback.dart';
 import 'package:masrouf/presentation/common/l10n_x.dart';
-import 'package:masrouf/presentation/dashboard/widgets/dashboard_widgets.dart';
 import 'package:masrouf/presentation/providers/analytics_providers.dart';
 import 'package:masrouf/presentation/providers/data_providers.dart';
+import 'package:masrouf/presentation/providers/range_providers.dart';
 
 class AnalyticsPage extends ConsumerStatefulWidget {
   const AnalyticsPage({super.key});
@@ -34,25 +36,27 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final theme = Theme.of(context);
     final formatter = ref.watch(moneyFormatterProvider);
     final base = ref.watch(baseCurrencyProvider);
     final locale = ref.watch(localeCodeProvider);
-    final ym = ref.watch(selectedMonthProvider);
+    final range = ref.watch(analyticsRangeProvider);
 
-    final summaryAsync = ref.watch(monthSummaryProvider(ym));
-    final slicesAsync = ref.watch(categorySlicesProvider((ym, _sliceType)));
-    final cashflowAsync = ref.watch(cashflowProvider((ym, _granularity)));
-    final summary = summaryAsync.value;
-    final slices = slicesAsync.value;
+    final reportAsync = ref.watch(rangeReportProvider(_sliceType));
+    final cashflowAsync = ref.watch(cashflowProvider(_granularity));
+    final report = reportAsync.value;
     final cashflow = cashflowAsync.value;
+    final slices = report?.slices;
 
     // An empty chart and a failed query look identical, so a failure here read
     // as "you spent nothing this month" — which for a spending tracker is a
     // wrong answer presented as a fact.
-    final analyticsFailed = summaryAsync.hasError ||
-        slicesAsync.hasError ||
-        cashflowAsync.hasError;
+    final analyticsFailed = reportAsync.hasError || cashflowAsync.hasError;
+
+    // Budgets and the income trend stay monthly on purpose: a cap is a monthly
+    // commitment and the trend is a month-by-month series, so neither means
+    // anything read over an arbitrary window. The month they use is the one the
+    // range ends in.
+    final ym = Ym.fromDate(range.to);
     final income = ref.watch(incomeBreakdownProvider(ym)).value;
     final budgetsByCategory = <String, BudgetProgress>{
       for (final p in ref.watch(budgetProgressProvider(ym)).value ??
@@ -65,29 +69,24 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
       body: ListView(
         padding: const EdgeInsets.only(bottom: 96),
         children: <Widget>[
-          MonthStepper(
-            label: DateFormat.yMMMM(locale).format(ym.firstDay),
-            onPrevious: ref.read(selectedMonthProvider.notifier).previous,
-            onNext: ref.read(selectedMonthProvider.notifier).next,
-            canGoNext: !ref.read(selectedMonthProvider.notifier).isCurrent,
-          ),
-          if (summary != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Gap.lg),
-              child: MonthSummaryCard(
-                summary: summary,
-                formatter: formatter,
-                l10n: l10n,
-              ),
+          const SizedBox(height: Gap.sm),
+          const RangeSelector(),
+          if (report != null)
+            RangeHeadline(
+              report: report,
+              formatter: formatter,
+              l10n: l10n,
+              label: _sliceType == TxnType.income
+                  ? l10n.dashboardIn
+                  : l10n.dashboardOut,
             ),
           const SizedBox(height: Gap.xl),
 
           if (analyticsFailed)
             ValueUnavailable(
               onRetry: () {
-                ref.invalidate(monthSummaryProvider(ym));
-                ref.invalidate(categorySlicesProvider((ym, _sliceType)));
-                ref.invalidate(cashflowProvider((ym, _granularity)));
+                ref.invalidate(rangeReportProvider(_sliceType));
+                ref.invalidate(cashflowProvider(_granularity));
               },
             ),
           _SectionTitle(
@@ -118,8 +117,8 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
           CategoryDonut(
             slices: slices ?? const <CategorySlice>[],
             total: (_sliceType == TxnType.income
-                    ? summary?.income
-                    : summary?.expense) ??
+                    ? report?.income
+                    : report?.expense) ??
                 Money.zero(base),
             formatter: formatter,
             l10n: l10n,
@@ -179,7 +178,6 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
           ),
 
           const SizedBox(height: Gap.xl),
-          if (summary != null) _MonthComparison(current: summary, theme: theme),
         ],
       ),
     );
@@ -213,80 +211,3 @@ class _SectionTitle extends StatelessWidget {
 ///
 /// A two-row comparison rather than a chart: with exactly two values there is
 /// nothing for a chart to reveal that the numbers do not already say.
-class _MonthComparison extends ConsumerWidget {
-  const _MonthComparison({required this.current, required this.theme});
-
-  final MonthSummary current;
-  final ThemeData theme;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = context.l10n;
-    final formatter = ref.watch(moneyFormatterProvider);
-    final previous = ref.watch(monthSummaryProvider(current.ym.previous)).value;
-    if (previous == null) return const SizedBox.shrink();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: Gap.lg),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(Gap.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                l10n.analyticsPreviousMonth,
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: Gap.sm),
-              _ComparisonRow(
-                label: l10n.dashboardOut,
-                now: formatter.format(current.expense),
-                then: formatter.format(previous.expense),
-                theme: theme,
-              ),
-              const SizedBox(height: Gap.xs),
-              _ComparisonRow(
-                label: l10n.dashboardIn,
-                now: formatter.format(current.income),
-                then: formatter.format(previous.income),
-                theme: theme,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ComparisonRow extends StatelessWidget {
-  const _ComparisonRow({
-    required this.label,
-    required this.now,
-    required this.then,
-    required this.theme,
-  });
-
-  final String label;
-  final String now;
-  final String then;
-  final ThemeData theme;
-
-  @override
-  Widget build(BuildContext context) => Row(
-        children: <Widget>[
-          Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
-          Text(now, style: theme.textTheme.bodyMedium),
-          const SizedBox(width: Gap.md),
-          Text(
-            then,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      );
-}

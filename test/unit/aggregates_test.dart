@@ -5,6 +5,7 @@ import 'package:masrouf/core/money/money.dart';
 import 'package:masrouf/core/time/ym.dart';
 import 'package:masrouf/domain/entities/analytics/analytics.dart';
 import 'package:masrouf/data/local/app_database.dart';
+import 'package:masrouf/domain/entities/analytics/date_range.dart';
 import 'package:masrouf/domain/entities/account.dart';
 import 'package:masrouf/domain/entities/category.dart';
 import 'package:masrouf/domain/entities/history_filter.dart';
@@ -445,7 +446,12 @@ void main() {
       final txn = expense('t1', 25000, date);
 
       final spentPerMonth = db.analyticsDao
-          .watchCashflow(userId, ym, base, CashflowGranularity.daily)
+          .watchCashflow(
+            userId,
+            DateRange(from: ym.firstDay, to: ym.lastDay),
+            base,
+            CashflowGranularity.daily,
+          )
           .map(
             (points) =>
                 points.fold<int>(0, (sum, p) => sum + p.expense.milli),

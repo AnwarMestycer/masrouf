@@ -84,7 +84,9 @@ void main() {
     await pumpApp(tester, db: db, sync: sync);
     await openAnalytics(tester);
 
-    expect(find.text('No income recorded this month'), findsOneWidget);
+    // The Analytics tab reads over a chosen window now, so it says "period"
+    // rather than "month"; the dashboard keeps the monthly wording.
+    expect(find.text('No income in this period'), findsOneWidget);
     expect(find.textContaining('0% of income'), findsNothing);
   });
 

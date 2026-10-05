@@ -10,6 +10,7 @@ import 'package:masrouf/domain/entities/savings_goal.dart';
 import 'package:masrouf/domain/entities/txn.dart';
 import 'package:masrouf/domain/enums/txn_type.dart';
 import 'package:masrouf/presentation/providers/data_providers.dart';
+import 'package:masrouf/presentation/providers/range_providers.dart';
 
 /// The month the analytics screens are looking at.
 ///
@@ -52,9 +53,10 @@ final categorySlicesProvider =
 );
 
 final cashflowProvider =
-    StreamProvider.family<List<CashflowPoint>, (Ym, CashflowGranularity)>(
-  (ref, args) =>
-      ref.watch(analyticsRepositoryProvider).watchCashflow(args.$1, args.$2),
+    StreamProvider.family<List<CashflowPoint>, CashflowGranularity>(
+  (ref, granularity) => ref
+      .watch(analyticsRepositoryProvider)
+      .watchCashflow(ref.watch(analyticsRangeProvider), granularity),
 );
 
 final incomeBreakdownProvider = StreamProvider.family<IncomeBreakdown, Ym>(

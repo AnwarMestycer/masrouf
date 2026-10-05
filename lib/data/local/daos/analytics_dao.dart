@@ -119,17 +119,17 @@ class AnalyticsDao extends DatabaseAccessor<AppDatabase>
 
   /// Cash flow across [ym], bucketed by day or week.
   ///
-  /// Buckets are zero-filled so the chart has a point for every day of the month;
+  /// Buckets are zero-filled so the chart has a point for every day of the range;
   /// a sparse series would make an idle week look like a gap in the data rather
   /// than a week without spending.
   Stream<List<CashflowPoint>> watchCashflow(
     String userId,
-    Ym ym,
+    DateRange range,
     Currency base,
     CashflowGranularity granularity,
   ) {
-    final firstYmd = ym.firstDay.ymd;
-    final lastYmd = ym.lastDay.ymd;
+    final firstYmd = range.from.ymd;
+    final lastYmd = range.to.ymd;
 
     final query = select(dailyTotals)
       ..where(
@@ -152,8 +152,8 @@ class AnalyticsDao extends DatabaseAccessor<AppDatabase>
       final points = <CashflowPoint>[];
 
       if (granularity == CashflowGranularity.daily) {
-        for (var day = 1; day <= ym.dayCount; day++) {
-          final date = DateTime(ym.year, ym.month, day);
+        for (var i = 0; i < range.dayCount; i++) {
+          final date = range.from.add(Duration(days: i));
           points.add(
             CashflowPoint(
               start: date,
@@ -167,8 +167,8 @@ class AnalyticsDao extends DatabaseAccessor<AppDatabase>
 
       // Weekly: accumulate into Monday-anchored buckets.
       final buckets = <DateTime, List<int>>{};
-      for (var day = 1; day <= ym.dayCount; day++) {
-        final date = DateTime(ym.year, ym.month, day);
+      for (var i = 0; i < range.dayCount; i++) {
+        final date = range.from.add(Duration(days: i));
         final bucket = buckets.putIfAbsent(
           date.startOfWeek,
           () => <int>[0, 0],
@@ -189,7 +189,7 @@ class AnalyticsDao extends DatabaseAccessor<AppDatabase>
       }
       if (points.isEmpty) {
         points.add(
-          CashflowPoint(start: ym.firstDay, income: zero, expense: zero),
+          CashflowPoint(start: range.from, income: zero, expense: zero),
         );
       }
       return points;

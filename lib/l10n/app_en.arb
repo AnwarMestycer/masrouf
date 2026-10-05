@@ -560,5 +560,57 @@
       }
     }
   },
-  "analyticsShowLess": "Show less"
+  "analyticsShowLess": "Show less",
+  "rangeThisMonth": "This month",
+  "rangeLastMonth": "Last month",
+  "rangeLast30Days": "Last 30 days",
+  "rangeLast3Months": "Last 3 months",
+  "rangeLast6Months": "Last 6 months",
+  "rangeYearToDate": "Year to date",
+  "rangePayPeriod": "Pay period",
+  "rangeCustom": "Custom",
+  "rangePickDates": "Pick dates",
+  "analyticsEveryday": "Everyday",
+  "analyticsPerDay": "{amount}/day",
+  "@analyticsPerDay": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "analyticsSetAside": "{count, plural, =1{1 large payment set aside} other{{count} large payments set aside}}",
+  "@analyticsSetAside": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsTypicalPurchase": "Typical purchase {amount}",
+  "@analyticsTypicalPurchase": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "analyticsTopMovers": "Biggest changes",
+  "analyticsRangeDays": "{count, plural, =1{1 day} other{{count} days}}",
+  "@analyticsRangeDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsComparedTo": "vs previous {days}",
+  "@analyticsComparedTo": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "analyticsBurnRateNoIncomeRange": "No income in this period"
 }

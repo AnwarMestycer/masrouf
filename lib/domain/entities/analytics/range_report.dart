@@ -101,5 +101,11 @@ class RangeReport {
 
   Money get net => income - expense;
 
+  /// Share of the window's income that was spent, or null when there was none
+  /// to divide by. Null rather than zero so the UI can say so outright instead
+  /// of showing an untrue 0%.
+  double? get burnRate =>
+      income.isZero ? null : expense.milli / income.milli;
+
   bool get isEmpty => txnCount == 0;
 }

@@ -270,5 +270,22 @@
   "backupAutoHint": "يحتفظ بآخر أربع نسخ احتياطية على هذا الجهاز.",
   "budgetAlertSpentTitle": "استُهلكت {category} بالكامل",
   "budgetAlertSpentBody": "تم استخدام {cap} كاملة. هذه ميزانية الشهر بأكملها.",
-  "analyticsShowLess": "عرض أقل"
+  "analyticsShowLess": "عرض أقل",
+  "rangeThisMonth": "هذا الشهر",
+  "rangeLastMonth": "الشهر الماضي",
+  "rangeLast30Days": "آخر ٣٠ يوماً",
+  "rangeLast3Months": "آخر ٣ أشهر",
+  "rangeLast6Months": "آخر ٦ أشهر",
+  "rangeYearToDate": "منذ بداية السنة",
+  "rangePayPeriod": "فترة الراتب",
+  "rangeCustom": "مخصّص",
+  "rangePickDates": "اختر التواريخ",
+  "analyticsEveryday": "الاعتيادي",
+  "analyticsPerDay": "{amount}/يوم",
+  "analyticsSetAside": "{count, plural, =1{دفعة كبيرة واحدة مستبعدة} other{{count} دفعات كبيرة مستبعدة}}",
+  "analyticsTypicalPurchase": "الشراء المعتاد {amount}",
+  "analyticsTopMovers": "أكبر التغيّرات",
+  "analyticsRangeDays": "{count, plural, =1{يوم واحد} other{{count} أيام}}",
+  "analyticsComparedTo": "مقارنةً بـ {days} السابقة",
+  "analyticsBurnRateNoIncomeRange": "لا دخل في هذه الفترة"
 }

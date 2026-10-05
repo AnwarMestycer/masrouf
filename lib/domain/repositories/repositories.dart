@@ -7,6 +7,7 @@ import 'package:masrouf/domain/entities/budget.dart';
 import 'package:masrouf/domain/entities/planned_expense.dart';
 import 'package:masrouf/domain/entities/savings_goal.dart';
 import 'package:masrouf/domain/entities/analytics/analytics.dart';
+import 'package:masrouf/domain/entities/analytics/date_range.dart';
 import 'package:masrouf/domain/entities/analytics/cashflow_calendar.dart';
 import 'package:masrouf/domain/entities/analytics/forecast.dart';
 import 'package:masrouf/domain/entities/category.dart';
@@ -159,7 +160,10 @@ abstract interface class GoalRepository {
 abstract interface class AnalyticsRepository {
   Stream<MonthSummary> watchMonthSummary(Ym ym);
   Stream<List<CategorySlice>> watchCategorySlices(Ym ym, {TxnType type});
-  Stream<List<CashflowPoint>> watchCashflow(Ym ym, CashflowGranularity granularity);
+  Stream<List<CashflowPoint>> watchCashflow(
+    DateRange range,
+    CashflowGranularity granularity,
+  );
   Stream<IncomeBreakdown> watchIncomeBreakdown(Ym latest, {int monthCount});
   Future<List<MonthSummary>> summaries(List<Ym> months);
 

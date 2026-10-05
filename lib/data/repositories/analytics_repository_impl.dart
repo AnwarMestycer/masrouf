@@ -9,6 +9,7 @@ import 'package:masrouf/core/time/date_x.dart';
 import 'package:masrouf/core/time/ym.dart';
 import 'package:masrouf/data/local/app_database.dart';
 import 'package:masrouf/domain/entities/analytics/analytics.dart';
+import 'package:masrouf/domain/entities/analytics/date_range.dart';
 import 'package:masrouf/domain/enums/txn_type.dart';
 import 'package:masrouf/domain/repositories/repositories.dart';
 
@@ -46,10 +47,10 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
 
   @override
   Stream<List<CashflowPoint>> watchCashflow(
-    Ym ym,
+    DateRange range,
     CashflowGranularity granularity,
   ) =>
-      _db.analyticsDao.watchCashflow(userId, ym, base, granularity);
+      _db.analyticsDao.watchCashflow(userId, range, base, granularity);
 
   @override
   Stream<IncomeBreakdown> watchIncomeBreakdown(Ym latest, {int monthCount = 6}) =>

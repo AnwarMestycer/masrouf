@@ -28,6 +28,13 @@ class KvDao extends DatabaseAccessor<AppDatabase> with _$KvDaoMixin {
   static const String lastBackupAt = 'last_backup_at';
   static const String autoBackup = 'auto_backup_enabled';
 
+  /// The analytics window, remembered across launches. Device-local: which
+  /// window someone reads their spending over is a habit of this phone, not a
+  /// property of the account.
+  static const String analyticsPreset = 'analytics_range_preset';
+  static const String analyticsCustomFrom = 'analytics_range_from';
+  static const String analyticsCustomTo = 'analytics_range_to';
+
   static String pullCursor(String entity) => 'pull_cursor.$entity';
 
   Future<String?> get(String key) async {

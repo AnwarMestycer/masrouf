@@ -957,4 +957,77 @@ class L10nAr extends L10n {
 
   @override
   String get analyticsShowLess => 'عرض أقل';
+
+  @override
+  String get rangeThisMonth => 'هذا الشهر';
+
+  @override
+  String get rangeLastMonth => 'الشهر الماضي';
+
+  @override
+  String get rangeLast30Days => 'آخر ٣٠ يوماً';
+
+  @override
+  String get rangeLast3Months => 'آخر ٣ أشهر';
+
+  @override
+  String get rangeLast6Months => 'آخر ٦ أشهر';
+
+  @override
+  String get rangeYearToDate => 'منذ بداية السنة';
+
+  @override
+  String get rangePayPeriod => 'فترة الراتب';
+
+  @override
+  String get rangeCustom => 'مخصّص';
+
+  @override
+  String get rangePickDates => 'اختر التواريخ';
+
+  @override
+  String get analyticsEveryday => 'الاعتيادي';
+
+  @override
+  String analyticsPerDay(String amount) {
+    return '$amount/يوم';
+  }
+
+  @override
+  String analyticsSetAside(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count دفعات كبيرة مستبعدة',
+      one: 'دفعة كبيرة واحدة مستبعدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String analyticsTypicalPurchase(String amount) {
+    return 'الشراء المعتاد $amount';
+  }
+
+  @override
+  String get analyticsTopMovers => 'أكبر التغيّرات';
+
+  @override
+  String analyticsRangeDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count أيام',
+      one: 'يوم واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String analyticsComparedTo(String days) {
+    return 'مقارنةً بـ $days السابقة';
+  }
+
+  @override
+  String get analyticsBurnRateNoIncomeRange => 'لا دخل في هذه الفترة';
 }

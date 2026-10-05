@@ -1718,6 +1718,108 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Show less'**
   String get analyticsShowLess;
+
+  /// No description provided for @rangeThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This month'**
+  String get rangeThisMonth;
+
+  /// No description provided for @rangeLastMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Last month'**
+  String get rangeLastMonth;
+
+  /// No description provided for @rangeLast30Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 days'**
+  String get rangeLast30Days;
+
+  /// No description provided for @rangeLast3Months.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 3 months'**
+  String get rangeLast3Months;
+
+  /// No description provided for @rangeLast6Months.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 6 months'**
+  String get rangeLast6Months;
+
+  /// No description provided for @rangeYearToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Year to date'**
+  String get rangeYearToDate;
+
+  /// No description provided for @rangePayPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay period'**
+  String get rangePayPeriod;
+
+  /// No description provided for @rangeCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get rangeCustom;
+
+  /// No description provided for @rangePickDates.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick dates'**
+  String get rangePickDates;
+
+  /// No description provided for @analyticsEveryday.
+  ///
+  /// In en, this message translates to:
+  /// **'Everyday'**
+  String get analyticsEveryday;
+
+  /// No description provided for @analyticsPerDay.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount}/day'**
+  String analyticsPerDay(String amount);
+
+  /// No description provided for @analyticsSetAside.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 large payment set aside} other{{count} large payments set aside}}'**
+  String analyticsSetAside(int count);
+
+  /// No description provided for @analyticsTypicalPurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'Typical purchase {amount}'**
+  String analyticsTypicalPurchase(String amount);
+
+  /// No description provided for @analyticsTopMovers.
+  ///
+  /// In en, this message translates to:
+  /// **'Biggest changes'**
+  String get analyticsTopMovers;
+
+  /// No description provided for @analyticsRangeDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day} other{{count} days}}'**
+  String analyticsRangeDays(int count);
+
+  /// No description provided for @analyticsComparedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'vs previous {days}'**
+  String analyticsComparedTo(String days);
+
+  /// No description provided for @analyticsBurnRateNoIncomeRange.
+  ///
+  /// In en, this message translates to:
+  /// **'No income in this period'**
+  String get analyticsBurnRateNoIncomeRange;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

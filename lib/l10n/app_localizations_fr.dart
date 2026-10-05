@@ -967,4 +967,77 @@ class L10nFr extends L10n {
 
   @override
   String get analyticsShowLess => 'Afficher moins';
+
+  @override
+  String get rangeThisMonth => 'Ce mois-ci';
+
+  @override
+  String get rangeLastMonth => 'Le mois dernier';
+
+  @override
+  String get rangeLast30Days => '30 derniers jours';
+
+  @override
+  String get rangeLast3Months => '3 derniers mois';
+
+  @override
+  String get rangeLast6Months => '6 derniers mois';
+
+  @override
+  String get rangeYearToDate => 'Depuis janvier';
+
+  @override
+  String get rangePayPeriod => 'Période de paie';
+
+  @override
+  String get rangeCustom => 'Personnalisé';
+
+  @override
+  String get rangePickDates => 'Choisir les dates';
+
+  @override
+  String get analyticsEveryday => 'Courant';
+
+  @override
+  String analyticsPerDay(String amount) {
+    return '$amount/jour';
+  }
+
+  @override
+  String analyticsSetAside(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count gros paiements mis à part',
+      one: '1 gros paiement mis à part',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String analyticsTypicalPurchase(String amount) {
+    return 'Achat typique $amount';
+  }
+
+  @override
+  String get analyticsTopMovers => 'Plus fortes variations';
+
+  @override
+  String analyticsRangeDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jours',
+      one: '1 jour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String analyticsComparedTo(String days) {
+    return 'vs $days précédents';
+  }
+
+  @override
+  String get analyticsBurnRateNoIncomeRange => 'Aucun revenu sur cette période';
 }
