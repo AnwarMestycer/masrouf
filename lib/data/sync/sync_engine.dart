@@ -55,10 +55,26 @@ class SyncEngine {
 
   SyncStatus _current = SyncStatus.idle;
 
+  /// Whether a sync has run to completion since [start].
+  ///
+  /// Read by sign-in before it decides whether this account is empty. False
+  /// means "we do not know what the server has", which is a different thing
+  /// from "the server has nothing" — and seeding on the first is what mints a
+  /// duplicate starter set.
+  bool _hasCompletedSync = false;
+
+  bool get hasCompletedSync => _hasCompletedSync;
+
   Stream<SyncStatus> get status => _status.stream;
   SyncStatus get currentStatus => _current;
 
-  /// Begins syncing for a signed-in user.
+  /// Begins syncing for a signed-in user, and awaits the first run.
+  ///
+  /// The await is load-bearing. Sign-in seeds a starter set when the account
+  /// looks empty, and "looks empty" can only be judged once the first pull has
+  /// landed. This used to fire the initial sync with `unawaited`, so the seeder
+  /// always won the race against the network, saw zero categories and seeded —
+  /// and the pull then delivered the account's real ones alongside the copies.
   Future<void> start(String userId, Currency base) async {
     if (_userId == userId && _periodic != null) {
       _base = base;
@@ -89,10 +105,11 @@ class SyncEngine {
       (_) => unawaited(syncNow()),
     );
 
-    unawaited(syncNow());
+    await syncNow();
   }
 
   Future<void> stop() async {
+    _hasCompletedSync = false;
     await _connectivitySub?.cancel();
     await _pendingSub?.cancel();
     _connectivitySub = null;
@@ -149,6 +166,7 @@ class SyncEngine {
         _rerunRequested = true;
       }
 
+      _hasCompletedSync = true;
       _emit(
         _current.copyWith(
           state: SyncState.idle,

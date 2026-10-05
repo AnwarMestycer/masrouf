@@ -179,8 +179,17 @@ sign-in/sign-out and runs outside the widget tree so it fires once per session,
 not once per rebuild. The order is deliberate: sync start (wrapped in
 try/catch — everything after it must run offline) → seed default categories only
 if the pull found none → `materialiseDue()` for recurring rules → rebuild
-aggregates → refresh digest. Sign-out clears pull cursors *and* user data, so the
-next account on the device does a complete first pull.
+aggregates → refresh digest → auto-backup. Sign-out clears pull cursors *and*
+user data, so the next account on the device does a complete first pull.
+
+**`SyncEngine.start()` awaits its first sync, and that await is load-bearing.**
+Seeding asks "does this account have categories?", which is only answerable once
+the pull has landed. `start` previously fired the initial sync with `unawaited`,
+so the seeder always won the race, saw an empty table and minted a second
+starter set in the current language beside the account's real one. The seed is
+additionally guarded on `engine.hasCompletedSync`, because a sync that never ran
+leaves the local count saying "nothing here" when it means "we never found out".
+Never call `seedDefaultsIfEmpty` on a state the network has not confirmed.
 
 Seeding is client-side only, in `data/local/seed/default_categories.dart`; there
 is deliberately no Postgres trigger doing the same job, and ids are minted fresh

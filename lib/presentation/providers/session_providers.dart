@@ -62,9 +62,22 @@ class SessionLifecycle extends Notifier<void> {
       debugPrint('sync start failed, continuing offline: $error\n$stackTrace');
     }
 
-    await ref
-        .read(categoryRepositoryProvider)
-        .seedDefaultsIfEmpty(base, names: await _seedNames());
+    // Only seed once the pull has actually landed.
+    //
+    // `seedDefaultsIfEmpty` judges emptiness from the local category count, and
+    // a sync that never completed leaves that count saying "nothing here yet"
+    // when it means "we never found out". Seeding on that mints a second
+    // starter set — in whatever language is current — beside the account's real
+    // categories, which is how a ledger ends up with both Groceries and
+    // Courses. Signing in needs the network anyway, so a genuinely new account
+    // reaches this with a completed sync; anything else is retried next launch.
+    if (engine.hasCompletedSync) {
+      await ref
+          .read(categoryRepositoryProvider)
+          .seedDefaultsIfEmpty(base, names: await _seedNames());
+    } else {
+      debugPrint('first sync did not complete; deferring the starter set');
+    }
 
     // Generate anything the schedule owes. Runs on every launch because the
     // device may have been closed across several due dates; it is idempotent.
