@@ -5,6 +5,7 @@ import 'package:masrouf/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:masrouf/domain/entities/user_settings.dart';
 import 'package:masrouf/presentation/providers/analytics_providers.dart';
+import 'package:masrouf/presentation/providers/backup_providers.dart';
 import 'package:masrouf/presentation/providers/auth_providers.dart';
 import 'package:masrouf/presentation/providers/core_providers.dart';
 import 'package:masrouf/presentation/providers/data_providers.dart';
@@ -79,6 +80,11 @@ class SessionLifecycle extends Notifier<void> {
     // Recomposed every launch so the summary quotes this week, not whichever
     // week the app was last opened in.
     unawaited(ref.read(digestControllerProvider).refresh());
+
+    // Last, and unawaited: it reads the whole ledger, and nothing above should
+    // wait on it. Runs after the pull and the aggregate rebuild so the snapshot
+    // it writes is of settled data rather than whatever existed mid-sync.
+    unawaited(ref.read(backupControllerProvider).maybeAutoBackup());
   }
 
   /// The starter set's labels in the user's language.

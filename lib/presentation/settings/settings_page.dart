@@ -12,6 +12,7 @@ import 'package:masrouf/presentation/providers/auth_providers.dart';
 import 'package:masrouf/presentation/providers/core_providers.dart';
 import 'package:masrouf/presentation/providers/data_providers.dart';
 import 'package:masrouf/presentation/providers/notification_providers.dart';
+import 'package:masrouf/presentation/settings/backup_section.dart';
 import 'package:masrouf/presentation/settings/export_service.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -283,6 +284,10 @@ class SettingsPage extends ConsumerWidget {
                   .save(settings.copyWith(paydayDayOfMonth: day));
             },
           ),
+          const Divider(),
+
+          _SectionHeader(title: l10n.settingsBackups),
+          const BackupSection(),
           const Divider(),
 
           ListTile(

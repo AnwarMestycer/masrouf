@@ -107,7 +107,7 @@ rather than failing on the first request.
 
 ```bash
 flutter analyze   # clean
-flutter test      # 244 tests (2 skip without the config file)
+flutter test      # 257 tests (2 skip without the config file)
 ```
 
 ---
@@ -122,6 +122,7 @@ lib/
 │   ├── local/     drift schema, DAOs, mappers, seed, row writer
 │   ├── remote/    Supabase APIs and DTO mapping
 │   ├── sync/      pull, push, conflict resolution
+│   ├── backup/    local JSON snapshots and restore
 │   └── repositories/
 └── presentation/  Riverpod providers + widgets
 ```
@@ -220,6 +221,31 @@ or app update. `release_config_test.dart` asserts both are present.
 
 ---
 
+## Backups
+
+A local JSON snapshot of all nine synced tables, written to `backups/` in the app
+documents directory, newest four kept. Automatic at launch when the switch is on
+and the newest is over a week old; manual backup, share and restore from
+settings.
+
+The file reuses the **sync wire format verbatim** — `remote_mappers.dart` writes
+it and `applyRemoteRows` reads it — so a backup is exactly what the server would
+have been sent, and the two can never disagree about what a row is. Tombstones
+are included: dropping them would make a restore resurrect everything the user
+had deleted.
+
+Restore is **restore-as-truth**, in one transaction: the synced tables are
+cleared and rewritten, every row is enqueued as a push, and the pull cursors are
+cleared so the next sync re-reads the account from scratch rather than resuming a
+position describing data that no longer exists. The aggregates are rebuilt rather
+than nudged.
+
+This is a second line of defence, not a replacement for sync: an account can be
+locked out, and a user on a bad connection may have weeks of rows that have never
+left the phone.
+
+---
+
 ## Performance notes
 
 - **Cold start.** The database opens and the session restores before `runApp`, so
@@ -277,6 +303,10 @@ Called out rather than hidden:
 - **Recurring backfill is capped at 24 occurrences per rule per run**, so an app
   left closed for two years does not materialise hundreds of rows at launch. The
   remainder generates on subsequent launches.
+- **Restore reads only backups already on this device.** Picking an arbitrary
+  file would need a file-picker dependency, and the case it buys — a file carried
+  from another phone — is the one the account sync already serves. Share exists so
+  a copy can leave the device; bringing one back is a v2 problem.
 - **A failed push is retried, never dropped.** After the retry budget is spent the
   entry stays in the queue rather than being discarded — the local row is still
   the user's data.

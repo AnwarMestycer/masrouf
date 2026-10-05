@@ -891,4 +891,57 @@ class L10nAr extends L10n {
   String budgetAlertOverBody(String spent, String cap, String overspend) {
     return 'تم استخدام $spent من $cap — بزيادة $overspend.';
   }
+
+  @override
+  String get settingsBackups => 'النسخ الاحتياطية';
+
+  @override
+  String get backupNow => 'أنشئ نسخة احتياطية الآن';
+
+  @override
+  String backupLastAt(String date) {
+    return 'آخر نسخة احتياطية $date';
+  }
+
+  @override
+  String get backupNever => 'لا توجد نسخة احتياطية';
+
+  @override
+  String get backupDone => 'تم حفظ النسخة الاحتياطية';
+
+  @override
+  String get backupEmpty => 'لا شيء لحفظه بعد.';
+
+  @override
+  String get backupFailed => 'تعذّر كتابة النسخة الاحتياطية.';
+
+  @override
+  String get backupShare => 'شارك أحدث نسخة احتياطية';
+
+  @override
+  String get backupRestore => 'استعادة من نسخة احتياطية';
+
+  @override
+  String get backupRestoreTitle => 'استعادة هذه النسخة؟';
+
+  @override
+  String get backupRestoreBody =>
+      'سيحل محتوى النسخة الاحتياطية محل ما في هذا الجهاز، ثم يُزامن مع حسابك. كل ما أُدخل بعد تاريخ النسخة سيُفقد.';
+
+  @override
+  String get backupRestoreConfirm => 'استعادة';
+
+  @override
+  String backupRestoreDone(int count) {
+    return 'تمت استعادة $count سجلاً';
+  }
+
+  @override
+  String get backupRestoreInvalid => 'هذا الملف ليس نسخة احتياطية من مصروف.';
+
+  @override
+  String get backupAuto => 'نسخة احتياطية أسبوعية تلقائية';
+
+  @override
+  String get backupAutoHint => 'يحتفظ بآخر أربع نسخ احتياطية على هذا الجهاز.';
 }

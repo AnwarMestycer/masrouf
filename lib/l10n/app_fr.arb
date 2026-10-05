@@ -251,5 +251,21 @@
   "budgetAlertNearTitle": "{category} est presque épuisé",
   "budgetAlertNearBody": "{spent} sur {cap} utilisés — il reste {remaining} ce mois-ci.",
   "budgetAlertOverTitle": "{category} dépasse le budget",
-  "budgetAlertOverBody": "{spent} sur {cap} utilisés — {overspend} de dépassement."
+  "budgetAlertOverBody": "{spent} sur {cap} utilisés — {overspend} de dépassement.",
+  "settingsBackups": "Sauvegardes",
+  "backupNow": "Sauvegarder maintenant",
+  "backupLastAt": "Dernière sauvegarde {date}",
+  "backupNever": "Aucune sauvegarde",
+  "backupDone": "Sauvegarde enregistrée",
+  "backupEmpty": "Rien à sauvegarder pour le moment.",
+  "backupFailed": "Impossible d’écrire la sauvegarde.",
+  "backupShare": "Partager la dernière sauvegarde",
+  "backupRestore": "Restaurer une sauvegarde",
+  "backupRestoreTitle": "Restaurer cette sauvegarde ?",
+  "backupRestoreBody": "Le contenu de la sauvegarde remplace ce qui est sur cet appareil, puis est synchronisé avec votre compte. Tout ce qui a été saisi depuis la sauvegarde sera perdu.",
+  "backupRestoreConfirm": "Restaurer",
+  "backupRestoreDone": "{count} enregistrements restaurés",
+  "backupRestoreInvalid": "Ce fichier n’est pas une sauvegarde Masrouf.",
+  "backupAuto": "Sauvegarde hebdomadaire automatique",
+  "backupAutoHint": "Conserve les quatre dernières sauvegardes sur cet appareil."
 }

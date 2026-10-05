@@ -888,4 +888,57 @@ class L10nEn extends L10n {
   String budgetAlertOverBody(String spent, String cap, String overspend) {
     return '$spent of $cap used — $overspend over.';
   }
+
+  @override
+  String get settingsBackups => 'Backups';
+
+  @override
+  String get backupNow => 'Back up now';
+
+  @override
+  String backupLastAt(String date) {
+    return 'Last backup $date';
+  }
+
+  @override
+  String get backupNever => 'No backup yet';
+
+  @override
+  String get backupDone => 'Backup saved';
+
+  @override
+  String get backupEmpty => 'Nothing to back up yet.';
+
+  @override
+  String get backupFailed => 'Could not write the backup.';
+
+  @override
+  String get backupShare => 'Share latest backup';
+
+  @override
+  String get backupRestore => 'Restore from a backup';
+
+  @override
+  String get backupRestoreTitle => 'Restore this backup?';
+
+  @override
+  String get backupRestoreBody =>
+      'Everything in the backup replaces what is on this device, then syncs to your account. Anything recorded since the backup was taken is lost.';
+
+  @override
+  String get backupRestoreConfirm => 'Restore';
+
+  @override
+  String backupRestoreDone(int count) {
+    return 'Restored $count records';
+  }
+
+  @override
+  String get backupRestoreInvalid => 'That file is not a Masrouf backup.';
+
+  @override
+  String get backupAuto => 'Automatic weekly backup';
+
+  @override
+  String get backupAutoHint => 'Keeps the last four backups on this device.';
 }

@@ -899,4 +899,59 @@ class L10nFr extends L10n {
   String budgetAlertOverBody(String spent, String cap, String overspend) {
     return '$spent sur $cap utilisés — $overspend de dépassement.';
   }
+
+  @override
+  String get settingsBackups => 'Sauvegardes';
+
+  @override
+  String get backupNow => 'Sauvegarder maintenant';
+
+  @override
+  String backupLastAt(String date) {
+    return 'Dernière sauvegarde $date';
+  }
+
+  @override
+  String get backupNever => 'Aucune sauvegarde';
+
+  @override
+  String get backupDone => 'Sauvegarde enregistrée';
+
+  @override
+  String get backupEmpty => 'Rien à sauvegarder pour le moment.';
+
+  @override
+  String get backupFailed => 'Impossible d’écrire la sauvegarde.';
+
+  @override
+  String get backupShare => 'Partager la dernière sauvegarde';
+
+  @override
+  String get backupRestore => 'Restaurer une sauvegarde';
+
+  @override
+  String get backupRestoreTitle => 'Restaurer cette sauvegarde ?';
+
+  @override
+  String get backupRestoreBody =>
+      'Le contenu de la sauvegarde remplace ce qui est sur cet appareil, puis est synchronisé avec votre compte. Tout ce qui a été saisi depuis la sauvegarde sera perdu.';
+
+  @override
+  String get backupRestoreConfirm => 'Restaurer';
+
+  @override
+  String backupRestoreDone(int count) {
+    return '$count enregistrements restaurés';
+  }
+
+  @override
+  String get backupRestoreInvalid =>
+      'Ce fichier n’est pas une sauvegarde Masrouf.';
+
+  @override
+  String get backupAuto => 'Sauvegarde hebdomadaire automatique';
+
+  @override
+  String get backupAutoHint =>
+      'Conserve les quatre dernières sauvegardes sur cet appareil.';
 }

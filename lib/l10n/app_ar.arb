@@ -251,5 +251,21 @@
   "budgetAlertNearTitle": "{category} على وشك النفاد",
   "budgetAlertNearBody": "تم استخدام {spent} من {cap} — بقي {remaining} هذا الشهر.",
   "budgetAlertOverTitle": "{category} تجاوزت الميزانية",
-  "budgetAlertOverBody": "تم استخدام {spent} من {cap} — بزيادة {overspend}."
+  "budgetAlertOverBody": "تم استخدام {spent} من {cap} — بزيادة {overspend}.",
+  "settingsBackups": "النسخ الاحتياطية",
+  "backupNow": "أنشئ نسخة احتياطية الآن",
+  "backupLastAt": "آخر نسخة احتياطية {date}",
+  "backupNever": "لا توجد نسخة احتياطية",
+  "backupDone": "تم حفظ النسخة الاحتياطية",
+  "backupEmpty": "لا شيء لحفظه بعد.",
+  "backupFailed": "تعذّر كتابة النسخة الاحتياطية.",
+  "backupShare": "شارك أحدث نسخة احتياطية",
+  "backupRestore": "استعادة من نسخة احتياطية",
+  "backupRestoreTitle": "استعادة هذه النسخة؟",
+  "backupRestoreBody": "سيحل محتوى النسخة الاحتياطية محل ما في هذا الجهاز، ثم يُزامن مع حسابك. كل ما أُدخل بعد تاريخ النسخة سيُفقد.",
+  "backupRestoreConfirm": "استعادة",
+  "backupRestoreDone": "تمت استعادة {count} سجلاً",
+  "backupRestoreInvalid": "هذا الملف ليس نسخة احتياطية من مصروف.",
+  "backupAuto": "نسخة احتياطية أسبوعية تلقائية",
+  "backupAutoHint": "يحتفظ بآخر أربع نسخ احتياطية على هذا الجهاز."
 }

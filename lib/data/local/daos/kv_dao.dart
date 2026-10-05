@@ -23,6 +23,11 @@ class KvDao extends DatabaseAccessor<AppDatabase> with _$KvDaoMixin {
   static const String plannedReminders = 'planned_reminders_enabled';
   static const String budgetAlerts = 'budget_alerts_enabled';
 
+  /// Backup bookkeeping. Also device-local: a backup file lives on one phone, so
+  /// when it was last written says nothing about any other device.
+  static const String lastBackupAt = 'last_backup_at';
+  static const String autoBackup = 'auto_backup_enabled';
+
   static String pullCursor(String entity) => 'pull_cursor.$entity';
 
   Future<String?> get(String key) async {

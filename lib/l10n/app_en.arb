@@ -513,5 +513,35 @@
         "type": "String"
       }
     }
-  }
+  },
+  "settingsBackups": "Backups",
+  "backupNow": "Back up now",
+  "backupLastAt": "Last backup {date}",
+  "@backupLastAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "backupNever": "No backup yet",
+  "backupDone": "Backup saved",
+  "backupEmpty": "Nothing to back up yet.",
+  "backupFailed": "Could not write the backup.",
+  "backupShare": "Share latest backup",
+  "backupRestore": "Restore from a backup",
+  "backupRestoreTitle": "Restore this backup?",
+  "backupRestoreBody": "Everything in the backup replaces what is on this device, then syncs to your account. Anything recorded since the backup was taken is lost.",
+  "backupRestoreConfirm": "Restore",
+  "backupRestoreDone": "Restored {count} records",
+  "@backupRestoreDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupRestoreInvalid": "That file is not a Masrouf backup.",
+  "backupAuto": "Automatic weekly backup",
+  "backupAutoHint": "Keeps the last four backups on this device."
 }

@@ -1604,6 +1604,102 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'{spent} of {cap} used — {overspend} over.'**
   String budgetAlertOverBody(String spent, String cap, String overspend);
+
+  /// No description provided for @settingsBackups.
+  ///
+  /// In en, this message translates to:
+  /// **'Backups'**
+  String get settingsBackups;
+
+  /// No description provided for @backupNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Back up now'**
+  String get backupNow;
+
+  /// No description provided for @backupLastAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Last backup {date}'**
+  String backupLastAt(String date);
+
+  /// No description provided for @backupNever.
+  ///
+  /// In en, this message translates to:
+  /// **'No backup yet'**
+  String get backupNever;
+
+  /// No description provided for @backupDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup saved'**
+  String get backupDone;
+
+  /// No description provided for @backupEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to back up yet.'**
+  String get backupEmpty;
+
+  /// No description provided for @backupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not write the backup.'**
+  String get backupFailed;
+
+  /// No description provided for @backupShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share latest backup'**
+  String get backupShare;
+
+  /// No description provided for @backupRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from a backup'**
+  String get backupRestore;
+
+  /// No description provided for @backupRestoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore this backup?'**
+  String get backupRestoreTitle;
+
+  /// No description provided for @backupRestoreBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything in the backup replaces what is on this device, then syncs to your account. Anything recorded since the backup was taken is lost.'**
+  String get backupRestoreBody;
+
+  /// No description provided for @backupRestoreConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get backupRestoreConfirm;
+
+  /// No description provided for @backupRestoreDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Restored {count} records'**
+  String backupRestoreDone(int count);
+
+  /// No description provided for @backupRestoreInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'That file is not a Masrouf backup.'**
+  String get backupRestoreInvalid;
+
+  /// No description provided for @backupAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic weekly backup'**
+  String get backupAuto;
+
+  /// No description provided for @backupAutoHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Keeps the last four backups on this device.'**
+  String get backupAutoHint;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

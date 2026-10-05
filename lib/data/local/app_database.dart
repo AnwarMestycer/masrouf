@@ -107,6 +107,33 @@ class AppDatabase extends _$AppDatabase {
         },
       );
 
+  /// Wipes the synced tables and everything derived from them, leaving the KV
+  /// store intact.
+  ///
+  /// Distinct from [clearUserData], which also drops KV. A restore replaces the
+  /// ledger but must not take the notification switches and backup bookkeeping
+  /// with it — those describe this phone, not the account being restored.
+  Future<void> clearSyncedData() => transaction(() async {
+        await batch((Batch b) {
+          b.deleteWhere(transactions, (_) => const Constant<bool>(true));
+          b.deleteWhere(budgets, (_) => const Constant<bool>(true));
+          b.deleteWhere(plannedExpenses, (_) => const Constant<bool>(true));
+          b.deleteWhere(savingsGoals, (_) => const Constant<bool>(true));
+          b.deleteWhere(recurringRules, (_) => const Constant<bool>(true));
+          // Accounts and categories last: transactions reference them, and
+          // `PRAGMA foreign_keys = ON` rejects the delete while a child row is
+          // still pointing at them.
+          b.deleteWhere(accounts, (_) => const Constant<bool>(true));
+          b.deleteWhere(categories, (_) => const Constant<bool>(true));
+          b.deleteWhere(exchangeRates, (_) => const Constant<bool>(true));
+          b.deleteWhere(userSettingsRows, (_) => const Constant<bool>(true));
+          b.deleteWhere(syncQueueEntries, (_) => const Constant<bool>(true));
+          b.deleteWhere(monthlyCategoryTotals, (_) => const Constant<bool>(true));
+          b.deleteWhere(dailyTotals, (_) => const Constant<bool>(true));
+          b.deleteWhere(accountBalances, (_) => const Constant<bool>(true));
+        });
+      });
+
   /// Wipes every user-scoped row. Called on sign-out so a second account on the
   /// same device never sees the first one's ledger.
   Future<void> clearUserData() => transaction(() async {
