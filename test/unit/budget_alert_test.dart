@@ -79,6 +79,52 @@ void main() {
       expect(decision.toFire.single.level, BudgetAlertLevel.overspent);
     });
 
+    /// Reaching the line is worth reporting, so the crossing still fires — but
+    /// BudgetProgress.isOver is strictly greater, so at exactly the cap an
+    /// "over budget" message contradicts every screen showing the same budget
+    /// and quotes an overage of zero. Observed on a device: "Rent is over
+    /// budget — 115.000 DT of 115.000 DT used — 0.000 DT over."
+    test('exactly at the cap is fully spent, not over', () {
+      final decision = BudgetAlerts.evaluate(
+        progress: <BudgetProgress>[progressAt('b1', 115000, 115000)],
+        firedKeys: <String>{},
+        ym: ym,
+      );
+
+      final alert = decision.toFire.single;
+      expect(alert.level, BudgetAlertLevel.overspent);
+      expect(alert.isFullySpent, isTrue);
+      expect(alert.progress.overspend.milli, 0);
+      expect(
+        alert.progress.isOver,
+        isFalse,
+        reason: 'the alert must agree with what the budgets screen says',
+      );
+    });
+
+    test('a single millime over is a real overspend', () {
+      final decision = BudgetAlerts.evaluate(
+        progress: <BudgetProgress>[progressAt('b1', 115000, 115001)],
+        firedKeys: <String>{},
+        ym: ym,
+      );
+
+      final alert = decision.toFire.single;
+      expect(alert.isFullySpent, isFalse);
+      expect(alert.progress.overspend.milli, 1);
+      expect(alert.progress.isOver, isTrue);
+    });
+
+    test('being under the cap is never reported as fully spent', () {
+      final decision = BudgetAlerts.evaluate(
+        progress: <BudgetProgress>[progressAt('b1', 100000, 85000)],
+        firedKeys: <String>{},
+        ym: ym,
+      );
+
+      expect(decision.toFire.single.isFullySpent, isFalse);
+    });
+
     /// One write can take a budget past both lines. Saying "nearly there" and
     /// "over budget" in the same breath reads as a bug, so only the higher one
     /// is shown — but both are flagged, or the 80% alert would fire later when

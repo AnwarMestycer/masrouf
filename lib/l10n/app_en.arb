@@ -543,5 +543,21 @@
   },
   "backupRestoreInvalid": "That file is not a Masrouf backup.",
   "backupAuto": "Automatic weekly backup",
-  "backupAutoHint": "Keeps the last four backups on this device."
+  "backupAutoHint": "Keeps the last four backups on this device.",
+  "budgetAlertSpentTitle": "{category} is fully spent",
+  "@budgetAlertSpentTitle": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetAlertSpentBody": "All {cap} is used. That is the whole budget for this month.",
+  "@budgetAlertSpentBody": {
+    "placeholders": {
+      "cap": {
+        "type": "String"
+      }
+    }
+  }
 }

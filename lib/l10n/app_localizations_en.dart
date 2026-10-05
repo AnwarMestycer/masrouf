@@ -941,4 +941,14 @@ class L10nEn extends L10n {
 
   @override
   String get backupAutoHint => 'Keeps the last four backups on this device.';
+
+  @override
+  String budgetAlertSpentTitle(String category) {
+    return '$category is fully spent';
+  }
+
+  @override
+  String budgetAlertSpentBody(String cap) {
+    return 'All $cap is used. That is the whole budget for this month.';
+  }
 }

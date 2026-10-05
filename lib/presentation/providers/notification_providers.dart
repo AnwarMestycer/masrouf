@@ -313,6 +313,7 @@ class BudgetAlertController {
   /// category has been deleted.
   String _title(L10n l10n, BudgetAlert alert) {
     final name = alert.progress.category!.name;
+    if (alert.isFullySpent) return l10n.budgetAlertSpentTitle(name);
     return switch (alert.level) {
       BudgetAlertLevel.nearLimit => l10n.budgetAlertNearTitle(name),
       BudgetAlertLevel.overspent => l10n.budgetAlertOverTitle(name),
@@ -321,8 +322,10 @@ class BudgetAlertController {
 
   String _body(L10n l10n, MoneyFormatter formatter, BudgetAlert alert) {
     final progress = alert.progress;
-    final spent = formatter.format(progress.spent);
     final cap = formatter.format(progress.cap);
+    if (alert.isFullySpent) return l10n.budgetAlertSpentBody(cap);
+
+    final spent = formatter.format(progress.spent);
     return switch (alert.level) {
       BudgetAlertLevel.nearLimit => l10n.budgetAlertNearBody(
           spent,

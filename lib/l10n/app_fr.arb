@@ -267,5 +267,7 @@
   "backupRestoreDone": "{count} enregistrements restaurés",
   "backupRestoreInvalid": "Ce fichier n’est pas une sauvegarde Masrouf.",
   "backupAuto": "Sauvegarde hebdomadaire automatique",
-  "backupAutoHint": "Conserve les quatre dernières sauvegardes sur cet appareil."
+  "backupAutoHint": "Conserve les quatre dernières sauvegardes sur cet appareil.",
+  "budgetAlertSpentTitle": "{category} est entièrement dépensé",
+  "budgetAlertSpentBody": "Les {cap} sont utilisés. C’est tout le budget du mois."
 }

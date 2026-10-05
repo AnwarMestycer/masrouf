@@ -944,4 +944,14 @@ class L10nAr extends L10n {
 
   @override
   String get backupAutoHint => 'يحتفظ بآخر أربع نسخ احتياطية على هذا الجهاز.';
+
+  @override
+  String budgetAlertSpentTitle(String category) {
+    return 'استُهلكت $category بالكامل';
+  }
+
+  @override
+  String budgetAlertSpentBody(String cap) {
+    return 'تم استخدام $cap كاملة. هذه ميزانية الشهر بأكملها.';
+  }
 }

@@ -1700,6 +1700,18 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Keeps the last four backups on this device.'**
   String get backupAutoHint;
+
+  /// No description provided for @budgetAlertSpentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{category} is fully spent'**
+  String budgetAlertSpentTitle(String category);
+
+  /// No description provided for @budgetAlertSpentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'All {cap} is used. That is the whole budget for this month.'**
+  String budgetAlertSpentBody(String cap);
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

@@ -27,6 +27,16 @@ class BudgetAlert {
 
   String get budgetId => progress.budget.id;
 
+  /// Spent to the cap exactly, with nothing over.
+  ///
+  /// Still an [BudgetAlertLevel.overspent] crossing — reaching the line is the
+  /// event worth reporting, and `ratio >= 1` is what decides that. But the app's
+  /// own [BudgetProgress.isOver] is strictly greater, so at exactly the cap the
+  /// alert would otherwise contradict every screen that shows the same budget,
+  /// and quote an overage of zero while doing it.
+  bool get isFullySpent =>
+      level == BudgetAlertLevel.overspent && progress.overspend.milli == 0;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
