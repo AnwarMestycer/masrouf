@@ -6,6 +6,7 @@ import 'package:masrouf/domain/entities/account.dart';
 import 'package:masrouf/domain/entities/budget.dart';
 import 'package:masrouf/domain/entities/planned_expense.dart';
 import 'package:masrouf/domain/entities/savings_goal.dart';
+import 'package:masrouf/domain/entities/savings_plan.dart';
 import 'package:masrouf/domain/entities/category.dart';
 import 'package:masrouf/domain/entities/recurring_rule.dart';
 import 'package:masrouf/domain/entities/txn.dart';
@@ -59,7 +60,8 @@ String rowKeyFor(SyncEntity entity, Json row) => switch (entity) {
       SyncEntity.recurringRules ||
       SyncEntity.budgets ||
       SyncEntity.plannedExpenses ||
-      SyncEntity.savingsGoals =>
+      SyncEntity.savingsGoals ||
+      SyncEntity.savingsPeriods =>
         row['id'] as String,
     };
 
@@ -297,6 +299,45 @@ SavingsGoal goalFromJson(Json row) => SavingsGoal(
       updatedAt: _readTimestamp(row['updated_at']),
     );
 
+// --------------------------------------------------------- savings periods --
+
+Json savingsPeriodToJson(
+  String userId,
+  SavingsPeriod period, {
+  DateTime? deletedAt,
+}) =>
+    <String, dynamic>{
+      'id': period.id,
+      'user_id': userId,
+      'started_on': period.startedOn.toIsoDate(),
+      'income': period.income.toDecimalString(),
+      'committed': period.committed.toDecimalString(),
+      'confirmed_on': period.confirmedOn?.toIsoDate(),
+      'saved': period.saved?.toDecimalString(),
+      'currency': period.committed.currency.code,
+      'updated_at': period.updatedAt.toUtc().toIso8601String(),
+      'deleted_at': deletedAt?.toUtc().toIso8601String(),
+    };
+
+SavingsPeriod savingsPeriodFromJson(Json row) {
+  final currency = Currency.fromCode(row['currency'] as String? ?? 'TND');
+  final saved = row['saved'];
+  return SavingsPeriod(
+    id: row['id'] as String,
+    startedOn: parseIsoDate(row['started_on'] as String),
+    income: Money.fromJson(row['income'], currency),
+    committed: Money.fromJson(row['committed'], currency),
+    confirmedOn: row['confirmed_on'] == null
+        ? null
+        : parseIsoDate(row['confirmed_on'] as String),
+    // A confirmed period must carry its figure; the two are constrained
+    // together server-side, and reading one without the other would silently
+    // understate what is owed.
+    saved: saved == null ? null : Money.fromJson(saved, currency),
+    updatedAt: _readTimestamp(row['updated_at']),
+  );
+}
+
 // ------------------------------------------- settings and exchange rates --
 
 Json settingsToJson(String userId, UserSettings settings) => <String, dynamic>{
@@ -305,19 +346,39 @@ Json settingsToJson(String userId, UserSettings settings) => <String, dynamic>{
       'locale': settings.locale,
       'theme_mode': themeModeToWire(settings.themeMode),
       'payday_day_of_month': settings.paydayDayOfMonth,
+      'savings_rate': settings.savings.rate,
+      'savings_floor': settings.savings.floor?.toDecimalString(),
+      'savings_ceiling': settings.savings.ceiling?.toDecimalString(),
+      'savings_recovery_periods': settings.savings.recoveryPeriods,
       'updated_at': DateTime.now().toUtc().toIso8601String(),
     };
 
-UserSettings settingsFromJson(Json row) => UserSettings(
-      baseCurrency: Currency.fromCode(row['base_currency'] as String? ?? 'TND'),
-      locale: row['locale'] as String? ?? 'fr',
-      themeMode: switch (row['theme_mode'] as String?) {
-        'light' => ThemeMode.light,
-        'dark' => ThemeMode.dark,
-        _ => ThemeMode.system,
-      },
-      paydayDayOfMonth: (row['payday_day_of_month'] as num?)?.toInt() ?? 25,
-    );
+UserSettings settingsFromJson(Json row) {
+  final base = Currency.fromCode(row['base_currency'] as String? ?? 'TND');
+  return UserSettings(
+    baseCurrency: base,
+    locale: row['locale'] as String? ?? 'fr',
+    themeMode: switch (row['theme_mode'] as String?) {
+      'light' => ThemeMode.light,
+      'dark' => ThemeMode.dark,
+      _ => ThemeMode.system,
+    },
+    paydayDayOfMonth: (row['payday_day_of_month'] as num?)?.toInt() ?? 25,
+    // Absent on a server that has not run the savings migration yet, which
+    // reads as "no plan" rather than failing the whole pull.
+    savings: SavingsPlan(
+      rate: _readDouble(row['savings_rate'], 0),
+      floor: row['savings_floor'] == null
+          ? null
+          : Money.fromJson(row['savings_floor'], base),
+      ceiling: row['savings_ceiling'] == null
+          ? null
+          : Money.fromJson(row['savings_ceiling'], base),
+      recoveryPeriods:
+          (row['savings_recovery_periods'] as num?)?.toInt() ?? 1,
+    ),
+  );
+}
 
 Json rateToJson(String userId, ExchangeRate rate) => <String, dynamic>{
       'user_id': userId,

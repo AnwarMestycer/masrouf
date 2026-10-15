@@ -512,6 +512,38 @@ class AnalyticsDao extends DatabaseAccessor<AppDatabase>
     });
   }
 
+  /// Total income in `[from, to]`, in base currency.
+  ///
+  /// The counterpart of [expenseBetween], and read the same way: from
+  /// `daily_totals`, so a period's income is a handful of row reads.
+  Stream<int> watchIncomeBetween(String userId, DateTime from, DateTime to) {
+    final total = dailyTotals.totalMilli.sum();
+    return (selectOnly(dailyTotals)
+          ..addColumns(<Expression<Object>>[total])
+          ..where(
+            dailyTotals.userId.equals(userId) &
+                dailyTotals.type.equals(TxnType.income.wire) &
+                dailyTotals.ymd.isBiggerOrEqualValue(from.ymd) &
+                dailyTotals.ymd.isSmallerOrEqualValue(to.ymd),
+          ))
+        .watchSingle()
+        .map((row) => row.read(total) ?? 0);
+  }
+
+  Future<int> incomeBetween(String userId, DateTime from, DateTime to) async {
+    final total = dailyTotals.totalMilli.sum();
+    final row = await (selectOnly(dailyTotals)
+          ..addColumns(<Expression<Object>>[total])
+          ..where(
+            dailyTotals.userId.equals(userId) &
+                dailyTotals.type.equals(TxnType.income.wire) &
+                dailyTotals.ymd.isBiggerOrEqualValue(from.ymd) &
+                dailyTotals.ymd.isSmallerOrEqualValue(to.ymd),
+          ))
+        .getSingle();
+    return row.read(total) ?? 0;
+  }
+
   /// Non-streaming summary, for the month-over-month comparison strip.
   Future<List<MonthSummary>> summariesFor(
     String userId,

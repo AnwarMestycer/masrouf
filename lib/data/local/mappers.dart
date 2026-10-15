@@ -6,6 +6,7 @@ import 'package:masrouf/domain/entities/account.dart';
 import 'package:masrouf/domain/entities/budget.dart';
 import 'package:masrouf/domain/entities/planned_expense.dart';
 import 'package:masrouf/domain/entities/savings_goal.dart';
+import 'package:masrouf/domain/entities/savings_plan.dart';
 import 'package:masrouf/domain/entities/category.dart';
 import 'package:masrouf/domain/entities/recurring_rule.dart';
 import 'package:masrouf/domain/entities/txn.dart';
@@ -83,6 +84,21 @@ extension SavingsGoalRowX on SavingsGoalRow {
       );
 }
 
+extension SavingsPeriodRowX on SavingsPeriodRow {
+  SavingsPeriod toEntity() {
+    final money = Currency.fromCode(currency);
+    return SavingsPeriod(
+      id: id,
+      startedOn: startedOn,
+      income: Money(incomeMilli, money),
+      committed: Money(committedMilli, money),
+      confirmedOn: confirmedOn,
+      saved: savedMilli == null ? null : Money(savedMilli!, money),
+      updatedAt: updatedAt,
+    );
+  }
+}
+
 extension TransactionRowX on TxnRow {
   Txn toEntity() {
     final money = Currency.fromCode(currency);
@@ -139,16 +155,29 @@ extension ExchangeRateRowX on ExchangeRateRow {
 }
 
 extension UserSettingsRowX on UserSettingsRow {
-  UserSettings toEntity() => UserSettings(
-        baseCurrency: Currency.fromCode(baseCurrency),
-        locale: locale,
-        themeMode: switch (themeMode) {
-          'light' => ThemeMode.light,
-          'dark' => ThemeMode.dark,
-          _ => ThemeMode.system,
-        },
-        paydayDayOfMonth: paydayDayOfMonth,
-      );
+  UserSettings toEntity() {
+    final base = Currency.fromCode(baseCurrency);
+    return UserSettings(
+      baseCurrency: base,
+      locale: locale,
+      themeMode: switch (themeMode) {
+        'light' => ThemeMode.light,
+        'dark' => ThemeMode.dark,
+        _ => ThemeMode.system,
+      },
+      paydayDayOfMonth: paydayDayOfMonth,
+      savings: SavingsPlan(
+        rate: savingsRate,
+        floor: savingsFloorMilli == null
+            ? null
+            : Money(savingsFloorMilli!, base),
+        ceiling: savingsCeilingMilli == null
+            ? null
+            : Money(savingsCeilingMilli!, base),
+        recoveryPeriods: savingsRecoveryPeriods,
+      ),
+    );
+  }
 }
 
 String themeModeToWire(ThemeMode mode) => switch (mode) {

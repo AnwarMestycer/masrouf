@@ -196,6 +196,29 @@ Future<void> applyRemoteRows(
         );
       });
 
+    case SyncEntity.savingsPeriods:
+      await db.batch((Batch b) {
+        b.insertAllOnConflictUpdate(
+          db.savingsPeriods,
+          rows.map((row) {
+            final period = savingsPeriodFromJson(row);
+            return SavingsPeriodsCompanion.insert(
+              id: period.id,
+              userId: userId,
+              startedOn: period.startedOn,
+              incomeMilli: Value<int>(period.income.milli),
+              committedMilli: Value<int>(period.committed.milli),
+              confirmedOn: Value<DateTime?>(period.confirmedOn),
+              savedMilli: Value<int?>(period.saved?.milli),
+              currency: period.committed.currency.code,
+              createdAt: DateTime.now(),
+              updatedAt: period.updatedAt,
+              deletedAt: Value<DateTime?>(tombstoneOf(row)),
+            );
+          }).toList(growable: false),
+        );
+      });
+
     case SyncEntity.exchangeRates:
       await db.batch((Batch b) {
         b.insertAllOnConflictUpdate(

@@ -6,6 +6,7 @@ import 'package:masrouf/domain/entities/account.dart';
 import 'package:masrouf/domain/entities/budget.dart';
 import 'package:masrouf/domain/entities/planned_expense.dart';
 import 'package:masrouf/domain/entities/savings_goal.dart';
+import 'package:masrouf/domain/entities/savings_plan.dart';
 import 'package:masrouf/domain/entities/analytics/analytics.dart';
 import 'package:masrouf/domain/entities/analytics/date_range.dart';
 import 'package:masrouf/domain/entities/analytics/cashflow_calendar.dart';
@@ -154,6 +155,20 @@ abstract interface class PlannedRepository {
 abstract interface class GoalRepository {
   Stream<List<SavingsGoalProgress>> watchProgress();
   Future<Result<SavingsGoal>> save(SavingsGoal goal);
+  Future<Result<void>> remove(String id);
+}
+
+abstract interface class SavingsRepository {
+  /// The plan, the open period and the running account, in one value.
+  Stream<SavingsStatus> watchStatus();
+  Stream<List<SavingsPeriod>> watchConfirmed();
+
+  /// Opens a period starting today. Fails when one is already open.
+  Future<Result<SavingsPeriod>> start();
+
+  /// Closes the open period with what was actually set aside.
+  Future<Result<SavingsPeriod>> confirm(Money saved);
+
   Future<Result<void>> remove(String id);
 }
 

@@ -18,6 +18,7 @@ import 'package:masrouf/domain/enums/txn_type.dart';
 import 'package:masrouf/domain/repositories/repositories.dart';
 import 'package:masrouf/presentation/providers/auth_providers.dart';
 import 'package:masrouf/presentation/providers/core_providers.dart';
+import 'package:masrouf/presentation/providers/savings_providers.dart';
 
 final settingsRepositoryProvider = Provider<SettingsRepository>(
   (ref) => SettingsRepositoryImpl(
@@ -167,6 +168,7 @@ final analyticsRepositoryProvider = Provider<AnalyticsRepository>(
     // Analytics is display-only and re-reads when the rates arrive, so an
     // unknown rate here is safe to treat as "no rate yet".
     ratesToBase: ref.watch(ratesToBaseProvider) ?? const <String, double>{},
+    savingsReserved: ref.watch(savingsReservedProvider),
   ),
 );
 

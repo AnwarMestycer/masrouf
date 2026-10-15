@@ -176,6 +176,38 @@ class SavingsGoals extends Table with SyncedTable {
   DateTimeColumn get createdAt => dateTime()();
 }
 
+/// One cycle of the savings plan: what it asked for, and what was set aside.
+///
+/// A period is closed by confirming it rather than by a date — income here does
+/// not arrive on a schedule, so "the end of the month" is not a moment the
+/// ledger can recognise, while "I have counted what I saved" is.
+///
+/// Nothing stores what is owed. That is
+/// `max(0, sum(committed) - sum(saved))` across confirmed periods: one
+/// invariant, derived on read rather than kept as a second set of books.
+@TableIndex(name: 'savings_periods_user_updated', columns: {#userId, #updatedAt})
+@DataClassName('SavingsPeriodRow')
+class SavingsPeriods extends Table with SyncedTable {
+  DateTimeColumn get startedOn => dateTime()();
+
+  /// Income counted into the period so far. Grows until the period is closed.
+  IntColumn get incomeMilli => integer().withDefault(const Constant<int>(0))();
+
+  /// The share of [incomeMilli] the plan asked for, frozen when it closed.
+  IntColumn get committedMilli =>
+      integer().withDefault(const Constant<int>(0))();
+
+  /// Null until confirmed. The period is open until then, and at most one may
+  /// be open at a time.
+  DateTimeColumn get confirmedOn => dateTime().nullable()();
+
+  /// What was actually set aside. Null until confirmed.
+  IntColumn get savedMilli => integer().nullable()();
+
+  TextColumn get currency => text().withLength(min: 3, max: 3)();
+  DateTimeColumn get createdAt => dateTime()();
+}
+
 @DataClassName('ExchangeRateRow')
 class ExchangeRates extends Table with SyncedTable {
   TextColumn get currency => text().withLength(min: 3, max: 3)();
@@ -188,4 +220,15 @@ class UserSettingsRows extends Table with SyncedTable {
   TextColumn get locale => text().withLength(max: 8)();
   TextColumn get themeMode => text().withLength(max: 8)();
   IntColumn get paydayDayOfMonth => integer()();
+
+  /// The savings plan. One row per user, exactly like the payday it sits
+  /// beside, rather than a table of its own for a single set of numbers.
+  ///
+  /// A rate of zero means no plan: nothing is committed and nothing is
+  /// reserved, which is the state every existing account upgrades into.
+  RealColumn get savingsRate => real().withDefault(const Constant<double>(0))();
+  IntColumn get savingsFloorMilli => integer().nullable()();
+  IntColumn get savingsCeilingMilli => integer().nullable()();
+  IntColumn get savingsRecoveryPeriods =>
+      integer().withDefault(const Constant<int>(1))();
 }

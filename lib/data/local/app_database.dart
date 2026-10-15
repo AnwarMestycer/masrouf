@@ -11,6 +11,7 @@ import 'package:masrouf/data/local/daos/planned_dao.dart';
 import 'package:masrouf/data/local/daos/category_dao.dart';
 import 'package:masrouf/data/local/daos/kv_dao.dart';
 import 'package:masrouf/data/local/daos/recurring_dao.dart';
+import 'package:masrouf/data/local/daos/savings_dao.dart';
 import 'package:masrouf/data/local/daos/sync_queue_dao.dart';
 import 'package:masrouf/data/local/daos/transaction_dao.dart';
 import 'package:masrouf/data/local/tables/local_tables.dart';
@@ -32,6 +33,7 @@ part 'app_database.g.dart';
     Budgets,
     PlannedExpenses,
     SavingsGoals,
+    SavingsPeriods,
     ExchangeRates,
     UserSettingsRows,
     SyncQueueEntries,
@@ -48,6 +50,7 @@ part 'app_database.g.dart';
     BudgetDao,
     PlannedDao,
     GoalDao,
+    SavingsDao,
     AnalyticsDao,
     SyncQueueDao,
     KvDao,
@@ -72,8 +75,9 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   /// 1 -> 2: `budgets`. 2 -> 3: `planned_expenses`. 3 -> 4: `savings_goals`.
+  /// 4 -> 5: `savings_periods`, and the savings plan on `user_settings`.
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -92,6 +96,24 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 4) {
             await m.createTable(savingsGoals);
+          }
+          if (from < 5) {
+            await m.createTable(savingsPeriods);
+            // Additive with defaults, so an existing row upgrades into "no
+            // plan" rather than needing a backfill.
+            await m.addColumn(userSettingsRows, userSettingsRows.savingsRate);
+            await m.addColumn(
+              userSettingsRows,
+              userSettingsRows.savingsFloorMilli,
+            );
+            await m.addColumn(
+              userSettingsRows,
+              userSettingsRows.savingsCeilingMilli,
+            );
+            await m.addColumn(
+              userSettingsRows,
+              userSettingsRows.savingsRecoveryPeriods,
+            );
           }
         },
         beforeOpen: (OpeningDetails details) async {
@@ -119,6 +141,7 @@ class AppDatabase extends _$AppDatabase {
           b.deleteWhere(budgets, (_) => const Constant<bool>(true));
           b.deleteWhere(plannedExpenses, (_) => const Constant<bool>(true));
           b.deleteWhere(savingsGoals, (_) => const Constant<bool>(true));
+          b.deleteWhere(savingsPeriods, (_) => const Constant<bool>(true));
           b.deleteWhere(recurringRules, (_) => const Constant<bool>(true));
           // Accounts and categories last: transactions reference them, and
           // `PRAGMA foreign_keys = ON` rejects the delete while a child row is
@@ -145,6 +168,7 @@ class AppDatabase extends _$AppDatabase {
           b.deleteWhere(budgets, (_) => const Constant<bool>(true));
           b.deleteWhere(plannedExpenses, (_) => const Constant<bool>(true));
           b.deleteWhere(savingsGoals, (_) => const Constant<bool>(true));
+          b.deleteWhere(savingsPeriods, (_) => const Constant<bool>(true));
           b.deleteWhere(exchangeRates, (_) => const Constant<bool>(true));
           b.deleteWhere(userSettingsRows, (_) => const Constant<bool>(true));
           b.deleteWhere(syncQueueEntries, (_) => const Constant<bool>(true));

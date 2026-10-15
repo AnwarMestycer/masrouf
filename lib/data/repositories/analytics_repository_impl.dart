@@ -22,6 +22,7 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
     required this.base,
     required this.paydayDayOfMonth,
     required this.ratesToBase,
+    this.savingsReserved = const Money(0, Currency.tnd),
   })  : _db = db,
         _recurring = recurring,
         _planned = planned;
@@ -33,6 +34,10 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
   final Currency base;
   final int paydayDayOfMonth;
   final Map<String, double> ratesToBase;
+
+  /// What the open savings period is holding back. Injected rather than queried
+  /// so this repository keeps taking its inputs from one place.
+  final Money savingsReserved;
 
   @override
   Stream<MonthSummary> watchMonthSummary(Ym ym) =>
@@ -95,10 +100,18 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
     final reserved = plans.fold<int>(0, (sum, p) => sum + inBase(p.amount));
 
     return SafeToSpend(
-      amount: Money(balance.milli - committed - reserved, base),
+      // Savings come out too. The money for the open period is still sitting in
+      // the account it arrived in, so without this the app would be offering
+      // back what has already been promised — which is the whole reason the
+      // commitment is reserved rather than merely recorded.
+      amount: Money(
+        balance.milli - committed - reserved - savingsReserved.milli,
+        base,
+      ),
       currentBalance: balance,
       upcomingBills: bills,
       reserved: Money(reserved, base),
+      savingsReserved: savingsReserved,
       horizon: horizon,
     );
   }

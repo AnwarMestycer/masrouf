@@ -54,6 +54,26 @@ void main() {
         created_at INTEGER NOT NULL
       );
     ''');
+    // Present in v1 and never created by an upgrade step, so a real v1
+    // database has it. The v5 step adds the savings plan to it by ALTER, which
+    // fails outright against a schema that is missing the table.
+    raw.execute('''
+      CREATE TABLE user_settings_rows (
+        id TEXT NOT NULL PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        updated_at INTEGER NOT NULL,
+        deleted_at INTEGER NULL,
+        base_currency TEXT NOT NULL,
+        locale TEXT NOT NULL,
+        theme_mode TEXT NOT NULL,
+        payday_day_of_month INTEGER NOT NULL
+      );
+    ''');
+    raw.execute('''
+      INSERT INTO user_settings_rows (id, user_id, updated_at, base_currency,
+                                      locale, theme_mode, payday_day_of_month)
+      VALUES ('u1', 'u1', 1, 'TND', 'fr', 'system', 25)
+    ''');
     raw.execute('PRAGMA user_version = 1');
   }
 
@@ -94,10 +114,10 @@ void main() {
     final db = await openMigrated();
     addTearDown(db.close);
 
-    expect(db.schemaVersion, 4);
+    expect(db.schemaVersion, 5);
     expect(
       raw.select('PRAGMA user_version').single['user_version'],
-      4,
+      5,
       reason: 'the migration must record that it ran',
     );
 
@@ -113,6 +133,16 @@ void main() {
     expect(await db.select(db.budgets).get(), isEmpty);
     expect(await db.select(db.plannedExpenses).get(), isEmpty);
     expect(await db.select(db.savingsGoals).get(), isEmpty);
+    expect(await db.select(db.savingsPeriods).get(), isEmpty);
+
+    // The savings plan is added to a table that already had rows. Those rows
+    // must survive and read as "no plan" rather than needing a backfill.
+    final settings = await db.select(db.userSettingsRows).getSingle();
+    expect(settings.paydayDayOfMonth, 25, reason: 'the old row is untouched');
+    expect(settings.savingsRate, 0);
+    expect(settings.savingsRecoveryPeriods, 1);
+    expect(settings.savingsFloorMilli, isNull);
+
     await db.budgetDao.upsert(
       'u1',
       Budget(
@@ -136,7 +166,8 @@ void main() {
     expect(await db.select(db.budgets).get(), isEmpty);
     expect(await db.select(db.plannedExpenses).get(), isEmpty);
     expect(await db.select(db.savingsGoals).get(), isEmpty);
-    expect(db.schemaVersion, 4);
+    expect(await db.select(db.savingsPeriods).get(), isEmpty);
+    expect(db.schemaVersion, 5);
   });
 
   test('reopening an already-migrated database changes nothing', () async {
@@ -189,7 +220,7 @@ void main() {
     final db = await openMigrated();
     addTearDown(db.close);
 
-    expect(raw.select('PRAGMA user_version').single['user_version'], 4);
+    expect(raw.select('PRAGMA user_version').single['user_version'], 5);
     expect(
       (await db.select(db.budgets).get()).single.amountMilli,
       200000,

@@ -172,6 +172,7 @@ class SafeToSpend {
     required this.currentBalance,
     required this.upcomingBills,
     required this.reserved,
+    required this.savingsReserved,
     required this.horizon,
   });
 
@@ -187,6 +188,12 @@ class SafeToSpend {
   /// recurring bills. Surfaced separately so the user can see *why* the figure
   /// is lower than their balance — an unexplained gap reads as a bug.
   final Money reserved;
+
+  /// Held back for the open savings period — its own share plus any catching
+  /// up. Separate from [reserved] because it is a promise to yourself rather
+  /// than a bill someone else will send, and the screen should be able to say
+  /// which is which.
+  final Money savingsReserved;
 
   /// The next payday.
   final DateTime horizon;

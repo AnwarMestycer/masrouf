@@ -36,6 +36,7 @@ class PullWorker {
     SyncEntity.budgets,
     SyncEntity.plannedExpenses,
     SyncEntity.savingsGoals,
+    SyncEntity.savingsPeriods,
     SyncEntity.recurringRules,
     SyncEntity.transactions,
     SyncEntity.exchangeRates,
@@ -130,6 +131,7 @@ class PullWorker {
       SyncEntity.budgets => db.budgets.actualTableName,
       SyncEntity.plannedExpenses => db.plannedExpenses.actualTableName,
       SyncEntity.savingsGoals => db.savingsGoals.actualTableName,
+      SyncEntity.savingsPeriods => db.savingsPeriods.actualTableName,
       SyncEntity.exchangeRates => db.exchangeRates.actualTableName,
       SyncEntity.userSettings => db.userSettingsRows.actualTableName,
     };

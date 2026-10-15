@@ -77,6 +77,7 @@ class PushWorker {
     SyncEntity.budgets,
     SyncEntity.plannedExpenses,
     SyncEntity.savingsGoals,
+    SyncEntity.savingsPeriods,
     SyncEntity.recurringRules,
     SyncEntity.transactions,
     SyncEntity.exchangeRates,
@@ -187,6 +188,20 @@ class PushWorker {
               (r) => goalToJson(
                 userId,
                 r.toEntity(Currency.fromCode(r.currency)),
+                deletedAt: r.deletedAt,
+              ),
+            )
+            .toList(growable: false);
+
+      case SyncEntity.savingsPeriods:
+        final rows = await (db.select(db.savingsPeriods)
+              ..where((t) => t.id.isIn(ids)))
+            .get();
+        return rows
+            .map(
+              (r) => savingsPeriodToJson(
+                userId,
+                r.toEntity(),
                 deletedAt: r.deletedAt,
               ),
             )

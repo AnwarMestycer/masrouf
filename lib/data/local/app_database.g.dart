@@ -5207,6 +5207,690 @@ class SavingsGoalsCompanion extends UpdateCompanion<SavingsGoalRow> {
   }
 }
 
+class $SavingsPeriodsTable extends SavingsPeriods
+    with TableInfo<$SavingsPeriodsTable, SavingsPeriodRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SavingsPeriodsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+    'user_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _startedOnMeta = const VerificationMeta(
+    'startedOn',
+  );
+  @override
+  late final GeneratedColumn<DateTime> startedOn = GeneratedColumn<DateTime>(
+    'started_on',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _incomeMilliMeta = const VerificationMeta(
+    'incomeMilli',
+  );
+  @override
+  late final GeneratedColumn<int> incomeMilli = GeneratedColumn<int>(
+    'income_milli',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant<int>(0),
+  );
+  static const VerificationMeta _committedMilliMeta = const VerificationMeta(
+    'committedMilli',
+  );
+  @override
+  late final GeneratedColumn<int> committedMilli = GeneratedColumn<int>(
+    'committed_milli',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant<int>(0),
+  );
+  static const VerificationMeta _confirmedOnMeta = const VerificationMeta(
+    'confirmedOn',
+  );
+  @override
+  late final GeneratedColumn<DateTime> confirmedOn = GeneratedColumn<DateTime>(
+    'confirmed_on',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _savedMilliMeta = const VerificationMeta(
+    'savedMilli',
+  );
+  @override
+  late final GeneratedColumn<int> savedMilli = GeneratedColumn<int>(
+    'saved_milli',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _currencyMeta = const VerificationMeta(
+    'currency',
+  );
+  @override
+  late final GeneratedColumn<String> currency = GeneratedColumn<String>(
+    'currency',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 3,
+      maxTextLength: 3,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    userId,
+    updatedAt,
+    deletedAt,
+    startedOn,
+    incomeMilli,
+    committedMilli,
+    confirmedOn,
+    savedMilli,
+    currency,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'savings_periods';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SavingsPeriodRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('started_on')) {
+      context.handle(
+        _startedOnMeta,
+        startedOn.isAcceptableOrUnknown(data['started_on']!, _startedOnMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startedOnMeta);
+    }
+    if (data.containsKey('income_milli')) {
+      context.handle(
+        _incomeMilliMeta,
+        incomeMilli.isAcceptableOrUnknown(
+          data['income_milli']!,
+          _incomeMilliMeta,
+        ),
+      );
+    }
+    if (data.containsKey('committed_milli')) {
+      context.handle(
+        _committedMilliMeta,
+        committedMilli.isAcceptableOrUnknown(
+          data['committed_milli']!,
+          _committedMilliMeta,
+        ),
+      );
+    }
+    if (data.containsKey('confirmed_on')) {
+      context.handle(
+        _confirmedOnMeta,
+        confirmedOn.isAcceptableOrUnknown(
+          data['confirmed_on']!,
+          _confirmedOnMeta,
+        ),
+      );
+    }
+    if (data.containsKey('saved_milli')) {
+      context.handle(
+        _savedMilliMeta,
+        savedMilli.isAcceptableOrUnknown(data['saved_milli']!, _savedMilliMeta),
+      );
+    }
+    if (data.containsKey('currency')) {
+      context.handle(
+        _currencyMeta,
+        currency.isAcceptableOrUnknown(data['currency']!, _currencyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_currencyMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SavingsPeriodRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SavingsPeriodRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_id'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      startedOn: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}started_on'],
+      )!,
+      incomeMilli: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}income_milli'],
+      )!,
+      committedMilli: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}committed_milli'],
+      )!,
+      confirmedOn: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}confirmed_on'],
+      ),
+      savedMilli: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}saved_milli'],
+      ),
+      currency: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}currency'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $SavingsPeriodsTable createAlias(String alias) {
+    return $SavingsPeriodsTable(attachedDatabase, alias);
+  }
+}
+
+class SavingsPeriodRow extends DataClass
+    implements Insertable<SavingsPeriodRow> {
+  final String id;
+  final String userId;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final DateTime startedOn;
+
+  /// Income counted into the period so far. Grows until the period is closed.
+  final int incomeMilli;
+
+  /// The share of [incomeMilli] the plan asked for, frozen when it closed.
+  final int committedMilli;
+
+  /// Null until confirmed. The period is open until then, and at most one may
+  /// be open at a time.
+  final DateTime? confirmedOn;
+
+  /// What was actually set aside. Null until confirmed.
+  final int? savedMilli;
+  final String currency;
+  final DateTime createdAt;
+  const SavingsPeriodRow({
+    required this.id,
+    required this.userId,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.startedOn,
+    required this.incomeMilli,
+    required this.committedMilli,
+    this.confirmedOn,
+    this.savedMilli,
+    required this.currency,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['user_id'] = Variable<String>(userId);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['started_on'] = Variable<DateTime>(startedOn);
+    map['income_milli'] = Variable<int>(incomeMilli);
+    map['committed_milli'] = Variable<int>(committedMilli);
+    if (!nullToAbsent || confirmedOn != null) {
+      map['confirmed_on'] = Variable<DateTime>(confirmedOn);
+    }
+    if (!nullToAbsent || savedMilli != null) {
+      map['saved_milli'] = Variable<int>(savedMilli);
+    }
+    map['currency'] = Variable<String>(currency);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  SavingsPeriodsCompanion toCompanion(bool nullToAbsent) {
+    return SavingsPeriodsCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      startedOn: Value(startedOn),
+      incomeMilli: Value(incomeMilli),
+      committedMilli: Value(committedMilli),
+      confirmedOn: confirmedOn == null && nullToAbsent
+          ? const Value.absent()
+          : Value(confirmedOn),
+      savedMilli: savedMilli == null && nullToAbsent
+          ? const Value.absent()
+          : Value(savedMilli),
+      currency: Value(currency),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory SavingsPeriodRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SavingsPeriodRow(
+      id: serializer.fromJson<String>(json['id']),
+      userId: serializer.fromJson<String>(json['userId']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      startedOn: serializer.fromJson<DateTime>(json['startedOn']),
+      incomeMilli: serializer.fromJson<int>(json['incomeMilli']),
+      committedMilli: serializer.fromJson<int>(json['committedMilli']),
+      confirmedOn: serializer.fromJson<DateTime?>(json['confirmedOn']),
+      savedMilli: serializer.fromJson<int?>(json['savedMilli']),
+      currency: serializer.fromJson<String>(json['currency']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'userId': serializer.toJson<String>(userId),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'startedOn': serializer.toJson<DateTime>(startedOn),
+      'incomeMilli': serializer.toJson<int>(incomeMilli),
+      'committedMilli': serializer.toJson<int>(committedMilli),
+      'confirmedOn': serializer.toJson<DateTime?>(confirmedOn),
+      'savedMilli': serializer.toJson<int?>(savedMilli),
+      'currency': serializer.toJson<String>(currency),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  SavingsPeriodRow copyWith({
+    String? id,
+    String? userId,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    DateTime? startedOn,
+    int? incomeMilli,
+    int? committedMilli,
+    Value<DateTime?> confirmedOn = const Value.absent(),
+    Value<int?> savedMilli = const Value.absent(),
+    String? currency,
+    DateTime? createdAt,
+  }) => SavingsPeriodRow(
+    id: id ?? this.id,
+    userId: userId ?? this.userId,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    startedOn: startedOn ?? this.startedOn,
+    incomeMilli: incomeMilli ?? this.incomeMilli,
+    committedMilli: committedMilli ?? this.committedMilli,
+    confirmedOn: confirmedOn.present ? confirmedOn.value : this.confirmedOn,
+    savedMilli: savedMilli.present ? savedMilli.value : this.savedMilli,
+    currency: currency ?? this.currency,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  SavingsPeriodRow copyWithCompanion(SavingsPeriodsCompanion data) {
+    return SavingsPeriodRow(
+      id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      startedOn: data.startedOn.present ? data.startedOn.value : this.startedOn,
+      incomeMilli: data.incomeMilli.present
+          ? data.incomeMilli.value
+          : this.incomeMilli,
+      committedMilli: data.committedMilli.present
+          ? data.committedMilli.value
+          : this.committedMilli,
+      confirmedOn: data.confirmedOn.present
+          ? data.confirmedOn.value
+          : this.confirmedOn,
+      savedMilli: data.savedMilli.present
+          ? data.savedMilli.value
+          : this.savedMilli,
+      currency: data.currency.present ? data.currency.value : this.currency,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SavingsPeriodRow(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('startedOn: $startedOn, ')
+          ..write('incomeMilli: $incomeMilli, ')
+          ..write('committedMilli: $committedMilli, ')
+          ..write('confirmedOn: $confirmedOn, ')
+          ..write('savedMilli: $savedMilli, ')
+          ..write('currency: $currency, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    userId,
+    updatedAt,
+    deletedAt,
+    startedOn,
+    incomeMilli,
+    committedMilli,
+    confirmedOn,
+    savedMilli,
+    currency,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SavingsPeriodRow &&
+          other.id == this.id &&
+          other.userId == this.userId &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.startedOn == this.startedOn &&
+          other.incomeMilli == this.incomeMilli &&
+          other.committedMilli == this.committedMilli &&
+          other.confirmedOn == this.confirmedOn &&
+          other.savedMilli == this.savedMilli &&
+          other.currency == this.currency &&
+          other.createdAt == this.createdAt);
+}
+
+class SavingsPeriodsCompanion extends UpdateCompanion<SavingsPeriodRow> {
+  final Value<String> id;
+  final Value<String> userId;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<DateTime> startedOn;
+  final Value<int> incomeMilli;
+  final Value<int> committedMilli;
+  final Value<DateTime?> confirmedOn;
+  final Value<int?> savedMilli;
+  final Value<String> currency;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const SavingsPeriodsCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.startedOn = const Value.absent(),
+    this.incomeMilli = const Value.absent(),
+    this.committedMilli = const Value.absent(),
+    this.confirmedOn = const Value.absent(),
+    this.savedMilli = const Value.absent(),
+    this.currency = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SavingsPeriodsCompanion.insert({
+    required String id,
+    required String userId,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required DateTime startedOn,
+    this.incomeMilli = const Value.absent(),
+    this.committedMilli = const Value.absent(),
+    this.confirmedOn = const Value.absent(),
+    this.savedMilli = const Value.absent(),
+    required String currency,
+    required DateTime createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       userId = Value(userId),
+       updatedAt = Value(updatedAt),
+       startedOn = Value(startedOn),
+       currency = Value(currency),
+       createdAt = Value(createdAt);
+  static Insertable<SavingsPeriodRow> custom({
+    Expression<String>? id,
+    Expression<String>? userId,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<DateTime>? startedOn,
+    Expression<int>? incomeMilli,
+    Expression<int>? committedMilli,
+    Expression<DateTime>? confirmedOn,
+    Expression<int>? savedMilli,
+    Expression<String>? currency,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (startedOn != null) 'started_on': startedOn,
+      if (incomeMilli != null) 'income_milli': incomeMilli,
+      if (committedMilli != null) 'committed_milli': committedMilli,
+      if (confirmedOn != null) 'confirmed_on': confirmedOn,
+      if (savedMilli != null) 'saved_milli': savedMilli,
+      if (currency != null) 'currency': currency,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SavingsPeriodsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? userId,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<DateTime>? startedOn,
+    Value<int>? incomeMilli,
+    Value<int>? committedMilli,
+    Value<DateTime?>? confirmedOn,
+    Value<int?>? savedMilli,
+    Value<String>? currency,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return SavingsPeriodsCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      startedOn: startedOn ?? this.startedOn,
+      incomeMilli: incomeMilli ?? this.incomeMilli,
+      committedMilli: committedMilli ?? this.committedMilli,
+      confirmedOn: confirmedOn ?? this.confirmedOn,
+      savedMilli: savedMilli ?? this.savedMilli,
+      currency: currency ?? this.currency,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (startedOn.present) {
+      map['started_on'] = Variable<DateTime>(startedOn.value);
+    }
+    if (incomeMilli.present) {
+      map['income_milli'] = Variable<int>(incomeMilli.value);
+    }
+    if (committedMilli.present) {
+      map['committed_milli'] = Variable<int>(committedMilli.value);
+    }
+    if (confirmedOn.present) {
+      map['confirmed_on'] = Variable<DateTime>(confirmedOn.value);
+    }
+    if (savedMilli.present) {
+      map['saved_milli'] = Variable<int>(savedMilli.value);
+    }
+    if (currency.present) {
+      map['currency'] = Variable<String>(currency.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SavingsPeriodsCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('startedOn: $startedOn, ')
+          ..write('incomeMilli: $incomeMilli, ')
+          ..write('committedMilli: $committedMilli, ')
+          ..write('confirmedOn: $confirmedOn, ')
+          ..write('savedMilli: $savedMilli, ')
+          ..write('currency: $currency, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $ExchangeRatesTable extends ExchangeRates
     with TableInfo<$ExchangeRatesTable, ExchangeRateRow> {
   @override
@@ -5719,6 +6403,50 @@ class $UserSettingsRowsTable extends UserSettingsRows
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _savingsRateMeta = const VerificationMeta(
+    'savingsRate',
+  );
+  @override
+  late final GeneratedColumn<double> savingsRate = GeneratedColumn<double>(
+    'savings_rate',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant<double>(0),
+  );
+  static const VerificationMeta _savingsFloorMilliMeta = const VerificationMeta(
+    'savingsFloorMilli',
+  );
+  @override
+  late final GeneratedColumn<int> savingsFloorMilli = GeneratedColumn<int>(
+    'savings_floor_milli',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _savingsCeilingMilliMeta =
+      const VerificationMeta('savingsCeilingMilli');
+  @override
+  late final GeneratedColumn<int> savingsCeilingMilli = GeneratedColumn<int>(
+    'savings_ceiling_milli',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _savingsRecoveryPeriodsMeta =
+      const VerificationMeta('savingsRecoveryPeriods');
+  @override
+  late final GeneratedColumn<int> savingsRecoveryPeriods = GeneratedColumn<int>(
+    'savings_recovery_periods',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant<int>(1),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -5729,6 +6457,10 @@ class $UserSettingsRowsTable extends UserSettingsRows
     locale,
     themeMode,
     paydayDayOfMonth,
+    savingsRate,
+    savingsFloorMilli,
+    savingsCeilingMilli,
+    savingsRecoveryPeriods,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -5807,6 +6539,42 @@ class $UserSettingsRowsTable extends UserSettingsRows
     } else if (isInserting) {
       context.missing(_paydayDayOfMonthMeta);
     }
+    if (data.containsKey('savings_rate')) {
+      context.handle(
+        _savingsRateMeta,
+        savingsRate.isAcceptableOrUnknown(
+          data['savings_rate']!,
+          _savingsRateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('savings_floor_milli')) {
+      context.handle(
+        _savingsFloorMilliMeta,
+        savingsFloorMilli.isAcceptableOrUnknown(
+          data['savings_floor_milli']!,
+          _savingsFloorMilliMeta,
+        ),
+      );
+    }
+    if (data.containsKey('savings_ceiling_milli')) {
+      context.handle(
+        _savingsCeilingMilliMeta,
+        savingsCeilingMilli.isAcceptableOrUnknown(
+          data['savings_ceiling_milli']!,
+          _savingsCeilingMilliMeta,
+        ),
+      );
+    }
+    if (data.containsKey('savings_recovery_periods')) {
+      context.handle(
+        _savingsRecoveryPeriodsMeta,
+        savingsRecoveryPeriods.isAcceptableOrUnknown(
+          data['savings_recovery_periods']!,
+          _savingsRecoveryPeriodsMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -5848,6 +6616,22 @@ class $UserSettingsRowsTable extends UserSettingsRows
         DriftSqlType.int,
         data['${effectivePrefix}payday_day_of_month'],
       )!,
+      savingsRate: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}savings_rate'],
+      )!,
+      savingsFloorMilli: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}savings_floor_milli'],
+      ),
+      savingsCeilingMilli: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}savings_ceiling_milli'],
+      ),
+      savingsRecoveryPeriods: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}savings_recovery_periods'],
+      )!,
     );
   }
 
@@ -5866,6 +6650,16 @@ class UserSettingsRow extends DataClass implements Insertable<UserSettingsRow> {
   final String locale;
   final String themeMode;
   final int paydayDayOfMonth;
+
+  /// The savings plan. One row per user, exactly like the payday it sits
+  /// beside, rather than a table of its own for a single set of numbers.
+  ///
+  /// A rate of zero means no plan: nothing is committed and nothing is
+  /// reserved, which is the state every existing account upgrades into.
+  final double savingsRate;
+  final int? savingsFloorMilli;
+  final int? savingsCeilingMilli;
+  final int savingsRecoveryPeriods;
   const UserSettingsRow({
     required this.id,
     required this.userId,
@@ -5875,6 +6669,10 @@ class UserSettingsRow extends DataClass implements Insertable<UserSettingsRow> {
     required this.locale,
     required this.themeMode,
     required this.paydayDayOfMonth,
+    required this.savingsRate,
+    this.savingsFloorMilli,
+    this.savingsCeilingMilli,
+    required this.savingsRecoveryPeriods,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -5889,6 +6687,14 @@ class UserSettingsRow extends DataClass implements Insertable<UserSettingsRow> {
     map['locale'] = Variable<String>(locale);
     map['theme_mode'] = Variable<String>(themeMode);
     map['payday_day_of_month'] = Variable<int>(paydayDayOfMonth);
+    map['savings_rate'] = Variable<double>(savingsRate);
+    if (!nullToAbsent || savingsFloorMilli != null) {
+      map['savings_floor_milli'] = Variable<int>(savingsFloorMilli);
+    }
+    if (!nullToAbsent || savingsCeilingMilli != null) {
+      map['savings_ceiling_milli'] = Variable<int>(savingsCeilingMilli);
+    }
+    map['savings_recovery_periods'] = Variable<int>(savingsRecoveryPeriods);
     return map;
   }
 
@@ -5904,6 +6710,14 @@ class UserSettingsRow extends DataClass implements Insertable<UserSettingsRow> {
       locale: Value(locale),
       themeMode: Value(themeMode),
       paydayDayOfMonth: Value(paydayDayOfMonth),
+      savingsRate: Value(savingsRate),
+      savingsFloorMilli: savingsFloorMilli == null && nullToAbsent
+          ? const Value.absent()
+          : Value(savingsFloorMilli),
+      savingsCeilingMilli: savingsCeilingMilli == null && nullToAbsent
+          ? const Value.absent()
+          : Value(savingsCeilingMilli),
+      savingsRecoveryPeriods: Value(savingsRecoveryPeriods),
     );
   }
 
@@ -5921,6 +6735,14 @@ class UserSettingsRow extends DataClass implements Insertable<UserSettingsRow> {
       locale: serializer.fromJson<String>(json['locale']),
       themeMode: serializer.fromJson<String>(json['themeMode']),
       paydayDayOfMonth: serializer.fromJson<int>(json['paydayDayOfMonth']),
+      savingsRate: serializer.fromJson<double>(json['savingsRate']),
+      savingsFloorMilli: serializer.fromJson<int?>(json['savingsFloorMilli']),
+      savingsCeilingMilli: serializer.fromJson<int?>(
+        json['savingsCeilingMilli'],
+      ),
+      savingsRecoveryPeriods: serializer.fromJson<int>(
+        json['savingsRecoveryPeriods'],
+      ),
     );
   }
   @override
@@ -5935,6 +6757,10 @@ class UserSettingsRow extends DataClass implements Insertable<UserSettingsRow> {
       'locale': serializer.toJson<String>(locale),
       'themeMode': serializer.toJson<String>(themeMode),
       'paydayDayOfMonth': serializer.toJson<int>(paydayDayOfMonth),
+      'savingsRate': serializer.toJson<double>(savingsRate),
+      'savingsFloorMilli': serializer.toJson<int?>(savingsFloorMilli),
+      'savingsCeilingMilli': serializer.toJson<int?>(savingsCeilingMilli),
+      'savingsRecoveryPeriods': serializer.toJson<int>(savingsRecoveryPeriods),
     };
   }
 
@@ -5947,6 +6773,10 @@ class UserSettingsRow extends DataClass implements Insertable<UserSettingsRow> {
     String? locale,
     String? themeMode,
     int? paydayDayOfMonth,
+    double? savingsRate,
+    Value<int?> savingsFloorMilli = const Value.absent(),
+    Value<int?> savingsCeilingMilli = const Value.absent(),
+    int? savingsRecoveryPeriods,
   }) => UserSettingsRow(
     id: id ?? this.id,
     userId: userId ?? this.userId,
@@ -5956,6 +6786,15 @@ class UserSettingsRow extends DataClass implements Insertable<UserSettingsRow> {
     locale: locale ?? this.locale,
     themeMode: themeMode ?? this.themeMode,
     paydayDayOfMonth: paydayDayOfMonth ?? this.paydayDayOfMonth,
+    savingsRate: savingsRate ?? this.savingsRate,
+    savingsFloorMilli: savingsFloorMilli.present
+        ? savingsFloorMilli.value
+        : this.savingsFloorMilli,
+    savingsCeilingMilli: savingsCeilingMilli.present
+        ? savingsCeilingMilli.value
+        : this.savingsCeilingMilli,
+    savingsRecoveryPeriods:
+        savingsRecoveryPeriods ?? this.savingsRecoveryPeriods,
   );
   UserSettingsRow copyWithCompanion(UserSettingsRowsCompanion data) {
     return UserSettingsRow(
@@ -5971,6 +6810,18 @@ class UserSettingsRow extends DataClass implements Insertable<UserSettingsRow> {
       paydayDayOfMonth: data.paydayDayOfMonth.present
           ? data.paydayDayOfMonth.value
           : this.paydayDayOfMonth,
+      savingsRate: data.savingsRate.present
+          ? data.savingsRate.value
+          : this.savingsRate,
+      savingsFloorMilli: data.savingsFloorMilli.present
+          ? data.savingsFloorMilli.value
+          : this.savingsFloorMilli,
+      savingsCeilingMilli: data.savingsCeilingMilli.present
+          ? data.savingsCeilingMilli.value
+          : this.savingsCeilingMilli,
+      savingsRecoveryPeriods: data.savingsRecoveryPeriods.present
+          ? data.savingsRecoveryPeriods.value
+          : this.savingsRecoveryPeriods,
     );
   }
 
@@ -5984,7 +6835,11 @@ class UserSettingsRow extends DataClass implements Insertable<UserSettingsRow> {
           ..write('baseCurrency: $baseCurrency, ')
           ..write('locale: $locale, ')
           ..write('themeMode: $themeMode, ')
-          ..write('paydayDayOfMonth: $paydayDayOfMonth')
+          ..write('paydayDayOfMonth: $paydayDayOfMonth, ')
+          ..write('savingsRate: $savingsRate, ')
+          ..write('savingsFloorMilli: $savingsFloorMilli, ')
+          ..write('savingsCeilingMilli: $savingsCeilingMilli, ')
+          ..write('savingsRecoveryPeriods: $savingsRecoveryPeriods')
           ..write(')'))
         .toString();
   }
@@ -5999,6 +6854,10 @@ class UserSettingsRow extends DataClass implements Insertable<UserSettingsRow> {
     locale,
     themeMode,
     paydayDayOfMonth,
+    savingsRate,
+    savingsFloorMilli,
+    savingsCeilingMilli,
+    savingsRecoveryPeriods,
   );
   @override
   bool operator ==(Object other) =>
@@ -6011,7 +6870,11 @@ class UserSettingsRow extends DataClass implements Insertable<UserSettingsRow> {
           other.baseCurrency == this.baseCurrency &&
           other.locale == this.locale &&
           other.themeMode == this.themeMode &&
-          other.paydayDayOfMonth == this.paydayDayOfMonth);
+          other.paydayDayOfMonth == this.paydayDayOfMonth &&
+          other.savingsRate == this.savingsRate &&
+          other.savingsFloorMilli == this.savingsFloorMilli &&
+          other.savingsCeilingMilli == this.savingsCeilingMilli &&
+          other.savingsRecoveryPeriods == this.savingsRecoveryPeriods);
 }
 
 class UserSettingsRowsCompanion extends UpdateCompanion<UserSettingsRow> {
@@ -6023,6 +6886,10 @@ class UserSettingsRowsCompanion extends UpdateCompanion<UserSettingsRow> {
   final Value<String> locale;
   final Value<String> themeMode;
   final Value<int> paydayDayOfMonth;
+  final Value<double> savingsRate;
+  final Value<int?> savingsFloorMilli;
+  final Value<int?> savingsCeilingMilli;
+  final Value<int> savingsRecoveryPeriods;
   final Value<int> rowid;
   const UserSettingsRowsCompanion({
     this.id = const Value.absent(),
@@ -6033,6 +6900,10 @@ class UserSettingsRowsCompanion extends UpdateCompanion<UserSettingsRow> {
     this.locale = const Value.absent(),
     this.themeMode = const Value.absent(),
     this.paydayDayOfMonth = const Value.absent(),
+    this.savingsRate = const Value.absent(),
+    this.savingsFloorMilli = const Value.absent(),
+    this.savingsCeilingMilli = const Value.absent(),
+    this.savingsRecoveryPeriods = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   UserSettingsRowsCompanion.insert({
@@ -6044,6 +6915,10 @@ class UserSettingsRowsCompanion extends UpdateCompanion<UserSettingsRow> {
     required String locale,
     required String themeMode,
     required int paydayDayOfMonth,
+    this.savingsRate = const Value.absent(),
+    this.savingsFloorMilli = const Value.absent(),
+    this.savingsCeilingMilli = const Value.absent(),
+    this.savingsRecoveryPeriods = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        userId = Value(userId),
@@ -6061,6 +6936,10 @@ class UserSettingsRowsCompanion extends UpdateCompanion<UserSettingsRow> {
     Expression<String>? locale,
     Expression<String>? themeMode,
     Expression<int>? paydayDayOfMonth,
+    Expression<double>? savingsRate,
+    Expression<int>? savingsFloorMilli,
+    Expression<int>? savingsCeilingMilli,
+    Expression<int>? savingsRecoveryPeriods,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -6072,6 +6951,12 @@ class UserSettingsRowsCompanion extends UpdateCompanion<UserSettingsRow> {
       if (locale != null) 'locale': locale,
       if (themeMode != null) 'theme_mode': themeMode,
       if (paydayDayOfMonth != null) 'payday_day_of_month': paydayDayOfMonth,
+      if (savingsRate != null) 'savings_rate': savingsRate,
+      if (savingsFloorMilli != null) 'savings_floor_milli': savingsFloorMilli,
+      if (savingsCeilingMilli != null)
+        'savings_ceiling_milli': savingsCeilingMilli,
+      if (savingsRecoveryPeriods != null)
+        'savings_recovery_periods': savingsRecoveryPeriods,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -6085,6 +6970,10 @@ class UserSettingsRowsCompanion extends UpdateCompanion<UserSettingsRow> {
     Value<String>? locale,
     Value<String>? themeMode,
     Value<int>? paydayDayOfMonth,
+    Value<double>? savingsRate,
+    Value<int?>? savingsFloorMilli,
+    Value<int?>? savingsCeilingMilli,
+    Value<int>? savingsRecoveryPeriods,
     Value<int>? rowid,
   }) {
     return UserSettingsRowsCompanion(
@@ -6096,6 +6985,11 @@ class UserSettingsRowsCompanion extends UpdateCompanion<UserSettingsRow> {
       locale: locale ?? this.locale,
       themeMode: themeMode ?? this.themeMode,
       paydayDayOfMonth: paydayDayOfMonth ?? this.paydayDayOfMonth,
+      savingsRate: savingsRate ?? this.savingsRate,
+      savingsFloorMilli: savingsFloorMilli ?? this.savingsFloorMilli,
+      savingsCeilingMilli: savingsCeilingMilli ?? this.savingsCeilingMilli,
+      savingsRecoveryPeriods:
+          savingsRecoveryPeriods ?? this.savingsRecoveryPeriods,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -6127,6 +7021,20 @@ class UserSettingsRowsCompanion extends UpdateCompanion<UserSettingsRow> {
     if (paydayDayOfMonth.present) {
       map['payday_day_of_month'] = Variable<int>(paydayDayOfMonth.value);
     }
+    if (savingsRate.present) {
+      map['savings_rate'] = Variable<double>(savingsRate.value);
+    }
+    if (savingsFloorMilli.present) {
+      map['savings_floor_milli'] = Variable<int>(savingsFloorMilli.value);
+    }
+    if (savingsCeilingMilli.present) {
+      map['savings_ceiling_milli'] = Variable<int>(savingsCeilingMilli.value);
+    }
+    if (savingsRecoveryPeriods.present) {
+      map['savings_recovery_periods'] = Variable<int>(
+        savingsRecoveryPeriods.value,
+      );
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -6144,6 +7052,10 @@ class UserSettingsRowsCompanion extends UpdateCompanion<UserSettingsRow> {
           ..write('locale: $locale, ')
           ..write('themeMode: $themeMode, ')
           ..write('paydayDayOfMonth: $paydayDayOfMonth, ')
+          ..write('savingsRate: $savingsRate, ')
+          ..write('savingsFloorMilli: $savingsFloorMilli, ')
+          ..write('savingsCeilingMilli: $savingsCeilingMilli, ')
+          ..write('savingsRecoveryPeriods: $savingsRecoveryPeriods, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -7848,6 +8760,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $SavingsGoalsTable savingsGoals = $SavingsGoalsTable(this);
+  late final $SavingsPeriodsTable savingsPeriods = $SavingsPeriodsTable(this);
   late final $ExchangeRatesTable exchangeRates = $ExchangeRatesTable(this);
   late final $UserSettingsRowsTable userSettingsRows = $UserSettingsRowsTable(
     this,
@@ -7926,6 +8839,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'goals_user_updated',
     'CREATE INDEX goals_user_updated ON savings_goals (user_id, updated_at)',
   );
+  late final Index savingsPeriodsUserUpdated = Index(
+    'savings_periods_user_updated',
+    'CREATE INDEX savings_periods_user_updated ON savings_periods (user_id, updated_at)',
+  );
   late final AccountDao accountDao = AccountDao(this as AppDatabase);
   late final CategoryDao categoryDao = CategoryDao(this as AppDatabase);
   late final TransactionDao transactionDao = TransactionDao(
@@ -7935,6 +8852,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final BudgetDao budgetDao = BudgetDao(this as AppDatabase);
   late final PlannedDao plannedDao = PlannedDao(this as AppDatabase);
   late final GoalDao goalDao = GoalDao(this as AppDatabase);
+  late final SavingsDao savingsDao = SavingsDao(this as AppDatabase);
   late final AnalyticsDao analyticsDao = AnalyticsDao(this as AppDatabase);
   late final SyncQueueDao syncQueueDao = SyncQueueDao(this as AppDatabase);
   late final KvDao kvDao = KvDao(this as AppDatabase);
@@ -7950,6 +8868,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     budgets,
     plannedExpenses,
     savingsGoals,
+    savingsPeriods,
     exchangeRates,
     userSettingsRows,
     syncQueueEntries,
@@ -7973,6 +8892,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     plannedUserDue,
     plannedUserUpdated,
     goalsUserUpdated,
+    savingsPeriodsUserUpdated,
   ];
 }
 
@@ -10400,6 +11320,334 @@ typedef $$SavingsGoalsTableProcessedTableManager =
       SavingsGoalRow,
       PrefetchHooks Function()
     >;
+typedef $$SavingsPeriodsTableCreateCompanionBuilder =
+    SavingsPeriodsCompanion Function({
+      required String id,
+      required String userId,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required DateTime startedOn,
+      Value<int> incomeMilli,
+      Value<int> committedMilli,
+      Value<DateTime?> confirmedOn,
+      Value<int?> savedMilli,
+      required String currency,
+      required DateTime createdAt,
+      Value<int> rowid,
+    });
+typedef $$SavingsPeriodsTableUpdateCompanionBuilder =
+    SavingsPeriodsCompanion Function({
+      Value<String> id,
+      Value<String> userId,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<DateTime> startedOn,
+      Value<int> incomeMilli,
+      Value<int> committedMilli,
+      Value<DateTime?> confirmedOn,
+      Value<int?> savedMilli,
+      Value<String> currency,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$SavingsPeriodsTableFilterComposer
+    extends Composer<_$AppDatabase, $SavingsPeriodsTable> {
+  $$SavingsPeriodsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get startedOn => $composableBuilder(
+    column: $table.startedOn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get incomeMilli => $composableBuilder(
+    column: $table.incomeMilli,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get committedMilli => $composableBuilder(
+    column: $table.committedMilli,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get confirmedOn => $composableBuilder(
+    column: $table.confirmedOn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get savedMilli => $composableBuilder(
+    column: $table.savedMilli,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get currency => $composableBuilder(
+    column: $table.currency,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$SavingsPeriodsTableOrderingComposer
+    extends Composer<_$AppDatabase, $SavingsPeriodsTable> {
+  $$SavingsPeriodsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get startedOn => $composableBuilder(
+    column: $table.startedOn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get incomeMilli => $composableBuilder(
+    column: $table.incomeMilli,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get committedMilli => $composableBuilder(
+    column: $table.committedMilli,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get confirmedOn => $composableBuilder(
+    column: $table.confirmedOn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get savedMilli => $composableBuilder(
+    column: $table.savedMilli,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get currency => $composableBuilder(
+    column: $table.currency,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$SavingsPeriodsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SavingsPeriodsTable> {
+  $$SavingsPeriodsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startedOn =>
+      $composableBuilder(column: $table.startedOn, builder: (column) => column);
+
+  GeneratedColumn<int> get incomeMilli => $composableBuilder(
+    column: $table.incomeMilli,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get committedMilli => $composableBuilder(
+    column: $table.committedMilli,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get confirmedOn => $composableBuilder(
+    column: $table.confirmedOn,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get savedMilli => $composableBuilder(
+    column: $table.savedMilli,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get currency =>
+      $composableBuilder(column: $table.currency, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$SavingsPeriodsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SavingsPeriodsTable,
+          SavingsPeriodRow,
+          $$SavingsPeriodsTableFilterComposer,
+          $$SavingsPeriodsTableOrderingComposer,
+          $$SavingsPeriodsTableAnnotationComposer,
+          $$SavingsPeriodsTableCreateCompanionBuilder,
+          $$SavingsPeriodsTableUpdateCompanionBuilder,
+          (
+            SavingsPeriodRow,
+            BaseReferences<
+              _$AppDatabase,
+              $SavingsPeriodsTable,
+              SavingsPeriodRow
+            >,
+          ),
+          SavingsPeriodRow,
+          PrefetchHooks Function()
+        > {
+  $$SavingsPeriodsTableTableManager(
+    _$AppDatabase db,
+    $SavingsPeriodsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SavingsPeriodsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SavingsPeriodsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SavingsPeriodsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> userId = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<DateTime> startedOn = const Value.absent(),
+                Value<int> incomeMilli = const Value.absent(),
+                Value<int> committedMilli = const Value.absent(),
+                Value<DateTime?> confirmedOn = const Value.absent(),
+                Value<int?> savedMilli = const Value.absent(),
+                Value<String> currency = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SavingsPeriodsCompanion(
+                id: id,
+                userId: userId,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                startedOn: startedOn,
+                incomeMilli: incomeMilli,
+                committedMilli: committedMilli,
+                confirmedOn: confirmedOn,
+                savedMilli: savedMilli,
+                currency: currency,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String userId,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required DateTime startedOn,
+                Value<int> incomeMilli = const Value.absent(),
+                Value<int> committedMilli = const Value.absent(),
+                Value<DateTime?> confirmedOn = const Value.absent(),
+                Value<int?> savedMilli = const Value.absent(),
+                required String currency,
+                required DateTime createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => SavingsPeriodsCompanion.insert(
+                id: id,
+                userId: userId,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                startedOn: startedOn,
+                incomeMilli: incomeMilli,
+                committedMilli: committedMilli,
+                confirmedOn: confirmedOn,
+                savedMilli: savedMilli,
+                currency: currency,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$SavingsPeriodsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SavingsPeriodsTable,
+      SavingsPeriodRow,
+      $$SavingsPeriodsTableFilterComposer,
+      $$SavingsPeriodsTableOrderingComposer,
+      $$SavingsPeriodsTableAnnotationComposer,
+      $$SavingsPeriodsTableCreateCompanionBuilder,
+      $$SavingsPeriodsTableUpdateCompanionBuilder,
+      (
+        SavingsPeriodRow,
+        BaseReferences<_$AppDatabase, $SavingsPeriodsTable, SavingsPeriodRow>,
+      ),
+      SavingsPeriodRow,
+      PrefetchHooks Function()
+    >;
 typedef $$ExchangeRatesTableCreateCompanionBuilder =
     ExchangeRatesCompanion Function({
       required String id,
@@ -10631,6 +11879,10 @@ typedef $$UserSettingsRowsTableCreateCompanionBuilder =
       required String locale,
       required String themeMode,
       required int paydayDayOfMonth,
+      Value<double> savingsRate,
+      Value<int?> savingsFloorMilli,
+      Value<int?> savingsCeilingMilli,
+      Value<int> savingsRecoveryPeriods,
       Value<int> rowid,
     });
 typedef $$UserSettingsRowsTableUpdateCompanionBuilder =
@@ -10643,6 +11895,10 @@ typedef $$UserSettingsRowsTableUpdateCompanionBuilder =
       Value<String> locale,
       Value<String> themeMode,
       Value<int> paydayDayOfMonth,
+      Value<double> savingsRate,
+      Value<int?> savingsFloorMilli,
+      Value<int?> savingsCeilingMilli,
+      Value<int> savingsRecoveryPeriods,
       Value<int> rowid,
     });
 
@@ -10692,6 +11948,26 @@ class $$UserSettingsRowsTableFilterComposer
 
   ColumnFilters<int> get paydayDayOfMonth => $composableBuilder(
     column: $table.paydayDayOfMonth,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get savingsRate => $composableBuilder(
+    column: $table.savingsRate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get savingsFloorMilli => $composableBuilder(
+    column: $table.savingsFloorMilli,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get savingsCeilingMilli => $composableBuilder(
+    column: $table.savingsCeilingMilli,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get savingsRecoveryPeriods => $composableBuilder(
+    column: $table.savingsRecoveryPeriods,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -10744,6 +12020,26 @@ class $$UserSettingsRowsTableOrderingComposer
     column: $table.paydayDayOfMonth,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<double> get savingsRate => $composableBuilder(
+    column: $table.savingsRate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get savingsFloorMilli => $composableBuilder(
+    column: $table.savingsFloorMilli,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get savingsCeilingMilli => $composableBuilder(
+    column: $table.savingsCeilingMilli,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get savingsRecoveryPeriods => $composableBuilder(
+    column: $table.savingsRecoveryPeriods,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$UserSettingsRowsTableAnnotationComposer
@@ -10780,6 +12076,26 @@ class $$UserSettingsRowsTableAnnotationComposer
 
   GeneratedColumn<int> get paydayDayOfMonth => $composableBuilder(
     column: $table.paydayDayOfMonth,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get savingsRate => $composableBuilder(
+    column: $table.savingsRate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get savingsFloorMilli => $composableBuilder(
+    column: $table.savingsFloorMilli,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get savingsCeilingMilli => $composableBuilder(
+    column: $table.savingsCeilingMilli,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get savingsRecoveryPeriods => $composableBuilder(
+    column: $table.savingsRecoveryPeriods,
     builder: (column) => column,
   );
 }
@@ -10829,6 +12145,10 @@ class $$UserSettingsRowsTableTableManager
                 Value<String> locale = const Value.absent(),
                 Value<String> themeMode = const Value.absent(),
                 Value<int> paydayDayOfMonth = const Value.absent(),
+                Value<double> savingsRate = const Value.absent(),
+                Value<int?> savingsFloorMilli = const Value.absent(),
+                Value<int?> savingsCeilingMilli = const Value.absent(),
+                Value<int> savingsRecoveryPeriods = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => UserSettingsRowsCompanion(
                 id: id,
@@ -10839,6 +12159,10 @@ class $$UserSettingsRowsTableTableManager
                 locale: locale,
                 themeMode: themeMode,
                 paydayDayOfMonth: paydayDayOfMonth,
+                savingsRate: savingsRate,
+                savingsFloorMilli: savingsFloorMilli,
+                savingsCeilingMilli: savingsCeilingMilli,
+                savingsRecoveryPeriods: savingsRecoveryPeriods,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -10851,6 +12175,10 @@ class $$UserSettingsRowsTableTableManager
                 required String locale,
                 required String themeMode,
                 required int paydayDayOfMonth,
+                Value<double> savingsRate = const Value.absent(),
+                Value<int?> savingsFloorMilli = const Value.absent(),
+                Value<int?> savingsCeilingMilli = const Value.absent(),
+                Value<int> savingsRecoveryPeriods = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => UserSettingsRowsCompanion.insert(
                 id: id,
@@ -10861,6 +12189,10 @@ class $$UserSettingsRowsTableTableManager
                 locale: locale,
                 themeMode: themeMode,
                 paydayDayOfMonth: paydayDayOfMonth,
+                savingsRate: savingsRate,
+                savingsFloorMilli: savingsFloorMilli,
+                savingsCeilingMilli: savingsCeilingMilli,
+                savingsRecoveryPeriods: savingsRecoveryPeriods,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -11882,6 +13214,8 @@ class $AppDatabaseManager {
       $$PlannedExpensesTableTableManager(_db, _db.plannedExpenses);
   $$SavingsGoalsTableTableManager get savingsGoals =>
       $$SavingsGoalsTableTableManager(_db, _db.savingsGoals);
+  $$SavingsPeriodsTableTableManager get savingsPeriods =>
+      $$SavingsPeriodsTableTableManager(_db, _db.savingsPeriods);
   $$ExchangeRatesTableTableManager get exchangeRates =>
       $$ExchangeRatesTableTableManager(_db, _db.exchangeRates);
   $$UserSettingsRowsTableTableManager get userSettingsRows =>

@@ -328,6 +328,20 @@ class BackupService {
             )
             .toList(growable: false);
 
+      case SyncEntity.savingsPeriods:
+        final rows = await (_db.select(_db.savingsPeriods)
+              ..where((t) => t.userId.equals(userId)))
+            .get();
+        return rows
+            .map(
+              (r) => savingsPeriodToJson(
+                userId,
+                r.toEntity(),
+                deletedAt: r.deletedAt,
+              ),
+            )
+            .toList(growable: false);
+
       case SyncEntity.exchangeRates:
         final rows = await (_db.select(_db.exchangeRates)
               ..where((t) => t.userId.equals(userId)))

@@ -11,6 +11,7 @@ enum SyncEntity {
   budgets('budgets'),
   plannedExpenses('planned_expenses'),
   savingsGoals('savings_goals'),
+  savingsPeriods('savings_periods'),
   exchangeRates('exchange_rates'),
   userSettings('user_settings');
 
@@ -34,7 +35,8 @@ enum SyncEntity {
         SyncEntity.recurringRules ||
         SyncEntity.budgets ||
         SyncEntity.plannedExpenses ||
-        SyncEntity.savingsGoals =>
+        SyncEntity.savingsGoals ||
+        SyncEntity.savingsPeriods =>
           true,
       };
 }
