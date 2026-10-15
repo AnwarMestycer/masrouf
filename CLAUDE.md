@@ -36,6 +36,41 @@ Codegen is **drift only**. `riverpod_annotation` / `riverpod_generator` are in
 Generated `*.g.dart` and `lib/l10n/app_localizations*.dart` are excluded from
 analysis — never hand-edit them.
 
+## Shipping an APK
+
+```bash
+flutter build apk --release --target-platform android-arm64 \
+  --build-number=<above what is installed> --dart-define-from-file=masrouf.env
+```
+
+**`versionCode` is a downgrade trap.** `--split-per-abi` adds `1000 * ABI index`
+to it, so an arm64 split build is `2001`, not `1`. A plain build is `1`, which
+is *lower* — Android refuses the install, and ColorOS (Oppo) reports it as
+**"package appears to be invalid"** rather than saying downgrade. That error
+cost two sessions and looked like a corrupt download. Check what is on the
+device and pass `--build-number` above it; the test phone has had `2001` and
+then `3001`.
+
+Other things that are not the problem when an install fails, all verified:
+zip integrity, 16 KB page alignment (`zipalign -c -P 16 4`), the signing
+certificate (same debug key throughout), and the ABI split. Check
+`aapt2 dump badging` for `versionCode` first.
+
+The APK is signed with the **Android debug key** — `android/app/build.gradle.kts`
+still carries Flutter's `// TODO: Add your own signing config`. Fine for
+sideloading, rejected by Play, and a real key later means users must uninstall
+first.
+
+`--dart-define-from-file=masrouf.env` is required, or the build ships without
+Supabase credentials and shows the configuration screen.
+
+**Release mode black-screens on the x86_64 emulator**, while profile mode with
+the same AOT code renders correctly. Dart runs — app logs appear — only
+rendering is blank. Ruled out: R8/resource shrinking, Impeller, dart-defines,
+install method, stale task state. Unresolved, and most likely specific to the
+emulator's GL translator rather than a real device; keep an arm64 profile build
+around as the fallback when testing on hardware.
+
 ## Layering
 
 ```
