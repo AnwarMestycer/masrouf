@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:masrouf/core/money/currency.dart';
+import 'package:masrouf/domain/entities/savings_plan.dart';
 import 'package:masrouf/core/router/routes.dart';
 import 'package:masrouf/core/theme/spacing.dart';
 import 'package:masrouf/data/sync/sync_status.dart';
@@ -139,6 +140,15 @@ class SettingsPage extends ConsumerWidget {
             onTap: () => context.push(Routes.calendar),
           ),
           ListTile(
+            leading: const Icon(Icons.savings_outlined),
+            title: Text(l10n.savingsTitle),
+            subtitle: Text(
+              l10n.savingsRateLabel,
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(Routes.savings),
+          ),
+          ListTile(
             leading: const Icon(Icons.flag_outlined),
             title: Text(l10n.goalsTitle),
             trailing: const Icon(Icons.chevron_right),
@@ -265,6 +275,31 @@ class SettingsPage extends ConsumerWidget {
                     );
               },
             ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.percent),
+            title: Text(l10n.savingsRateLabel),
+            subtitle: Text('${(settings.savings.rate * 100).round()}%'),
+            onTap: () async {
+              final rate = await showDialog<double>(
+                context: context,
+                builder: (context) => _SavingsRatePicker(
+                  initial: settings.savings.rate,
+                  title: l10n.savingsRateLabel,
+                ),
+              );
+              if (rate == null) return;
+              await ref.read(settingsRepositoryProvider).save(
+                    settings.copyWith(
+                      savings: SavingsPlan(
+                        rate: rate,
+                        floor: settings.savings.floor,
+                        ceiling: settings.savings.ceiling,
+                        recoveryPeriods: settings.savings.recoveryPeriods,
+                      ),
+                    ),
+                  );
+            },
           ),
           ListTile(
             leading: const Icon(Icons.event_available_outlined),
@@ -468,6 +503,53 @@ class _NotificationToggle extends ConsumerWidget {
         }
         await onChanged(ref, true);
       },
+    );
+  }
+}
+
+/// Whole percentages from nothing to half of income.
+///
+/// A dialog of fixed steps rather than a free text field: the number is a
+/// policy, not a measurement, and five-point steps are the granularity anyone
+/// actually reasons in.
+class _SavingsRatePicker extends StatelessWidget {
+  const _SavingsRatePicker({required this.initial, required this.title});
+
+  final double initial;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    final current = (initial * 100).round();
+    return AlertDialog(
+      title: Text(title),
+      content: SizedBox(
+        width: 300,
+        height: 300,
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+          ),
+          itemCount: 11,
+          itemBuilder: (context, index) {
+            final percent = index * 5;
+            return InkWell(
+              onTap: () => Navigator.of(context).pop(percent / 100),
+              child: Center(
+                child: Text(
+                  '$percent%',
+                  style: TextStyle(
+                    fontWeight: percent == current ? FontWeight.bold : null,
+                    color: percent == current
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }

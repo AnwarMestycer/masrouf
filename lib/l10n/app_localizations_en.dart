@@ -1064,4 +1064,84 @@ class L10nEn extends L10n {
     );
     return '$_temp0';
   }
+
+  @override
+  String get savingsTitle => 'Savings';
+
+  @override
+  String get savingsNoPlan => 'No savings plan yet';
+
+  @override
+  String get savingsNoPlanHint =>
+      'Commit a share of what comes in. It is held back from safe to spend until you confirm what you actually saved.';
+
+  @override
+  String get savingsRateLabel => 'Share of income';
+
+  @override
+  String get savingsPlanSaved => 'Savings plan updated';
+
+  @override
+  String get savingsNoPeriod => 'No period open';
+
+  @override
+  String get savingsNoPeriodHint =>
+      'Start one and the share will be set aside as income arrives.';
+
+  @override
+  String get savingsStart => 'Start a period';
+
+  @override
+  String savingsSince(String date) {
+    return 'Since $date';
+  }
+
+  @override
+  String get savingsIncomeSoFar => 'Income so far';
+
+  @override
+  String get savingsCommitment => 'Its own share';
+
+  @override
+  String get savingsCatchUp => 'Catching up';
+
+  @override
+  String get savingsTarget => 'Target';
+
+  @override
+  String get savingsOwed => 'Owed to yourself';
+
+  @override
+  String savingsAhead(String amount) {
+    return 'Ahead by $amount';
+  }
+
+  @override
+  String get savingsConfirm => 'Confirm what you saved';
+
+  @override
+  String get savingsConfirmTitle => 'What did you actually save?';
+
+  @override
+  String get savingsConfirmHint =>
+      'Less is fine. The difference is added to what you owe yourself and asked for next period.';
+
+  @override
+  String get savingsSaved => 'Saved';
+
+  @override
+  String get savingsHistory => 'Past periods';
+
+  @override
+  String savingsShortBy(String amount) {
+    return '$amount short';
+  }
+
+  @override
+  String savingsOverBy(String amount) {
+    return '$amount over';
+  }
+
+  @override
+  String get savingsOnTarget => 'On target';
 }

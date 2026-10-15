@@ -1067,4 +1067,83 @@ class L10nAr extends L10n {
     );
     return '$_temp0';
   }
+
+  @override
+  String get savingsTitle => 'الادخار';
+
+  @override
+  String get savingsNoPlan => 'لا توجد خطة ادخار';
+
+  @override
+  String get savingsNoPlanHint =>
+      'التزم بحصة مما يدخل. تُحجز عن المتاح للإنفاق حتى تؤكّد ما ادّخرته فعلاً.';
+
+  @override
+  String get savingsRateLabel => 'حصة من الدخل';
+
+  @override
+  String get savingsPlanSaved => 'تم تحديث خطة الادخار';
+
+  @override
+  String get savingsNoPeriod => 'لا توجد فترة مفتوحة';
+
+  @override
+  String get savingsNoPeriodHint => 'ابدأ واحدة وستُحجز الحصة مع وصول الدخل.';
+
+  @override
+  String get savingsStart => 'ابدأ فترة';
+
+  @override
+  String savingsSince(String date) {
+    return 'منذ $date';
+  }
+
+  @override
+  String get savingsIncomeSoFar => 'الدخل حتى الآن';
+
+  @override
+  String get savingsCommitment => 'حصتها';
+
+  @override
+  String get savingsCatchUp => 'تعويض';
+
+  @override
+  String get savingsTarget => 'الهدف';
+
+  @override
+  String get savingsOwed => 'مستحق لنفسك';
+
+  @override
+  String savingsAhead(String amount) {
+    return 'متقدّم بـ $amount';
+  }
+
+  @override
+  String get savingsConfirm => 'أكّد ما ادّخرته';
+
+  @override
+  String get savingsConfirmTitle => 'كم ادّخرت فعلاً؟';
+
+  @override
+  String get savingsConfirmHint =>
+      'الأقل مقبول. يُضاف الفرق إلى ما تدين به لنفسك ويُطلب في الفترة التالية.';
+
+  @override
+  String get savingsSaved => 'المُدّخر';
+
+  @override
+  String get savingsHistory => 'الفترات السابقة';
+
+  @override
+  String savingsShortBy(String amount) {
+    return 'ناقص $amount';
+  }
+
+  @override
+  String savingsOverBy(String amount) {
+    return 'زائد $amount';
+  }
+
+  @override
+  String get savingsOnTarget => 'مطابق للهدف';
 }

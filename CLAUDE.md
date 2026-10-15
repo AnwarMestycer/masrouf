@@ -26,7 +26,7 @@ dart run flutter_launcher_icons     # regenerates android mipmap-* from assets/i
 the app shows a configuration screen rather than failing on first request, and
 two tests in `test/unit/env_test.dart` self-skip.
 
-Baseline as of the last check: `flutter test` is 318 passing / 2 skipped and
+Baseline as of the last check: `flutter test` is 352 passing / 2 skipped and
 `flutter analyze` is clean.
 
 Codegen is **drift only**. `riverpod_annotation` / `riverpod_generator` are in
@@ -143,7 +143,7 @@ automatically once the above is done.
 
 Migrations here may create and backfill but must **never** drop or rewrite a
 column: existing rows are the user's only copy of anything written offline.
-Current `schemaVersion` is 4.
+Current `schemaVersion` is 5.
 
 ## Notifications and backups
 
@@ -171,6 +171,45 @@ wire format, keeps the newest four, and restores as truth — clear, rewrite,
 enqueue every row as a push, drop the pull cursors, rebuild aggregates. Inject
 `root:` and `encode:` in tests; the default encoder hops to a background isolate
 via `compute`.
+
+## Savings
+
+Pay-yourself-first: a period commits a share of the income that *actually
+arrives* (not a fixed sum — income here lands on the 26th, the 16th and the
+5th), safe-to-spend holds it back, and the user later confirms what was really
+set aside.
+
+The whole scheme is one invariant, in `SavingsLedger`:
+
+```
+owed = max(0, everything committed - everything confirmed)
+```
+
+Saving less grows it; saving more shrinks it but it **floors at zero**, so a
+good period never buys credit against a future one. Changing either half
+silently changes what the app asks of someone next month — both are pinned by
+tests in `savings_plan_test.dart`.
+
+Nothing stores `owed`, and nothing stores the open period's income. Both are
+derived — owed from the confirmed periods, income from the ledger. The savings
+*goals* feature is the cautionary tale: its progress is the linked account's
+whole balance, so two goals on one account each claim all of it.
+
+Two boundaries that are easy to reintroduce:
+
+- **A period starts the day after the last was confirmed.** Transactions carry a
+  calendar day and no time, so periods sharing a start date both count the same
+  income.
+- **The income window's end is clamped to never precede its own start**, or a
+  period beginning tomorrow is asked for income over an empty range and reports
+  a commitment of nothing.
+
+**The settings row is written with `insertOrReplace`.** Every column must be
+named on every write, in `SettingsRepositoryImpl.save` *and* in
+`row_writer.dart`. An omitted column is not left alone — it is reset to its
+default, which is how the savings plan silently went back to zero whenever the
+language was changed, and again on the next pull.
+`settings_roundtrip_test.dart` guards both paths.
 
 ## Session and routing
 

@@ -51,6 +51,16 @@ class SettingsRepositoryImpl implements SettingsRepository {
                   locale: settings.locale,
                   themeMode: themeModeToWire(settings.themeMode),
                   paydayDayOfMonth: settings.paydayDayOfMonth,
+                  // insertOrReplace rewrites the whole row, so every column has
+                  // to be named here. Leaving these out reset the savings plan
+                  // to zero every time any other setting was touched.
+                  savingsRate: Value<double>(settings.savings.rate),
+                  savingsFloorMilli:
+                      Value<int?>(settings.savings.floor?.milli),
+                  savingsCeilingMilli:
+                      Value<int?>(settings.savings.ceiling?.milli),
+                  savingsRecoveryPeriods:
+                      Value<int>(settings.savings.recoveryPeriods),
                   updatedAt: DateTime.now(),
                 ),
                 mode: InsertMode.insertOrReplace,

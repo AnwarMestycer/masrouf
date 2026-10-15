@@ -251,6 +251,14 @@ Future<void> applyRemoteRows(
               locale: settings.locale,
               themeMode: themeModeToWire(settings.themeMode),
               paydayDayOfMonth: settings.paydayDayOfMonth,
+              // Same trap as the local save path: this row is replaced
+              // wholesale, so an omitted column is not "left alone" — it is
+              // reset to its default.
+              savingsRate: Value<double>(settings.savings.rate),
+              savingsFloorMilli: Value<int?>(settings.savings.floor?.milli),
+              savingsCeilingMilli: Value<int?>(settings.savings.ceiling?.milli),
+              savingsRecoveryPeriods:
+                  Value<int>(settings.savings.recoveryPeriods),
               updatedAt: rowUpdatedAt(row),
             );
           }).toList(growable: false),

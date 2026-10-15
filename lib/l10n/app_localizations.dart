@@ -1874,6 +1874,144 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 transaction} other{{count} transactions}}'**
   String analyticsTransactionsCount(int count);
+
+  /// No description provided for @savingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Savings'**
+  String get savingsTitle;
+
+  /// No description provided for @savingsNoPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'No savings plan yet'**
+  String get savingsNoPlan;
+
+  /// No description provided for @savingsNoPlanHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Commit a share of what comes in. It is held back from safe to spend until you confirm what you actually saved.'**
+  String get savingsNoPlanHint;
+
+  /// No description provided for @savingsRateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Share of income'**
+  String get savingsRateLabel;
+
+  /// No description provided for @savingsPlanSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Savings plan updated'**
+  String get savingsPlanSaved;
+
+  /// No description provided for @savingsNoPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'No period open'**
+  String get savingsNoPeriod;
+
+  /// No description provided for @savingsNoPeriodHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Start one and the share will be set aside as income arrives.'**
+  String get savingsNoPeriodHint;
+
+  /// No description provided for @savingsStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a period'**
+  String get savingsStart;
+
+  /// No description provided for @savingsSince.
+  ///
+  /// In en, this message translates to:
+  /// **'Since {date}'**
+  String savingsSince(String date);
+
+  /// No description provided for @savingsIncomeSoFar.
+  ///
+  /// In en, this message translates to:
+  /// **'Income so far'**
+  String get savingsIncomeSoFar;
+
+  /// No description provided for @savingsCommitment.
+  ///
+  /// In en, this message translates to:
+  /// **'Its own share'**
+  String get savingsCommitment;
+
+  /// No description provided for @savingsCatchUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Catching up'**
+  String get savingsCatchUp;
+
+  /// No description provided for @savingsTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get savingsTarget;
+
+  /// No description provided for @savingsOwed.
+  ///
+  /// In en, this message translates to:
+  /// **'Owed to yourself'**
+  String get savingsOwed;
+
+  /// No description provided for @savingsAhead.
+  ///
+  /// In en, this message translates to:
+  /// **'Ahead by {amount}'**
+  String savingsAhead(String amount);
+
+  /// No description provided for @savingsConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm what you saved'**
+  String get savingsConfirm;
+
+  /// No description provided for @savingsConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What did you actually save?'**
+  String get savingsConfirmTitle;
+
+  /// No description provided for @savingsConfirmHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Less is fine. The difference is added to what you owe yourself and asked for next period.'**
+  String get savingsConfirmHint;
+
+  /// No description provided for @savingsSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get savingsSaved;
+
+  /// No description provided for @savingsHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Past periods'**
+  String get savingsHistory;
+
+  /// No description provided for @savingsShortBy.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} short'**
+  String savingsShortBy(String amount);
+
+  /// No description provided for @savingsOverBy.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} over'**
+  String savingsOverBy(String amount);
+
+  /// No description provided for @savingsOnTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'On target'**
+  String get savingsOnTarget;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

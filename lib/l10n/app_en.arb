@@ -638,5 +638,56 @@
         "type": "int"
       }
     }
-  }
+  },
+  "savingsTitle": "Savings",
+  "savingsNoPlan": "No savings plan yet",
+  "savingsNoPlanHint": "Commit a share of what comes in. It is held back from safe to spend until you confirm what you actually saved.",
+  "savingsRateLabel": "Share of income",
+  "savingsPlanSaved": "Savings plan updated",
+  "savingsNoPeriod": "No period open",
+  "savingsNoPeriodHint": "Start one and the share will be set aside as income arrives.",
+  "savingsStart": "Start a period",
+  "savingsSince": "Since {date}",
+  "@savingsSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "savingsIncomeSoFar": "Income so far",
+  "savingsCommitment": "Its own share",
+  "savingsCatchUp": "Catching up",
+  "savingsTarget": "Target",
+  "savingsOwed": "Owed to yourself",
+  "savingsAhead": "Ahead by {amount}",
+  "@savingsAhead": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "savingsConfirm": "Confirm what you saved",
+  "savingsConfirmTitle": "What did you actually save?",
+  "savingsConfirmHint": "Less is fine. The difference is added to what you owe yourself and asked for next period.",
+  "savingsSaved": "Saved",
+  "savingsHistory": "Past periods",
+  "savingsShortBy": "{amount} short",
+  "@savingsShortBy": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "savingsOverBy": "{amount} over",
+  "@savingsOverBy": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "savingsOnTarget": "On target"
 }

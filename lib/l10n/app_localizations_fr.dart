@@ -1077,4 +1077,84 @@ class L10nFr extends L10n {
     );
     return '$_temp0';
   }
+
+  @override
+  String get savingsTitle => 'Épargne';
+
+  @override
+  String get savingsNoPlan => 'Aucun plan d’épargne';
+
+  @override
+  String get savingsNoPlanHint =>
+      'Engagez une part de ce qui rentre. Elle est retenue sur le disponible jusqu’à ce que vous confirmiez ce que vous avez épargné.';
+
+  @override
+  String get savingsRateLabel => 'Part des revenus';
+
+  @override
+  String get savingsPlanSaved => 'Plan d’épargne mis à jour';
+
+  @override
+  String get savingsNoPeriod => 'Aucune période en cours';
+
+  @override
+  String get savingsNoPeriodHint =>
+      'Démarrez-en une et la part sera mise de côté à mesure que les revenus arrivent.';
+
+  @override
+  String get savingsStart => 'Démarrer une période';
+
+  @override
+  String savingsSince(String date) {
+    return 'Depuis le $date';
+  }
+
+  @override
+  String get savingsIncomeSoFar => 'Revenus à ce jour';
+
+  @override
+  String get savingsCommitment => 'Sa propre part';
+
+  @override
+  String get savingsCatchUp => 'Rattrapage';
+
+  @override
+  String get savingsTarget => 'Objectif';
+
+  @override
+  String get savingsOwed => 'Dû à vous-même';
+
+  @override
+  String savingsAhead(String amount) {
+    return 'En avance de $amount';
+  }
+
+  @override
+  String get savingsConfirm => 'Confirmer ce que vous avez épargné';
+
+  @override
+  String get savingsConfirmTitle => 'Combien avez-vous vraiment épargné ?';
+
+  @override
+  String get savingsConfirmHint =>
+      'Moins, c’est permis. La différence s’ajoute à ce que vous vous devez et sera demandée la période suivante.';
+
+  @override
+  String get savingsSaved => 'Épargné';
+
+  @override
+  String get savingsHistory => 'Périodes passées';
+
+  @override
+  String savingsShortBy(String amount) {
+    return '$amount de moins';
+  }
+
+  @override
+  String savingsOverBy(String amount) {
+    return '$amount de plus';
+  }
+
+  @override
+  String get savingsOnTarget => 'Objectif atteint';
 }
