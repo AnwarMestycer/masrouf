@@ -287,5 +287,14 @@
   "analyticsTopMovers": "أكبر التغيّرات",
   "analyticsRangeDays": "{count, plural, =1{يوم واحد} other{{count} أيام}}",
   "analyticsComparedTo": "مقارنةً بـ {days} السابقة",
-  "analyticsBurnRateNoIncomeRange": "لا دخل في هذه الفترة"
+  "analyticsBurnRateNoIncomeRange": "لا دخل في هذه الفترة",
+  "analyticsBurnRateFarOver": "أُنفق أكثر بكثير مما دخل",
+  "analyticsDetail": "التفاصيل",
+  "analyticsPerDayLabel": "لكل يوم",
+  "analyticsPerActiveDayLabel": "لكل يوم نشط",
+  "analyticsActiveDaysOf": "{active} من {total} يوماً",
+  "analyticsAveragePurchaseLabel": "متوسط الشراء",
+  "analyticsTypicalPurchaseLabel": "الشراء المعتاد",
+  "analyticsBusiestDayLabel": "أكثر الأيام إنفاقاً",
+  "analyticsTransactionsCount": "{count, plural, =1{عملية واحدة} other{{count} عمليات}}"
 }

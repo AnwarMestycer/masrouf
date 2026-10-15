@@ -1,3 +1,4 @@
+import 'package:masrouf/core/config/app_config.dart';
 import 'package:masrouf/core/money/money.dart';
 import 'package:masrouf/domain/entities/analytics/analytics.dart';
 import 'package:masrouf/domain/entities/analytics/date_range.dart';
@@ -36,6 +37,10 @@ class RangeReport {
     required this.previousIncome,
     required this.txnCount,
     required this.medianTxn,
+    required this.meanTxn,
+    required this.activeDays,
+    required this.busiestDay,
+    required this.busiestDayTotal,
     required this.large,
     required this.slices,
   });
@@ -47,6 +52,10 @@ class RangeReport {
         previousIncome = zero,
         txnCount = 0,
         medianTxn = zero,
+        meanTxn = zero,
+        activeDays = 0,
+        busiestDay = null,
+        busiestDayTotal = zero,
         large = const <LargePayment>[],
         slices = const <CategorySlice>[];
 
@@ -65,6 +74,21 @@ class RangeReport {
   /// mean nobody ever spent.
   final Money medianTxn;
 
+  /// The average purchase. Shown beside [medianTxn] rather than instead of it:
+  /// the gap between the two *is* the finding. A ledger whose mean is three
+  /// times its median is one where a few large payments are carrying the total.
+  final Money meanTxn;
+
+  /// Days in the window with at least one transaction.
+  ///
+  /// The denominator that makes a daily average honest. Spending 300 over three
+  /// days of a thirty-day window is not "10 a day".
+  final int activeDays;
+
+  /// The heaviest single day, or null when the window is empty.
+  final DateTime? busiestDay;
+  final Money busiestDayTotal;
+
   /// Payments large enough to dominate the total on their own, biggest first.
   final List<LargePayment> large;
 
@@ -79,6 +103,21 @@ class RangeReport {
   /// What was spent once the large payments are set aside — the number that
   /// answers "what does a normal week cost me".
   Money get everyday => expense - largeTotal;
+
+  /// Spending per day of the window, everything included.
+  Money get perDay => Money(
+        range.dayCount == 0 ? 0 : expense.milli ~/ range.dayCount,
+        expense.currency,
+      );
+
+  /// Spending per day on which anything was actually spent.
+  ///
+  /// Read together with [perDay]: a large gap between them means the spending
+  /// is bursty rather than steady, which is a different thing to know.
+  Money get perActiveDay => Money(
+        activeDays == 0 ? 0 : expense.milli ~/ activeDays,
+        expense.currency,
+      );
 
   /// Everyday spending per day of the window. Large payments are excluded
   /// deliberately: one tuition bill would otherwise set a daily rate that no
@@ -106,6 +145,17 @@ class RangeReport {
   /// of showing an untrue 0%.
   double? get burnRate =>
       income.isZero ? null : expense.milli / income.milli;
+
+  /// Whether spending so dwarfs the window's income that the percentage says
+  /// more about where the window's edges fell than about any spending habit.
+  ///
+  /// A ten-day window that misses payday but catches the rent it paid for
+  /// reports four figures of "income spent". The direction is the only part of
+  /// that worth showing.
+  bool get burnRateIsUninformative {
+    final rate = burnRate;
+    return rate != null && rate > AppConfig.analyticsBurnRateCeiling;
+  }
 
   bool get isEmpty => txnCount == 0;
 }

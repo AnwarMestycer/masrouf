@@ -612,5 +612,31 @@
       }
     }
   },
-  "analyticsBurnRateNoIncomeRange": "No income in this period"
+  "analyticsBurnRateNoIncomeRange": "No income in this period",
+  "analyticsBurnRateFarOver": "Spent far more than came in",
+  "analyticsDetail": "Detail",
+  "analyticsPerDayLabel": "Per day",
+  "analyticsPerActiveDayLabel": "Per active day",
+  "analyticsActiveDaysOf": "{active} of {total} days",
+  "@analyticsActiveDaysOf": {
+    "placeholders": {
+      "active": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "analyticsAveragePurchaseLabel": "Average purchase",
+  "analyticsTypicalPurchaseLabel": "Typical purchase",
+  "analyticsBusiestDayLabel": "Busiest day",
+  "analyticsTransactionsCount": "{count, plural, =1{1 transaction} other{{count} transactions}}",
+  "@analyticsTransactionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

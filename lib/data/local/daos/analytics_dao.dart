@@ -386,6 +386,9 @@ class AnalyticsDao extends DatabaseAccessor<AppDatabase>
       var previousIncome = 0;
       var previousExpense = 0;
       final amounts = <int>[];
+      // Spending per calendar day of the window, for the active-day count and
+      // the heaviest day. Keyed by ymd, which is already how the ledger sorts.
+      final byDay = <int, int>{};
       final current = <String, _Bucket>{};
       final before = <String, int>{};
       final categoriesById = <String, Category>{};
@@ -430,6 +433,7 @@ class AnalyticsDao extends DatabaseAccessor<AppDatabase>
           bucket.total += milli;
           bucket.count += 1;
           amounts.add(milli);
+          byDay[txn.dateYmd] = (byDay[txn.dateYmd] ?? 0) + milli;
           payments.add(
             LargePayment(
               id: txn.id,
@@ -460,6 +464,21 @@ class AnalyticsDao extends DatabaseAccessor<AppDatabase>
       final median = amounts.isEmpty
           ? zero
           : Money(amounts[amounts.length ~/ 2], base);
+      final mean = amounts.isEmpty
+          ? zero
+          : Money(
+              amounts.reduce((a, b) => a + b) ~/ amounts.length,
+              base,
+            );
+
+      var busiestYmd = 0;
+      var busiestTotal = 0;
+      byDay.forEach((ymd, total) {
+        if (total > busiestTotal) {
+          busiestTotal = total;
+          busiestYmd = ymd;
+        }
+      });
 
       // Large enough to move the total on its own *and* unlike its neighbours.
       // A share of the window scales with how much was spent and needs no
@@ -483,6 +502,10 @@ class AnalyticsDao extends DatabaseAccessor<AppDatabase>
         previousExpense: Money(previousExpense, base),
         txnCount: amounts.length,
         medianTxn: median,
+        meanTxn: mean,
+        activeDays: byDay.length,
+        busiestDay: busiestYmd == 0 ? null : ymdToDate(busiestYmd),
+        busiestDayTotal: Money(busiestTotal, base),
         large: large,
         slices: slices,
       );

@@ -85,9 +85,11 @@ class RangeHeadline extends StatelessWidget {
             child: Text(
               report.burnRate == null
                   ? l10n.analyticsBurnRateNoIncomeRange
-                  : l10n.analyticsBurnRate(
-                      '${(report.burnRate! * 100).round()}%',
-                    ),
+                  : report.burnRateIsUninformative
+                      ? l10n.analyticsBurnRateFarOver
+                      : l10n.analyticsBurnRate(
+                          '${(report.burnRate! * 100).round()}%',
+                        ),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: report.burnRate != null && report.burnRate! > 1
                     ? theme.colorScheme.error

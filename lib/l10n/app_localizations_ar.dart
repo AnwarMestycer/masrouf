@@ -1030,4 +1030,41 @@ class L10nAr extends L10n {
 
   @override
   String get analyticsBurnRateNoIncomeRange => 'لا دخل في هذه الفترة';
+
+  @override
+  String get analyticsBurnRateFarOver => 'أُنفق أكثر بكثير مما دخل';
+
+  @override
+  String get analyticsDetail => 'التفاصيل';
+
+  @override
+  String get analyticsPerDayLabel => 'لكل يوم';
+
+  @override
+  String get analyticsPerActiveDayLabel => 'لكل يوم نشط';
+
+  @override
+  String analyticsActiveDaysOf(int active, int total) {
+    return '$active من $total يوماً';
+  }
+
+  @override
+  String get analyticsAveragePurchaseLabel => 'متوسط الشراء';
+
+  @override
+  String get analyticsTypicalPurchaseLabel => 'الشراء المعتاد';
+
+  @override
+  String get analyticsBusiestDayLabel => 'أكثر الأيام إنفاقاً';
+
+  @override
+  String analyticsTransactionsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count عمليات',
+      one: 'عملية واحدة',
+    );
+    return '$_temp0';
+  }
 }

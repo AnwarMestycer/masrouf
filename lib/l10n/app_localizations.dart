@@ -1820,6 +1820,60 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'No income in this period'**
   String get analyticsBurnRateNoIncomeRange;
+
+  /// No description provided for @analyticsBurnRateFarOver.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent far more than came in'**
+  String get analyticsBurnRateFarOver;
+
+  /// No description provided for @analyticsDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Detail'**
+  String get analyticsDetail;
+
+  /// No description provided for @analyticsPerDayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Per day'**
+  String get analyticsPerDayLabel;
+
+  /// No description provided for @analyticsPerActiveDayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Per active day'**
+  String get analyticsPerActiveDayLabel;
+
+  /// No description provided for @analyticsActiveDaysOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{active} of {total} days'**
+  String analyticsActiveDaysOf(int active, int total);
+
+  /// No description provided for @analyticsAveragePurchaseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Average purchase'**
+  String get analyticsAveragePurchaseLabel;
+
+  /// No description provided for @analyticsTypicalPurchaseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Typical purchase'**
+  String get analyticsTypicalPurchaseLabel;
+
+  /// No description provided for @analyticsBusiestDayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Busiest day'**
+  String get analyticsBusiestDayLabel;
+
+  /// No description provided for @analyticsTransactionsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 transaction} other{{count} transactions}}'**
+  String analyticsTransactionsCount(int count);
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

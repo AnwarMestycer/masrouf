@@ -1040,4 +1040,41 @@ class L10nFr extends L10n {
 
   @override
   String get analyticsBurnRateNoIncomeRange => 'Aucun revenu sur cette période';
+
+  @override
+  String get analyticsBurnRateFarOver => 'Dépensé bien plus que reçu';
+
+  @override
+  String get analyticsDetail => 'Détail';
+
+  @override
+  String get analyticsPerDayLabel => 'Par jour';
+
+  @override
+  String get analyticsPerActiveDayLabel => 'Par jour actif';
+
+  @override
+  String analyticsActiveDaysOf(int active, int total) {
+    return '$active jours sur $total';
+  }
+
+  @override
+  String get analyticsAveragePurchaseLabel => 'Achat moyen';
+
+  @override
+  String get analyticsTypicalPurchaseLabel => 'Achat typique';
+
+  @override
+  String get analyticsBusiestDayLabel => 'Jour le plus chargé';
+
+  @override
+  String analyticsTransactionsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count opérations',
+      one: '1 opération',
+    );
+    return '$_temp0';
+  }
 }

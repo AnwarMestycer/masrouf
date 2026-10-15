@@ -29,6 +29,15 @@ abstract final class AppConfig {
   /// few purchases there are.
   static const int analyticsLargePaymentMedianMultiple = 3;
 
+  /// Above this ratio of spending to income, the burn rate stops being reported
+  /// as a percentage.
+  ///
+  /// "Spent 14083% of income" is arithmetically right and useless: it describes
+  /// where the window's edges fell, not how someone spent. Any window that
+  /// excludes payday but includes the rent it paid for produces a number like
+  /// that. Past this point the direction is the whole message.
+  static const double analyticsBurnRateCeiling = 5.0;
+
   /// Months of history the analytics screens keep in memory at once.
   static const int analyticsMonthWindow = 6;
 

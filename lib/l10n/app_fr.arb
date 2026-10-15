@@ -287,5 +287,14 @@
   "analyticsTopMovers": "Plus fortes variations",
   "analyticsRangeDays": "{count, plural, =1{1 jour} other{{count} jours}}",
   "analyticsComparedTo": "vs {days} précédents",
-  "analyticsBurnRateNoIncomeRange": "Aucun revenu sur cette période"
+  "analyticsBurnRateNoIncomeRange": "Aucun revenu sur cette période",
+  "analyticsBurnRateFarOver": "Dépensé bien plus que reçu",
+  "analyticsDetail": "Détail",
+  "analyticsPerDayLabel": "Par jour",
+  "analyticsPerActiveDayLabel": "Par jour actif",
+  "analyticsActiveDaysOf": "{active} jours sur {total}",
+  "analyticsAveragePurchaseLabel": "Achat moyen",
+  "analyticsTypicalPurchaseLabel": "Achat typique",
+  "analyticsBusiestDayLabel": "Jour le plus chargé",
+  "analyticsTransactionsCount": "{count, plural, =1{1 opération} other{{count} opérations}}"
 }

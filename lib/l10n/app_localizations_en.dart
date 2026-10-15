@@ -1027,4 +1027,41 @@ class L10nEn extends L10n {
 
   @override
   String get analyticsBurnRateNoIncomeRange => 'No income in this period';
+
+  @override
+  String get analyticsBurnRateFarOver => 'Spent far more than came in';
+
+  @override
+  String get analyticsDetail => 'Detail';
+
+  @override
+  String get analyticsPerDayLabel => 'Per day';
+
+  @override
+  String get analyticsPerActiveDayLabel => 'Per active day';
+
+  @override
+  String analyticsActiveDaysOf(int active, int total) {
+    return '$active of $total days';
+  }
+
+  @override
+  String get analyticsAveragePurchaseLabel => 'Average purchase';
+
+  @override
+  String get analyticsTypicalPurchaseLabel => 'Typical purchase';
+
+  @override
+  String get analyticsBusiestDayLabel => 'Busiest day';
+
+  @override
+  String analyticsTransactionsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count transactions',
+      one: '1 transaction',
+    );
+    return '$_temp0';
+  }
 }

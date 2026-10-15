@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:masrouf/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:masrouf/core/time/date_x.dart';
 import 'package:masrouf/domain/entities/user_settings.dart';
 import 'package:masrouf/presentation/providers/analytics_providers.dart';
 import 'package:masrouf/presentation/providers/backup_providers.dart';
@@ -10,6 +11,7 @@ import 'package:masrouf/presentation/providers/auth_providers.dart';
 import 'package:masrouf/presentation/providers/core_providers.dart';
 import 'package:masrouf/presentation/providers/data_providers.dart';
 import 'package:masrouf/presentation/providers/notification_providers.dart';
+import 'package:masrouf/presentation/providers/range_providers.dart';
 
 /// Everything that has to happen when a user signs in, and be undone when they
 /// sign out.
@@ -164,6 +166,15 @@ class AppLifecycleWatcher with WidgetsBindingObserver {
 
     unawaited(_ref.read(authRepositoryProvider).refreshSession());
     _ref.read(syncEngineProvider).requestSync();
+
+    // Analytics windows are resolved against a cached "today". Coming back the
+    // next day without this leaves "this month" and "last 30 days" describing
+    // the day the app was opened on, not the day it is being read on. Guarded
+    // on the date actually changing, because invalidating re-runs a ledger
+    // scan and most resumes happen within the same day.
+    if (_ref.read(analyticsTodayProvider) != DateTime.now().dateOnly) {
+      _ref.invalidate(analyticsTodayProvider);
+    }
   }
 }
 

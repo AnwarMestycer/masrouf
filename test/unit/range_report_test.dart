@@ -216,6 +216,150 @@ void main() {
     });
   });
 
+  group('the burn rate', () {
+    test('reports the share of income spent when that means something',
+        () async {
+      await add(txn(DateTime(2026, 9, 3), 500000, type: TxnType.income));
+      await add(txn(DateTime(2026, 9, 4), 100000));
+
+      final range = DateRange(
+        from: DateTime(2026, 9),
+        to: DateTime(2026, 9, 30),
+      );
+      final r = await report(range);
+
+      expect(r.burnRate, closeTo(0.2, 0.0001));
+      expect(r.burnRateIsUninformative, isFalse);
+    });
+
+    /// Observed on a ten-day window: "Spent 14083% of income". Arithmetically
+    /// right and useless — it describes where the window's edges fell relative
+    /// to payday, not how anyone spent. Past the ceiling the direction is the
+    /// whole message.
+    test('stops reporting a percentage once it is only window noise', () async {
+      await add(txn(DateTime(2026, 9, 3), 1500, type: TxnType.income));
+      await add(txn(DateTime(2026, 9, 4), 211250));
+
+      final range = DateRange(
+        from: DateTime(2026, 9),
+        to: DateTime(2026, 9, 30),
+      );
+      final r = await report(range);
+
+      expect(r.burnRate, greaterThan(100));
+      expect(r.burnRateIsUninformative, isTrue);
+    });
+
+    test('no income at all is still distinct from spending nothing', () async {
+      await add(txn(DateTime(2026, 9, 4), 1000));
+
+      final range = DateRange(
+        from: DateTime(2026, 9),
+        to: DateTime(2026, 9, 30),
+      );
+      final r = await report(range);
+
+      expect(r.burnRate, isNull, reason: 'nothing to divide by');
+      expect(
+        r.burnRateIsUninformative,
+        isFalse,
+        reason: 'null is reported as "no income", not as the far-over message',
+      );
+    });
+  });
+
+  group('the daily picture', () {
+    /// Three days of spending inside a thirty-day window is not "10 a day" on
+    /// every day — both denominators are shown because they answer different
+    /// questions.
+    test('per day and per active day are different questions', () async {
+      for (final day in <int>[3, 4, 5]) {
+        await add(txn(DateTime(2026, 9, day), 100000));
+      }
+      final range = DateRange(
+        from: DateTime(2026, 9),
+        to: DateTime(2026, 9, 30),
+      );
+      final r = await report(range);
+
+      expect(r.expense, const Money(300000, base));
+      expect(r.activeDays, 3);
+      expect(r.perDay, const Money(10000, base), reason: '300.000 over 30 days');
+      expect(
+        r.perActiveDay,
+        const Money(100000, base),
+        reason: '300.000 over the 3 days anything was spent',
+      );
+    });
+
+    test('several purchases on one day count as one active day', () async {
+      await add(txn(DateTime(2026, 9, 3), 1000));
+      await add(txn(DateTime(2026, 9, 3), 2000));
+      await add(txn(DateTime(2026, 9, 4), 3000));
+
+      final range = DateRange(
+        from: DateTime(2026, 9),
+        to: DateTime(2026, 9, 30),
+      );
+      expect((await report(range)).activeDays, 2);
+    });
+
+    test('the heaviest day is reported with its total', () async {
+      await add(txn(DateTime(2026, 9, 3), 5000));
+      await add(txn(DateTime(2026, 9, 7), 20000));
+      await add(txn(DateTime(2026, 9, 7), 10000));
+      await add(txn(DateTime(2026, 9, 9), 25000));
+
+      final range = DateRange(
+        from: DateTime(2026, 9),
+        to: DateTime(2026, 9, 30),
+      );
+      final r = await report(range);
+
+      expect(
+        r.busiestDay,
+        DateTime(2026, 9, 7),
+        reason: '30.000 across two purchases beats a single 25.000',
+      );
+      expect(r.busiestDayTotal, const Money(30000, base));
+    });
+
+    /// The gap between the two is the finding: a mean well above the median
+    /// means a few payments are carrying the total.
+    test('the mean and the median are both reported', () async {
+      for (var i = 0; i < 9; i++) {
+        await add(txn(DateTime(2026, 9, i + 1), 2000));
+      }
+      await add(txn(DateTime(2026, 9, 20), 200000));
+
+      final range = DateRange(
+        from: DateTime(2026, 9),
+        to: DateTime(2026, 9, 30),
+      );
+      final r = await report(range);
+
+      expect(r.medianTxn, const Money(2000, base), reason: 'the typical purchase');
+      expect(
+        r.meanTxn,
+        const Money(21800, base),
+        reason: '218.000 over 10 purchases — a figure nobody ever spent',
+      );
+    });
+
+    test('an empty window has no busiest day rather than a wrong one', () async {
+      final range = DateRange(
+        from: DateTime(2026, 5),
+        to: DateTime(2026, 5, 31),
+      );
+      final r = await report(range);
+
+      expect(r.busiestDay, isNull);
+      expect(r.activeDays, 0);
+      expect(r.perDay.isZero, isTrue);
+      expect(r.perActiveDay.isZero, isTrue, reason: 'never divides by zero');
+    });
+  });
+
   group('what the window excludes', () {
     test('transfers never reach the totals', () async {
       await add(txn(DateTime(2026, 9, 3), 10000));

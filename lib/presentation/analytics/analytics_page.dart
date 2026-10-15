@@ -10,6 +10,7 @@ import 'package:masrouf/presentation/analytics/widgets/cashflow_chart.dart';
 import 'package:masrouf/presentation/analytics/widgets/category_donut.dart';
 import 'package:masrouf/presentation/analytics/widgets/range_headline.dart';
 import 'package:masrouf/presentation/analytics/widgets/range_selector.dart';
+import 'package:masrouf/presentation/analytics/widgets/range_stats.dart';
 import 'package:masrouf/presentation/analytics/widgets/top_movers.dart';
 import 'package:masrouf/presentation/common/feedback.dart';
 import 'package:masrouf/presentation/common/l10n_x.dart';
@@ -163,6 +164,17 @@ class _AnalyticsPageState extends ConsumerState<AnalyticsPage> {
               l10n: l10n,
             ),
           ),
+
+          if (report != null && !report.isEmpty) ...<Widget>[
+            const SizedBox(height: Gap.xl),
+            _SectionTitle(title: l10n.analyticsDetail),
+            RangeStats(
+              report: report,
+              formatter: formatter,
+              l10n: l10n,
+              locale: locale,
+            ),
+          ],
 
           if (report != null && report.slices.isNotEmpty) ...<Widget>[
             const SizedBox(height: Gap.xl),

@@ -97,6 +97,22 @@ final analyticsRangeSelectionProvider =
   AnalyticsRange.new,
 );
 
+/// The day every window is resolved against.
+///
+/// A provider rather than a bare `DateTime.now()` inside
+/// [analyticsRangeProvider], because a `Provider` caches: `now` was read once,
+/// at first build, and nothing ever invalidated it. "This month", "last 30
+/// days" and the pay period were therefore pinned to whichever day the app
+/// happened to launch on, and a finance app left open for a few days quietly
+/// kept reporting a window that had stopped moving.
+///
+/// Invalidated from [AppLifecycleWatcher] when the date has actually changed —
+/// rebuilding it re-runs a ledger scan, so it is not worth doing on every
+/// resume.
+final analyticsTodayProvider = Provider<DateTime>(
+  (ref) => DateTime.now().dateOnly,
+);
+
 /// The selection resolved against the clock and the user's payday.
 final analyticsRangeProvider = Provider<DateRange>((ref) {
   final selection = ref.watch(analyticsRangeSelectionProvider);
@@ -104,7 +120,7 @@ final analyticsRangeProvider = Provider<DateRange>((ref) {
 
   return Ranges.resolve(
     selection.preset,
-    now: DateTime.now(),
+    now: ref.watch(analyticsTodayProvider),
     payday: payday,
     custom: selection.customFrom != null && selection.customTo != null
         ? DateRange(

@@ -26,7 +26,7 @@ dart run flutter_launcher_icons     # regenerates android mipmap-* from assets/i
 the app shows a configuration screen rather than failing on first request, and
 two tests in `test/unit/env_test.dart` self-skip.
 
-Baseline as of the last check: `flutter test` is 306 passing / 2 skipped and
+Baseline as of the last check: `flutter test` is 318 passing / 2 skipped and
 `flutter analyze` is clean.
 
 Codegen is **drift only**. `riverpod_annotation` / `riverpod_generator` are in
@@ -234,6 +234,18 @@ the window — there is a regression test for exactly that.
 
 Budgets and the income trend remain monthly on both the dashboard and Analytics;
 they use the month the range ends in.
+
+**`analyticsTodayProvider` is the clock every window resolves against.** It is a
+provider, not a bare `DateTime.now()`, because a `Provider` caches: `now` was
+read once at first build and nothing invalidated it, so every window was pinned
+to the day the app launched. `AppLifecycleWatcher` invalidates it on resume, but
+only when the date actually changed — rebuilding re-runs a ledger scan. Never
+call `DateTime.now()` directly when resolving a range.
+
+The burn rate stops being a percentage above
+`AppConfig.analyticsBurnRateCeiling`. A window that misses payday but catches
+the rent it paid for reported "spent 14083% of income" — true, and a statement
+about where the window's edges fell rather than about spending.
 
 ## Tests
 
