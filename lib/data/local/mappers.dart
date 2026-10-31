@@ -114,6 +114,7 @@ extension TransactionRowX on TxnRow {
       note: note,
       tags: tags,
       recurringRuleId: recurringRuleId,
+      goalId: goalId,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );

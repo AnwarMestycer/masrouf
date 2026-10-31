@@ -543,11 +543,8 @@ class L10nFr extends L10n {
   String get goalsAdd => 'Nouvel objectif';
 
   @override
-  String get goalsEmpty => 'Aucun objectif';
-
-  @override
   String get goalsEmptyHint =>
-      'Définissez un objectif et le compte qui le porte : la progression suit le solde réel de ce compte.';
+      'Fixez un objectif, puis affectez-lui de l’argent chaque fois que vous mettez de côté.';
 
   @override
   String get goalsTarget => 'Objectif';
@@ -573,11 +570,11 @@ class L10nFr extends L10n {
       'En retard — vos prévisions épargnent moins que nécessaire';
 
   @override
-  String get goalsAccount => 'Détenu sur';
+  String get goalsAccount => 'Épargne sur';
 
   @override
   String get goalsRemoveConfirm =>
-      'Supprimer cet objectif ? Le compte et son solde ne changent pas.';
+      'Supprimer cet objectif ? L’argent mis de côté reste sur votre compte épargne.';
 
   @override
   String get calendarTitle => 'Calendrier de trésorerie';
@@ -1086,23 +1083,10 @@ class L10nFr extends L10n {
 
   @override
   String get savingsNoPlanHint =>
-      'Engagez une part de ce qui rentre. Elle est retenue sur le disponible jusqu’à ce que vous confirmiez ce que vous avez épargné.';
+      'Fixez une part des revenus à mettre de côté chaque mois. Tant qu’elle n’est pas sur un compte épargne, elle est retenue sur le disponible.';
 
   @override
   String get savingsRateLabel => 'Part des revenus';
-
-  @override
-  String get savingsPlanSaved => 'Plan d’épargne mis à jour';
-
-  @override
-  String get savingsNoPeriod => 'Aucune période en cours';
-
-  @override
-  String get savingsNoPeriodHint =>
-      'Démarrez-en une et la part sera mise de côté à mesure que les revenus arrivent.';
-
-  @override
-  String get savingsStart => 'Démarrer une période';
 
   @override
   String savingsSince(String date) {
@@ -1119,9 +1103,6 @@ class L10nFr extends L10n {
   String get savingsCatchUp => 'Rattrapage';
 
   @override
-  String get savingsTarget => 'Objectif';
-
-  @override
   String get savingsOwed => 'Dû à vous-même';
 
   @override
@@ -1130,20 +1111,10 @@ class L10nFr extends L10n {
   }
 
   @override
-  String get savingsConfirm => 'Confirmer ce que vous avez épargné';
+  String get savingsSaved => 'Mis de côté';
 
   @override
-  String get savingsConfirmTitle => 'Combien avez-vous vraiment épargné ?';
-
-  @override
-  String get savingsConfirmHint =>
-      'Moins, c’est permis. La différence s’ajoute à ce que vous vous devez et sera demandée la période suivante.';
-
-  @override
-  String get savingsSaved => 'Épargné';
-
-  @override
-  String get savingsHistory => 'Périodes passées';
+  String get savingsHistory => 'Mois passés';
 
   @override
   String savingsShortBy(String amount) {
@@ -1157,4 +1128,114 @@ class L10nFr extends L10n {
 
   @override
   String get savingsOnTarget => 'Objectif atteint';
+
+  @override
+  String get savingsSavedSoFar => 'Mis de côté à ce jour';
+
+  @override
+  String get savingsStillToSave => 'Reste à mettre de côté';
+
+  @override
+  String get savingsPutAside => 'Mettre de côté';
+
+  @override
+  String get savingsTakeBack => 'Reprendre';
+
+  @override
+  String get savingsFrom => 'Depuis';
+
+  @override
+  String get savingsTo => 'Vers';
+
+  @override
+  String get savingsForGoal => 'Pour un objectif';
+
+  @override
+  String get savingsNoGoal => 'Aucun objectif';
+
+  @override
+  String savingsPutAsideDone(String amount) {
+    return '$amount mis de côté';
+  }
+
+  @override
+  String savingsTakeBackDone(String amount) {
+    return '$amount repris';
+  }
+
+  @override
+  String savingsGoalHolds(String amount) {
+    return 'Cet objectif contient $amount';
+  }
+
+  @override
+  String savingsNewAccount(String name) {
+    return 'Un compte épargne nommé « $name » sera créé pour cela.';
+  }
+
+  @override
+  String get savingsDefaultAccountName => 'Épargne';
+
+  @override
+  String get savingsNoOrdinaryAccount =>
+      'Ajoutez d’abord un compte courant depuis lequel épargner.';
+
+  @override
+  String get savingsNothingToTakeBack =>
+      'Aucun compte épargne ne contient encore d’argent.';
+
+  @override
+  String get savingsReview => 'Ajuster';
+
+  @override
+  String savingsReviewTitle(String month) {
+    return 'Combien $month a-t-il vraiment mis de côté ?';
+  }
+
+  @override
+  String get savingsReviewHint =>
+      'Le montant part de ce que vous avez viré sur vos comptes épargne. Modifiez-le pour inclure ce que vous avez mis de côté hors de l’application.';
+
+  @override
+  String get savingsSaveSomeOfThis => 'En épargner une partie';
+
+  @override
+  String get savingsReviewEnable => 'Bilan d’épargne de fin de mois';
+
+  @override
+  String get savingsReviewEnableHint =>
+      'Le 1er, un rappel pour vérifier ce que le mois précédent a mis de côté.';
+
+  @override
+  String get savingsNudgeEnable => 'Rappel d’épargne hebdomadaire';
+
+  @override
+  String get savingsNudgeEnableHint =>
+      'Le vendredi soir, tant que ce mois a encore de quoi mettre de côté.';
+
+  @override
+  String get channelSavingsName => 'Épargne';
+
+  @override
+  String get channelSavingsDescription =>
+      'Bilans de fin de mois et rappels pour mettre de côté.';
+
+  @override
+  String savingsReviewNotifTitle(String month) {
+    return 'Bilan d’épargne de $month';
+  }
+
+  @override
+  String get savingsReviewNotifBody =>
+      'Vérifiez ce que vous avez mis de côté, et ajustez si vous avez épargné hors de l’application.';
+
+  @override
+  String savingsNudgeTitle(String amount) {
+    return 'Encore $amount à mettre de côté';
+  }
+
+  @override
+  String savingsNudgeBody(String saved, String target) {
+    return '$saved sur $target mis de côté ce mois-ci.';
+  }
 }

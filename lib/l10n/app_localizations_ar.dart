@@ -536,11 +536,7 @@ class L10nAr extends L10n {
   String get goalsAdd => 'هدف جديد';
 
   @override
-  String get goalsEmpty => 'لا توجد أهداف';
-
-  @override
-  String get goalsEmptyHint =>
-      'حدِّد هدفًا والحساب الذي يحمله، فيتابع التقدُّم رصيد ذلك الحساب الفعلي.';
+  String get goalsEmptyHint => 'حدِّد هدفًا، ثم خصِّص له مالًا كلما ادّخرت.';
 
   @override
   String get goalsTarget => 'الهدف';
@@ -565,11 +561,11 @@ class L10nAr extends L10n {
   String get goalsBehind => 'متأخر — تدَّخر توقُّعاتك أقل مما يتطلَّبه';
 
   @override
-  String get goalsAccount => 'محفوظ في';
+  String get goalsAccount => 'يُدَّخر في';
 
   @override
   String get goalsRemoveConfirm =>
-      'إزالة هذا الهدف؟ لن يتأثَّر الحساب ولا رصيده.';
+      'إزالة هذا الهدف؟ يبقى المال المُدّخر له في حساب الادخار.';
 
   @override
   String get calendarTitle => 'تقويم التدفُّق';
@@ -1076,22 +1072,10 @@ class L10nAr extends L10n {
 
   @override
   String get savingsNoPlanHint =>
-      'التزم بحصة مما يدخل. تُحجز عن المتاح للإنفاق حتى تؤكّد ما ادّخرته فعلاً.';
+      'حدِّد حصة من الدخل تُدّخر كل شهر. ما دامت لم تصل إلى حساب ادخار، تُحجز عن المتاح للإنفاق.';
 
   @override
   String get savingsRateLabel => 'حصة من الدخل';
-
-  @override
-  String get savingsPlanSaved => 'تم تحديث خطة الادخار';
-
-  @override
-  String get savingsNoPeriod => 'لا توجد فترة مفتوحة';
-
-  @override
-  String get savingsNoPeriodHint => 'ابدأ واحدة وستُحجز الحصة مع وصول الدخل.';
-
-  @override
-  String get savingsStart => 'ابدأ فترة';
 
   @override
   String savingsSince(String date) {
@@ -1108,9 +1092,6 @@ class L10nAr extends L10n {
   String get savingsCatchUp => 'تعويض';
 
   @override
-  String get savingsTarget => 'الهدف';
-
-  @override
   String get savingsOwed => 'مستحق لنفسك';
 
   @override
@@ -1119,20 +1100,10 @@ class L10nAr extends L10n {
   }
 
   @override
-  String get savingsConfirm => 'أكّد ما ادّخرته';
-
-  @override
-  String get savingsConfirmTitle => 'كم ادّخرت فعلاً؟';
-
-  @override
-  String get savingsConfirmHint =>
-      'الأقل مقبول. يُضاف الفرق إلى ما تدين به لنفسك ويُطلب في الفترة التالية.';
-
-  @override
   String get savingsSaved => 'المُدّخر';
 
   @override
-  String get savingsHistory => 'الفترات السابقة';
+  String get savingsHistory => 'الأشهر السابقة';
 
   @override
   String savingsShortBy(String amount) {
@@ -1146,4 +1117,112 @@ class L10nAr extends L10n {
 
   @override
   String get savingsOnTarget => 'مطابق للهدف';
+
+  @override
+  String get savingsSavedSoFar => 'المُدّخر حتى الآن';
+
+  @override
+  String get savingsStillToSave => 'المتبقي للادخار';
+
+  @override
+  String get savingsPutAside => 'ادّخر';
+
+  @override
+  String get savingsTakeBack => 'استرجع';
+
+  @override
+  String get savingsFrom => 'من';
+
+  @override
+  String get savingsTo => 'إلى';
+
+  @override
+  String get savingsForGoal => 'لهدف';
+
+  @override
+  String get savingsNoGoal => 'بلا هدف';
+
+  @override
+  String savingsPutAsideDone(String amount) {
+    return 'تم ادّخار $amount';
+  }
+
+  @override
+  String savingsTakeBackDone(String amount) {
+    return 'تم استرجاع $amount';
+  }
+
+  @override
+  String savingsGoalHolds(String amount) {
+    return 'هذا الهدف يحوي $amount';
+  }
+
+  @override
+  String savingsNewAccount(String name) {
+    return 'سيُنشأ لذلك حساب ادخار باسم «$name».';
+  }
+
+  @override
+  String get savingsDefaultAccountName => 'ادخار';
+
+  @override
+  String get savingsNoOrdinaryAccount => 'أضف أولًا حسابًا عاديًا تدّخر منه.';
+
+  @override
+  String get savingsNothingToTakeBack => 'لا يوجد مال في حساب ادخار بعد.';
+
+  @override
+  String get savingsReview => 'تعديل';
+
+  @override
+  String savingsReviewTitle(String month) {
+    return 'كم ادُّخر فعلًا في $month؟';
+  }
+
+  @override
+  String get savingsReviewHint =>
+      'يبدأ المبلغ بما حوّلته إلى حسابات الادخار. عدِّله ليشمل ما ادّخرته خارج التطبيق.';
+
+  @override
+  String get savingsSaveSomeOfThis => 'ادّخر جزءًا منه';
+
+  @override
+  String get savingsReviewEnable => 'مراجعة الادخار في نهاية الشهر';
+
+  @override
+  String get savingsReviewEnableHint =>
+      'في أول الشهر، تذكير بمراجعة ما ادُّخر في الشهر الماضي.';
+
+  @override
+  String get savingsNudgeEnable => 'تذكير ادخار أسبوعي';
+
+  @override
+  String get savingsNudgeEnableHint =>
+      'مساء الجمعة، ما دام في هذا الشهر ما يُدّخر.';
+
+  @override
+  String get channelSavingsName => 'الادخار';
+
+  @override
+  String get channelSavingsDescription =>
+      'مراجعات نهاية الشهر وتذكيرات بالادخار.';
+
+  @override
+  String savingsReviewNotifTitle(String month) {
+    return 'راجع ادخار $month';
+  }
+
+  @override
+  String get savingsReviewNotifBody =>
+      'تحقَّق مما ادّخرته، وعدِّله إن ادّخرت خارج التطبيق.';
+
+  @override
+  String savingsNudgeTitle(String amount) {
+    return 'ما زال $amount للادخار';
+  }
+
+  @override
+  String savingsNudgeBody(String saved, String target) {
+    return 'ادُّخر $saved من $target هذا الشهر.';
+  }
 }

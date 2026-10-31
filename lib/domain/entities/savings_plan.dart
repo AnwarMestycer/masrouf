@@ -1,4 +1,6 @@
 import 'package:masrouf/core/money/money.dart';
+import 'package:masrouf/core/time/date_x.dart';
+import 'package:masrouf/core/time/ym.dart';
 import 'package:meta/meta.dart';
 
 /// How much of what comes in is meant to be set aside.
@@ -56,11 +58,16 @@ class SavingsPlan {
   }
 }
 
-/// One cycle of the plan: what was asked, and what was actually set aside.
+/// One month of the plan: what it asked, and what was actually set aside.
 ///
-/// A period is closed by confirming it rather than by a date. Income does not
-/// arrive on a schedule here, so "the end of the month" is not a moment the
-/// ledger can recognise — but "I have counted what I saved" is.
+/// A period is a calendar month. It opens by itself and closes by itself once
+/// the month is over; nothing waits on a button. Closing freezes the month's
+/// income, its share and what was saved onto the row, because from then on it
+/// is history and must not move when an old transaction is edited.
+///
+/// Rows written before monthly periods existed were opened and confirmed by
+/// hand and may span any stretch of days. They stay as they are: their
+/// commitments and confirmations still count toward what is owed.
 @immutable
 class SavingsPeriod {
   const SavingsPeriod({
@@ -74,23 +81,76 @@ class SavingsPeriod {
   });
 
   final String id;
+
+  /// The first day the period counts. The first of the month, except for the
+  /// month in which an older hand-confirmed period ended — see
+  /// [SavingsCalendar.windowStart].
   final DateTime startedOn;
 
-  /// Income counted into this period so far. Grows until the period is closed.
+  /// Income counted into this period. Zero until the period is closed.
   final Money income;
 
   /// The share of [income] this plan asked for, frozen when the period closed.
   final Money committed;
 
+  /// The last day the period covers, set when it closes. Null while open.
+  ///
+  /// For a monthly period this is the month's last day rather than the day it
+  /// happened to be closed on, so the next period's start follows from it
+  /// directly.
   final DateTime? confirmedOn;
 
-  /// What was actually set aside. Null until confirmed.
+  /// What was set aside. Null until closed.
   final Money? saved;
 
   final DateTime updatedAt;
 
   bool get isOpen => confirmedOn == null;
   bool get isConfirmed => confirmedOn != null;
+
+  /// The month this period belongs to.
+  Ym get month => Ym.fromDate(startedOn);
+
+  SavingsPeriod copyWith({Money? saved, DateTime? updatedAt}) => SavingsPeriod(
+        id: id,
+        startedOn: startedOn,
+        income: income,
+        committed: committed,
+        confirmedOn: confirmedOn,
+        saved: saved ?? this.saved,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+}
+
+/// The day boundaries of a monthly period.
+///
+/// Pure, so the two edges that have each been got wrong once are pinned by
+/// tests rather than by care.
+abstract final class SavingsCalendar {
+  /// The first day [month] counts income and savings from.
+  ///
+  /// The first of the month, unless an earlier period already covers some of
+  /// it — then the day after that one ends. Transactions carry a calendar day
+  /// and no time, so two periods sharing a day would both count that day's
+  /// income. Only arises in the month a hand-confirmed period ended in.
+  static DateTime windowStart(Ym month, DateTime? lastCovered) {
+    final first = month.firstDay;
+    if (lastCovered == null) return first;
+    final after = lastCovered.dateOnly.add(const Duration(days: 1));
+    return after.isAfter(first) ? after : first;
+  }
+
+  /// The last day of [month] to count, as of [today].
+  ///
+  /// Today while the month is running, the month's last day once it is over.
+  /// Never earlier than [start]: a window that begins tomorrow would otherwise
+  /// be asked about an empty range and report a commitment of nothing.
+  static DateTime windowEnd(Ym month, DateTime start, DateTime today) {
+    final last = month.lastDay;
+    final day = today.dateOnly;
+    final end = day.isAfter(last) ? last : day;
+    return start.isAfter(end) ? start : end;
+  }
 }
 
 /// The running account between the plan and what was actually saved.
@@ -133,7 +193,7 @@ class SavingsLedger {
     return over.isPositive ? over : Money.zero(committed.currency);
   }
 
-  /// The slice of [owed] asked for in the next period.
+  /// The slice of [owed] asked for in the open month.
   ///
   /// Spread across [SavingsPlan.recoveryPeriods], rounded up so the debt
   /// actually clears rather than leaving a millime behind forever.
@@ -154,46 +214,67 @@ class SavingsLedger {
 
 /// Everything the savings screen and safe-to-spend read, in one value.
 ///
-/// The open period's income is *derived* from the ledger rather than kept as a
-/// running counter on the row — a counter is a second set of books, and the
-/// savings goals in this app already show what happens when progress is stored
-/// apart from the transactions that caused it. Income and commitment are frozen
-/// onto the row only when the period is confirmed.
+/// The month's income and what has been saved so far are *derived* from the
+/// ledger rather than kept as running counters on the row — a counter is a
+/// second set of books. Both are frozen onto the row only when the month
+/// closes.
 @immutable
 class SavingsStatus {
   const SavingsStatus({
     required this.plan,
-    required this.open,
+    required this.month,
+    required this.startedOn,
     required this.incomeSoFar,
+    required this.savedSoFar,
     required this.ledger,
   });
 
   final SavingsPlan plan;
 
-  /// The period being accumulated, or null when none is open.
-  final SavingsPeriod? open;
+  /// The month being accumulated. Always the current one.
+  final Ym month;
 
-  /// Income received since the open period started. Zero when none is open.
+  /// The first day this month counts, normally the 1st.
+  final DateTime startedOn;
+
+  /// Income received this month so far.
   final Money incomeSoFar;
 
-  /// The running account across every confirmed period.
+  /// Moved into savings accounts this month so far.
+  ///
+  /// Money in only. Taking money back out makes it spendable again — it is in
+  /// an ordinary account once more — but it does not undo what this month set
+  /// aside, so it does not bring the hold-back back either.
+  final Money savedSoFar;
+
+  /// The running account across every closed period.
   final SavingsLedger ledger;
 
   bool get hasPlan => plan.rate > 0;
-  bool get isOpen => open != null;
 
-  /// This period's own share, before any catching up.
+  /// This month's own share, before any catching up.
   Money get commitment => plan.commitmentFor(incomeSoFar);
 
-  /// What this period should aim for: its share plus the catch-up instalment.
+  /// What this month should aim for: its share plus the catch-up instalment.
   Money get target => commitment + ledger.recoveryInstalment();
+
+  /// What is still to be set aside this month. Never negative.
+  Money get remaining {
+    final left = target - savedSoFar;
+    return left.isPositive ? left : Money.zero(target.currency);
+  }
+
+  /// Set aside beyond this month's target.
+  Money get aheadThisMonth {
+    final over = savedSoFar - target;
+    return over.isPositive ? over : Money.zero(target.currency);
+  }
 
   /// What safe-to-spend must hold back.
   ///
-  /// The whole target, because nothing has been set aside yet — the money is
-  /// still sitting in the account it arrived in. Reserving only part of it
-  /// would be telling someone they can spend what they have already promised
-  /// themselves.
+  /// Only what is still to be saved. Whatever has already been moved into a
+  /// savings account has left the spendable balance by itself; reserving it
+  /// again would count the same money out twice.
   Money get reserved =>
-      hasPlan && isOpen ? target : Money.zero(incomeSoFar.currency);
+      hasPlan ? remaining : Money.zero(incomeSoFar.currency);
 }

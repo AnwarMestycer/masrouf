@@ -1,7 +1,12 @@
 import 'package:masrouf/core/money/money.dart';
 import 'package:meta/meta.dart';
 
-/// A savings target, held in a real account.
+/// A savings target, fed by transfers into savings accounts.
+///
+/// A goal holds no money and no total. Its progress is the transfers
+/// earmarked for it — into a savings account, minus back out — so it cannot
+/// drift from the ledger, and two goals can never both claim the same dinar.
+/// Held in the base currency: the editor only creates it there.
 @immutable
 class SavingsGoal {
   const SavingsGoal({
@@ -17,7 +22,10 @@ class SavingsGoal {
   final String name;
   final Money target;
 
-  /// Whose balance is the progress. The goal stores no total of its own.
+  /// The savings account money for this goal goes to by default.
+  ///
+  /// Not where progress comes from. It once was — the account's whole balance
+  /// — which let two goals on one account each claim all of it.
   final String accountId;
 
   final DateTime? targetDate;
@@ -54,7 +62,7 @@ class SavingsGoal {
   int get hashCode => Object.hash(id, name, target, accountId, targetDate);
 }
 
-/// A goal with the balance that is actually backing it.
+/// A goal with what has actually been set aside for it.
 @immutable
 class SavingsGoalProgress {
   const SavingsGoalProgress({
@@ -65,9 +73,11 @@ class SavingsGoalProgress {
 
   final SavingsGoal goal;
 
-  /// The linked account's real balance, converted to the goal's currency.
+  /// Earmarked transfers into savings accounts minus those taken back out, in
+  /// the base currency at each transfer's frozen rate.
   final Money saved;
 
+  /// The default savings account's name.
   final String accountName;
 
   Money get remaining {

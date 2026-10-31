@@ -26,7 +26,7 @@ dart run flutter_launcher_icons     # regenerates android mipmap-* from assets/i
 the app shows a configuration screen rather than failing on first request, and
 two tests in `test/unit/env_test.dart` self-skip.
 
-Baseline as of the last check: `flutter test` is 352 passing / 2 skipped and
+Baseline as of the last check: `flutter test` is 396 passing / 2 skipped and
 `flutter analyze` is clean.
 
 Codegen is **drift only**. `riverpod_annotation` / `riverpod_generator` are in
@@ -178,23 +178,23 @@ automatically once the above is done.
 
 Migrations here may create and backfill but must **never** drop or rewrite a
 column: existing rows are the user's only copy of anything written offline.
-Current `schemaVersion` is 5.
+Current `schemaVersion` is 6.
 
 ## Notifications and backups
 
-`core/notifications/` holds a general `NotificationService` (three Android
-channels, schedule / show-now / cancel) plus two **pure decision modules** —
-`ReminderSchedule` and `BudgetAlerts` — that hold the actual rules and are
-unit-tested with no plugin, clock or database involved. Keep new rules there
-rather than in the controllers.
+`core/notifications/` holds a general `NotificationService` (four Android
+channels, schedule / show-now / cancel) plus three **pure decision modules** —
+`ReminderSchedule`, `BudgetAlerts` and `SavingsReminders` — that hold the actual
+rules and are unit-tested with no plugin, clock or database involved. Keep new
+rules there rather than in the controllers.
 
 `presentation/providers/notification_providers.dart` is the only wiring: the
-three device-local toggles (KV, not synced — a schedule belongs to the phone),
-the three controllers, and two **watcher providers**. The watchers listen to
-`budgetProgressProvider` and `pendingPlansProvider` instead of hooking each write
-site, so any path that touches the ledger or a plan — including a bulk edit, a
-pull or a restore — reschedules correctly. They are instantiated in `app.dart`
-alongside the session lifecycle.
+device-local toggles (KV, not synced — a schedule belongs to the phone), the
+controllers, and three **watcher providers**. The watchers listen to
+`budgetProgressProvider`, `pendingPlansProvider` and `savingsStatusProvider`
+instead of hooking each write site, so any path that touches the ledger or a
+plan — including a bulk edit, a pull or a restore — reschedules correctly. They
+are instantiated in `app.dart` alongside the session lifecycle.
 
 Scheduled notifications need `ScheduledNotificationReceiver` and
 `ScheduledNotificationBootReceiver` in `AndroidManifest.xml`;
@@ -209,35 +209,69 @@ via `compute`.
 
 ## Savings
 
-Pay-yourself-first: a period commits a share of the income that *actually
-arrives* (not a fixed sum — income here lands on the 26th, the 16th and the
-5th), safe-to-spend holds it back, and the user later confirms what was really
-set aside.
+One module (`SavingsRepository`, `presentation/savings/`) for the monthly plan
+and the goals it feeds. Pay-yourself-first: each **calendar month** commits a
+share of the income that *actually arrived* in it (not a fixed sum — income
+here lands on the 26th, the 16th and the 5th), safe-to-spend holds back what is
+not yet put aside, and the month closes itself when it ends.
 
-The whole scheme is one invariant, in `SavingsLedger`:
+**A saving is a transfer** from an ordinary account into an
+`AccountType.savings` account — through `putAside`, or typed on the add screen;
+both count. Transfers are not expenses, so savings never reach spending
+analytics or budgets. Taking money back (`takeBack`, savings → ordinary) makes
+it spendable again but does **not** reduce what the month set aside, so it does
+not bring the hold-back back. A transfer between two savings accounts, or two
+ordinary ones, saves nothing.
 
 ```
-owed = max(0, everything committed - everything confirmed)
+target   = plan.commitmentFor(month's income) + recovery instalment of owed
+reserved = max(0, target - moved into savings this month)
+owed     = max(0, everything committed - everything saved)   // SavingsLedger
 ```
 
-Saving less grows it; saving more shrinks it but it **floors at zero**, so a
-good period never buys credit against a future one. Changing either half
-silently changes what the app asks of someone next month — both are pinned by
-tests in `savings_plan_test.dart`.
+Safe-to-spend leaves savings accounts out of the balance and subtracts
+`reserved` — never the whole target, or money already moved is counted out
+twice. Saving less grows `owed`; saving more shrinks it but it **floors at
+zero**, so a good month never buys credit against a future one. Changing either
+half silently changes what the app asks of someone next month — pinned in
+`savings_plan_test.dart` and `savings_repository_test.dart`.
 
-Nothing stores `owed`, and nothing stores the open period's income. Both are
-derived — owed from the confirmed periods, income from the ledger. The savings
-*goals* feature is the cautionary tale: its progress is the linked account's
-whole balance, so two goals on one account each claim all of it.
+Nothing stores `owed`, the open month's income, what it has saved, or a goal's
+progress. All are derived: owed from closed periods, the rest from transactions.
 
-Two boundaries that are easy to reintroduce:
+- **`rollOver()` closes and opens months.** It runs at session start (after the
+  aggregate rebuild, since closing reads income from them), on a resume that
+  changed the date, and when a plan is switched on. Closing freezes income,
+  share and saved (= that month's transfers into savings) onto the row, with
+  `confirmed_on` = the month's **last day**. Months the app was never opened in
+  are filled in — but only after a month that was itself open, so a plan
+  switched back on after a year off does not invent a year of commitments.
+- **A month's row id is derived** (`Ids.savingsMonthId`, UUIDv5 of user and
+  month), so two devices closing the same month write the same row. A deleted
+  month stays deleted: `rollOver` never re-creates an existing id.
+- **A period starts the day after the last one covered**
+  (`SavingsCalendar.windowStart`). Transactions carry a day and no time, so
+  periods sharing a day both count its income. Only matters in the month an old
+  hand-confirmed period ended in; those rows (random ids, any span) are kept as
+  history, and one still open is closed as of yesterday.
+- **The window's end is clamped to never precede its own start**
+  (`windowEnd`), or a period beginning tomorrow reports a commitment of nothing.
+- The month's share uses the plan as it stands at closing: a rate changed on the
+  20th applies to that whole month.
+- `review(periodId, saved)` corrects a closed month for money saved outside the
+  app. It is the only place `saved` is typed.
 
-- **A period starts the day after the last was confirmed.** Transactions carry a
-  calendar day and no time, so periods sharing a start date both count the same
-  income.
-- **The income window's end is clamped to never precede its own start**, or a
-  period beginning tomorrow is asked for income over an empty range and reports
-  a commitment of nothing.
+**Goals** hold no money. Progress is `transactions.goal_id` (transfers only):
+earmarked transfers in minus earmarked transfers back out, summed by
+`SavingsDao.watchGoalTotals`. A goal's `accountId` is only its default savings
+account. It used to be the goal's whole balance, so two goals on one account
+each claimed all of it — don't go back to that. Editing a transfer on the add
+screen keeps its goal (`TransactionRepositoryImpl.update` carries it over,
+because that screen builds a fresh `Txn`).
+
+Write paths in the repository read with one-off queries, never `.first` on a
+watch: under the widget-test clock a drift stream's first value never arrives,
+and the handler hangs.
 
 **The settings row is written with `insertOrReplace`.** Every column must be
 named on every write, in `SettingsRepositoryImpl.save` *and* in
@@ -253,7 +287,7 @@ sign-in/sign-out and runs outside the widget tree so it fires once per session,
 not once per rebuild. The order is deliberate: sync start (wrapped in
 try/catch — everything after it must run offline) → seed default categories only
 if the pull found none → `materialiseDue()` for recurring rules → rebuild
-aggregates → refresh digest → auto-backup. Sign-out clears pull cursors *and*
+aggregates → savings `rollOver()` → refresh digest → auto-backup. Sign-out clears pull cursors *and*
 user data, so the next account on the device does a complete first pull.
 
 **`SyncEngine.start()` awaits its first sync, and that await is load-bearing.**

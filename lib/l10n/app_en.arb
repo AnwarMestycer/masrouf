@@ -249,8 +249,7 @@
   "forecastExplains": "Your usual spending, plus the bills you know about, plus what you planned.",
   "goalsTitle": "Savings goals",
   "goalsAdd": "New goal",
-  "goalsEmpty": "No goals yet",
-  "goalsEmptyHint": "Set a target and the account that holds it, and progress tracks that account’s real balance.",
+  "goalsEmptyHint": "Set a target, then earmark money for it whenever you put some aside.",
   "goalsTarget": "Target",
   "goalsBy": "By {date}",
   "@goalsBy": {
@@ -271,8 +270,8 @@
   "goalsReached": "Reached",
   "goalsOnTrack": "On track",
   "goalsBehind": "Behind — your forecast saves less than this needs",
-  "goalsAccount": "Held in",
-  "goalsRemoveConfirm": "Remove this goal? The account and its balance are untouched.",
+  "goalsAccount": "Saves into",
+  "goalsRemoveConfirm": "Remove this goal? The money set aside for it stays in your savings account.",
   "calendarTitle": "Cash-flow calendar",
   "calendarEmpty": "Nothing expected this month",
   "calendarDayTotal": "{amount} expected",
@@ -641,12 +640,8 @@
   },
   "savingsTitle": "Savings",
   "savingsNoPlan": "No savings plan yet",
-  "savingsNoPlanHint": "Commit a share of what comes in. It is held back from safe to spend until you confirm what you actually saved.",
+  "savingsNoPlanHint": "Set a share of income to put aside each month. Until it is in a savings account, it is held back from safe to spend.",
   "savingsRateLabel": "Share of income",
-  "savingsPlanSaved": "Savings plan updated",
-  "savingsNoPeriod": "No period open",
-  "savingsNoPeriodHint": "Start one and the share will be set aside as income arrives.",
-  "savingsStart": "Start a period",
   "savingsSince": "Since {date}",
   "@savingsSince": {
     "placeholders": {
@@ -658,7 +653,6 @@
   "savingsIncomeSoFar": "Income so far",
   "savingsCommitment": "Its own share",
   "savingsCatchUp": "Catching up",
-  "savingsTarget": "Target",
   "savingsOwed": "Owed to yourself",
   "savingsAhead": "Ahead by {amount}",
   "@savingsAhead": {
@@ -668,11 +662,8 @@
       }
     }
   },
-  "savingsConfirm": "Confirm what you saved",
-  "savingsConfirmTitle": "What did you actually save?",
-  "savingsConfirmHint": "Less is fine. The difference is added to what you owe yourself and asked for next period.",
-  "savingsSaved": "Saved",
-  "savingsHistory": "Past periods",
+  "savingsSaved": "Put aside",
+  "savingsHistory": "Past months",
   "savingsShortBy": "{amount} short",
   "@savingsShortBy": {
     "placeholders": {
@@ -689,5 +680,93 @@
       }
     }
   },
-  "savingsOnTarget": "On target"
+  "savingsOnTarget": "On target",
+  "savingsSavedSoFar": "Put aside so far",
+  "savingsStillToSave": "Still to put aside",
+  "savingsPutAside": "Put aside",
+  "savingsTakeBack": "Take back",
+  "savingsFrom": "From",
+  "savingsTo": "To",
+  "savingsForGoal": "For a goal",
+  "savingsNoGoal": "No goal",
+  "savingsPutAsideDone": "{amount} put aside",
+  "@savingsPutAsideDone": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "savingsTakeBackDone": "{amount} taken back",
+  "@savingsTakeBackDone": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "savingsGoalHolds": "That goal holds {amount}",
+  "@savingsGoalHolds": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "savingsNewAccount": "A savings account called “{name}” will be created for this.",
+  "@savingsNewAccount": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "savingsDefaultAccountName": "Savings",
+  "savingsNoOrdinaryAccount": "Add an everyday account to save from first.",
+  "savingsNothingToTakeBack": "Nothing is in a savings account yet.",
+  "savingsReview": "Adjust",
+  "savingsReviewTitle": "What did {month} really put aside?",
+  "@savingsReviewTitle": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "savingsReviewHint": "This starts at what you moved into savings accounts. Change it to include money set aside outside the app.",
+  "savingsSaveSomeOfThis": "Save some of this",
+  "savingsReviewEnable": "Month-end savings review",
+  "savingsReviewEnableHint": "On the 1st, a reminder to check what last month put aside.",
+  "savingsNudgeEnable": "Weekly savings reminder",
+  "savingsNudgeEnableHint": "Friday evening, while this month still has some to put aside.",
+  "channelSavingsName": "Savings",
+  "channelSavingsDescription": "Month-end reviews and reminders to put money aside.",
+  "savingsReviewNotifTitle": "Review {month}’s savings",
+  "@savingsReviewNotifTitle": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "savingsReviewNotifBody": "Check what you put aside, and adjust it if you saved outside the app.",
+  "savingsNudgeTitle": "{amount} still to put aside",
+  "@savingsNudgeTitle": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "savingsNudgeBody": "{saved} of {target} put aside this month.",
+  "@savingsNudgeBody": {
+    "placeholders": {
+      "saved": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  }
 }

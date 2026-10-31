@@ -35,7 +35,7 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
   final int paydayDayOfMonth;
   final Map<String, double> ratesToBase;
 
-  /// What the open savings period is holding back. Injected rather than queried
+  /// What this month has yet to put aside. Injected rather than queried
   /// so this repository keeps taking its inputs from one place.
   final Money savingsReserved;
 
@@ -86,6 +86,11 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
 
     var totalMilli = 0;
     for (final entry in balances) {
+      // Savings accounts hold money already put away. Counting them would offer
+      // back last month's savings as this week's spending money — and a saving
+      // would never lower the figure, since moving money between two counted
+      // accounts changes nothing.
+      if (entry.account.type == AccountType.savings) continue;
       final code = entry.account.currency.code;
       final rate = code == base.code ? 1.0 : (ratesToBase[code] ?? 0.0);
       totalMilli += (entry.balance.milli * rate).round();
@@ -100,10 +105,10 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
     final reserved = plans.fold<int>(0, (sum, p) => sum + inBase(p.amount));
 
     return SafeToSpend(
-      // Savings come out too. The money for the open period is still sitting in
-      // the account it arrived in, so without this the app would be offering
-      // back what has already been promised — which is the whole reason the
-      // commitment is reserved rather than merely recorded.
+      // Savings come out too: whatever this month has yet to put aside. It is
+      // still sitting in the account it arrived in, so without this the app
+      // would offer back what has already been promised. What has been put
+      // aside is out of the balance above already and is not taken twice.
       amount: Money(
         balance.milli - committed - reserved - savingsReserved.milli,
         base,

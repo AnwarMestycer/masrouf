@@ -6,7 +6,6 @@ import 'package:masrouf/domain/entities/analytics/cashflow_calendar.dart';
 import 'package:masrouf/domain/entities/analytics/forecast.dart';
 import 'package:masrouf/domain/entities/budget.dart';
 import 'package:masrouf/domain/entities/planned_expense.dart';
-import 'package:masrouf/domain/entities/savings_goal.dart';
 import 'package:masrouf/domain/entities/txn.dart';
 import 'package:masrouf/domain/enums/txn_type.dart';
 import 'package:masrouf/presentation/providers/data_providers.dart';
@@ -96,10 +95,6 @@ final calendarProvider = FutureProvider.family<CashflowCalendar, Ym>(
     ref.watch(ledgerRevisionProvider);
     return ref.watch(analyticsRepositoryProvider).calendar(ym);
   },
-);
-
-final goalsProvider = StreamProvider<List<SavingsGoalProgress>>(
-  (ref) => ref.watch(goalRepositoryProvider).watchProgress(),
 );
 
 /// The coming months' projection.

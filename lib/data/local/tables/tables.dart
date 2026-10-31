@@ -76,6 +76,11 @@ class Transactions extends Table with SyncedTable {
   TextColumn get note => text().nullable()();
   TextColumn get tags => text().map(const TagsConverter())();
   TextColumn get recurringRuleId => text().nullable()();
+
+  /// The savings goal a transfer is earmarked for. Transfers only; added in
+  /// schema v6.
+  TextColumn get goalId => text().nullable()();
+
   DateTimeColumn get createdAt => dateTime()();
 }
 
@@ -153,12 +158,13 @@ class PlannedExpenses extends Table with SyncedTable {
   DateTimeColumn get createdAt => dateTime()();
 }
 
-/// A savings target, tracked by an account's real balance.
+/// A savings target, fed by transfers earmarked for it.
 ///
-/// There is no `saved` column on purpose. Progress *is* [accountId]'s balance,
-/// so the goal can never disagree with the ledger — a second running total
-/// would be a parallel books nobody reconciles, and the first time the two
-/// diverge the user cannot tell which is lying.
+/// There is no `saved` column on purpose. Progress is the transfers whose
+/// `goal_id` names this goal, in minus out, so the goal can never disagree with
+/// the ledger — a second running total would be a parallel books nobody
+/// reconciles, and the first time the two diverge the user cannot tell which
+/// is lying.
 @TableIndex(name: 'goals_user_updated', columns: {#userId, #updatedAt})
 @DataClassName('SavingsGoalRow')
 class SavingsGoals extends Table with SyncedTable {
@@ -166,7 +172,8 @@ class SavingsGoals extends Table with SyncedTable {
   IntColumn get targetMilli => integer()();
   TextColumn get currency => text().withLength(min: 3, max: 3)();
 
-  /// The account whose balance is the progress.
+  /// The savings account this goal's money goes to by default. Not where its
+  /// progress comes from.
   TextColumn get accountId => text()();
 
   /// Optional. With one, the goal can say what it needs per month; without one
@@ -176,11 +183,12 @@ class SavingsGoals extends Table with SyncedTable {
   DateTimeColumn get createdAt => dateTime()();
 }
 
-/// One cycle of the savings plan: what it asked for, and what was set aside.
+/// One month of the savings plan: what it asked for, and what was set aside.
 ///
-/// A period is closed by confirming it rather than by a date — income here does
-/// not arrive on a schedule, so "the end of the month" is not a moment the
-/// ledger can recognise, while "I have counted what I saved" is.
+/// Opened and closed by `SavingsRepository.rollOver`, under an id derived from
+/// the user and the month so two devices write the same row. Rows from before
+/// months were the unit were opened and confirmed by hand and may span any
+/// stretch of days; they are kept as history.
 ///
 /// Nothing stores what is owed. That is
 /// `max(0, sum(committed) - sum(saved))` across confirmed periods: one
@@ -190,15 +198,15 @@ class SavingsGoals extends Table with SyncedTable {
 class SavingsPeriods extends Table with SyncedTable {
   DateTimeColumn get startedOn => dateTime()();
 
-  /// Income counted into the period so far. Grows until the period is closed.
+  /// Income counted into the period, frozen when it closes. Zero while open.
   IntColumn get incomeMilli => integer().withDefault(const Constant<int>(0))();
 
   /// The share of [incomeMilli] the plan asked for, frozen when it closed.
   IntColumn get committedMilli =>
       integer().withDefault(const Constant<int>(0))();
 
-  /// Null until confirmed. The period is open until then, and at most one may
-  /// be open at a time.
+  /// The last day the period covers, set when it closes; for a month, its last
+  /// day. Null while open, and at most one may be open at a time.
   DateTimeColumn get confirmedOn => dateTime().nullable()();
 
   /// What was actually set aside. Null until confirmed.

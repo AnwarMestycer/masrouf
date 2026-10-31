@@ -519,6 +519,7 @@ class TransactionDao extends DatabaseAccessor<AppDatabase>
         note: Value<String?>(txn.note),
         tags: txn.tags,
         recurringRuleId: Value<String?>(txn.recurringRuleId),
+        goalId: Value<String?>(txn.goalId),
         createdAt: txn.createdAt,
         updatedAt: txn.updatedAt,
       );

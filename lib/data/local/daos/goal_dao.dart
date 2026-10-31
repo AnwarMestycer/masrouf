@@ -1,34 +1,27 @@
 import 'package:drift/drift.dart';
 import 'package:masrouf/core/money/currency.dart';
-import 'package:masrouf/core/money/money.dart';
 import 'package:masrouf/data/local/app_database.dart';
 import 'package:masrouf/data/local/mappers.dart';
-import 'package:masrouf/data/local/tables/local_tables.dart';
 import 'package:masrouf/data/local/tables/tables.dart';
 import 'package:masrouf/domain/entities/savings_goal.dart';
 
 part 'goal_dao.g.dart';
 
-/// Savings goals and the account balances backing them.
+/// Savings goals, with the name of the account each one saves into.
 ///
-/// Progress is read from `account_balances` — the same maintained aggregate the
-/// dashboard uses — rather than stored on the goal. A goal cannot drift out of
-/// step with the ledger because it holds no copy of it.
-@DriftAccessor(tables: <Type>[SavingsGoals, Accounts, AccountBalances])
+/// Progress is not read here. It is the transfers earmarked for each goal,
+/// summed by `SavingsDao.watchGoalTotals`; a goal row holds no total of its
+/// own, so it cannot drift out of step with the ledger.
+@DriftAccessor(tables: <Type>[SavingsGoals, Accounts])
 class GoalDao extends DatabaseAccessor<AppDatabase> with _$GoalDaoMixin {
   GoalDao(super.db);
 
-  Stream<List<SavingsGoalProgress>> watchProgress(
+  Stream<List<({SavingsGoal goal, String accountName})>> watchGoals(
     String userId,
     Currency base,
   ) {
     final query = select(savingsGoals).join(<Join<HasResultSet, dynamic>>[
       leftOuterJoin(accounts, accounts.id.equalsExp(savingsGoals.accountId)),
-      leftOuterJoin(
-        accountBalances,
-        accountBalances.accountId.equalsExp(savingsGoals.accountId) &
-            accountBalances.userId.equalsExp(savingsGoals.userId),
-      ),
     ])
       ..where(
         savingsGoals.userId.equals(userId) & savingsGoals.deletedAt.isNull(),
@@ -36,24 +29,21 @@ class GoalDao extends DatabaseAccessor<AppDatabase> with _$GoalDaoMixin {
       ..orderBy(<OrderingTerm>[OrderingTerm.asc(savingsGoals.createdAt)]);
 
     return query.watch().map(
-          (rows) => rows.map((row) {
-            final goal = row.readTable(savingsGoals).toEntity(base);
-            final account = row.readTableOrNull(accounts);
-            final balance = row.readTableOrNull(accountBalances);
-            return SavingsGoalProgress(
-              goal: goal,
-              // A missing balance row means the account has no transactions
-              // yet, which is its opening balance exactly — not zero.
-              saved: Money(
-                balance?.balanceMilli ??
-                    account?.openingBalanceMilli ??
-                    0,
-                goal.target.currency,
-              ),
-              accountName: account?.name ?? '',
-            );
-          }).toList(growable: false),
+          (rows) => rows
+              .map(
+                (row) => (
+                  goal: row.readTable(savingsGoals).toEntity(base),
+                  accountName: row.readTableOrNull(accounts)?.name ?? '',
+                ),
+              )
+              .toList(growable: false),
         );
+  }
+
+  Future<SavingsGoal?> getById(String id, Currency base) async {
+    final row = await (select(savingsGoals)..where((t) => t.id.equals(id)))
+        .getSingleOrNull();
+    return row?.toEntity(base);
   }
 
   Future<void> upsert(String userId, SavingsGoal goal) =>

@@ -91,6 +91,7 @@ Future<void> applyRemoteRows(
               note: Value<String?>(txn.note),
               tags: txn.tags,
               recurringRuleId: Value<String?>(txn.recurringRuleId),
+              goalId: Value<String?>(txn.goalId),
               createdAt: txn.createdAt,
               updatedAt: txn.updatedAt,
               deletedAt: Value<DateTime?>(tombstoneOf(row)),

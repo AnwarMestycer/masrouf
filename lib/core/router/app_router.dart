@@ -14,7 +14,6 @@ import 'package:masrouf/presentation/budgets/budgets_page.dart';
 import 'package:masrouf/presentation/categories/categories_page.dart';
 import 'package:masrouf/presentation/calendar/calendar_page.dart';
 import 'package:masrouf/presentation/forecast/forecast_page.dart';
-import 'package:masrouf/presentation/goals/goals_page.dart';
 import 'package:masrouf/presentation/savings/savings_page.dart';
 import 'package:masrouf/presentation/planned/planned_page.dart';
 import 'package:masrouf/presentation/dashboard/dashboard_page.dart';
@@ -180,11 +179,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: Routes.forecast,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const ForecastPage(),
-      ),
-      GoRoute(
-        path: Routes.goals,
-        parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const GoalsPage(),
       ),
       GoRoute(
         path: Routes.savings,

@@ -1065,16 +1065,10 @@ abstract class L10n {
   /// **'New goal'**
   String get goalsAdd;
 
-  /// No description provided for @goalsEmpty.
-  ///
-  /// In en, this message translates to:
-  /// **'No goals yet'**
-  String get goalsEmpty;
-
   /// No description provided for @goalsEmptyHint.
   ///
   /// In en, this message translates to:
-  /// **'Set a target and the account that holds it, and progress tracks that account’s real balance.'**
+  /// **'Set a target, then earmark money for it whenever you put some aside.'**
   String get goalsEmptyHint;
 
   /// No description provided for @goalsTarget.
@@ -1116,13 +1110,13 @@ abstract class L10n {
   /// No description provided for @goalsAccount.
   ///
   /// In en, this message translates to:
-  /// **'Held in'**
+  /// **'Saves into'**
   String get goalsAccount;
 
   /// No description provided for @goalsRemoveConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Remove this goal? The account and its balance are untouched.'**
+  /// **'Remove this goal? The money set aside for it stays in your savings account.'**
   String get goalsRemoveConfirm;
 
   /// No description provided for @calendarTitle.
@@ -1890,7 +1884,7 @@ abstract class L10n {
   /// No description provided for @savingsNoPlanHint.
   ///
   /// In en, this message translates to:
-  /// **'Commit a share of what comes in. It is held back from safe to spend until you confirm what you actually saved.'**
+  /// **'Set a share of income to put aside each month. Until it is in a savings account, it is held back from safe to spend.'**
   String get savingsNoPlanHint;
 
   /// No description provided for @savingsRateLabel.
@@ -1898,30 +1892,6 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Share of income'**
   String get savingsRateLabel;
-
-  /// No description provided for @savingsPlanSaved.
-  ///
-  /// In en, this message translates to:
-  /// **'Savings plan updated'**
-  String get savingsPlanSaved;
-
-  /// No description provided for @savingsNoPeriod.
-  ///
-  /// In en, this message translates to:
-  /// **'No period open'**
-  String get savingsNoPeriod;
-
-  /// No description provided for @savingsNoPeriodHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Start one and the share will be set aside as income arrives.'**
-  String get savingsNoPeriodHint;
-
-  /// No description provided for @savingsStart.
-  ///
-  /// In en, this message translates to:
-  /// **'Start a period'**
-  String get savingsStart;
 
   /// No description provided for @savingsSince.
   ///
@@ -1947,12 +1917,6 @@ abstract class L10n {
   /// **'Catching up'**
   String get savingsCatchUp;
 
-  /// No description provided for @savingsTarget.
-  ///
-  /// In en, this message translates to:
-  /// **'Target'**
-  String get savingsTarget;
-
   /// No description provided for @savingsOwed.
   ///
   /// In en, this message translates to:
@@ -1965,34 +1929,16 @@ abstract class L10n {
   /// **'Ahead by {amount}'**
   String savingsAhead(String amount);
 
-  /// No description provided for @savingsConfirm.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm what you saved'**
-  String get savingsConfirm;
-
-  /// No description provided for @savingsConfirmTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'What did you actually save?'**
-  String get savingsConfirmTitle;
-
-  /// No description provided for @savingsConfirmHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Less is fine. The difference is added to what you owe yourself and asked for next period.'**
-  String get savingsConfirmHint;
-
   /// No description provided for @savingsSaved.
   ///
   /// In en, this message translates to:
-  /// **'Saved'**
+  /// **'Put aside'**
   String get savingsSaved;
 
   /// No description provided for @savingsHistory.
   ///
   /// In en, this message translates to:
-  /// **'Past periods'**
+  /// **'Past months'**
   String get savingsHistory;
 
   /// No description provided for @savingsShortBy.
@@ -2012,6 +1958,180 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'On target'**
   String get savingsOnTarget;
+
+  /// No description provided for @savingsSavedSoFar.
+  ///
+  /// In en, this message translates to:
+  /// **'Put aside so far'**
+  String get savingsSavedSoFar;
+
+  /// No description provided for @savingsStillToSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Still to put aside'**
+  String get savingsStillToSave;
+
+  /// No description provided for @savingsPutAside.
+  ///
+  /// In en, this message translates to:
+  /// **'Put aside'**
+  String get savingsPutAside;
+
+  /// No description provided for @savingsTakeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Take back'**
+  String get savingsTakeBack;
+
+  /// No description provided for @savingsFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get savingsFrom;
+
+  /// No description provided for @savingsTo.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get savingsTo;
+
+  /// No description provided for @savingsForGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'For a goal'**
+  String get savingsForGoal;
+
+  /// No description provided for @savingsNoGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'No goal'**
+  String get savingsNoGoal;
+
+  /// No description provided for @savingsPutAsideDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} put aside'**
+  String savingsPutAsideDone(String amount);
+
+  /// No description provided for @savingsTakeBackDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} taken back'**
+  String savingsTakeBackDone(String amount);
+
+  /// No description provided for @savingsGoalHolds.
+  ///
+  /// In en, this message translates to:
+  /// **'That goal holds {amount}'**
+  String savingsGoalHolds(String amount);
+
+  /// No description provided for @savingsNewAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'A savings account called “{name}” will be created for this.'**
+  String savingsNewAccount(String name);
+
+  /// No description provided for @savingsDefaultAccountName.
+  ///
+  /// In en, this message translates to:
+  /// **'Savings'**
+  String get savingsDefaultAccountName;
+
+  /// No description provided for @savingsNoOrdinaryAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an everyday account to save from first.'**
+  String get savingsNoOrdinaryAccount;
+
+  /// No description provided for @savingsNothingToTakeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is in a savings account yet.'**
+  String get savingsNothingToTakeBack;
+
+  /// No description provided for @savingsReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust'**
+  String get savingsReview;
+
+  /// No description provided for @savingsReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What did {month} really put aside?'**
+  String savingsReviewTitle(String month);
+
+  /// No description provided for @savingsReviewHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This starts at what you moved into savings accounts. Change it to include money set aside outside the app.'**
+  String get savingsReviewHint;
+
+  /// No description provided for @savingsSaveSomeOfThis.
+  ///
+  /// In en, this message translates to:
+  /// **'Save some of this'**
+  String get savingsSaveSomeOfThis;
+
+  /// No description provided for @savingsReviewEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Month-end savings review'**
+  String get savingsReviewEnable;
+
+  /// No description provided for @savingsReviewEnableHint.
+  ///
+  /// In en, this message translates to:
+  /// **'On the 1st, a reminder to check what last month put aside.'**
+  String get savingsReviewEnableHint;
+
+  /// No description provided for @savingsNudgeEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly savings reminder'**
+  String get savingsNudgeEnable;
+
+  /// No description provided for @savingsNudgeEnableHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Friday evening, while this month still has some to put aside.'**
+  String get savingsNudgeEnableHint;
+
+  /// No description provided for @channelSavingsName.
+  ///
+  /// In en, this message translates to:
+  /// **'Savings'**
+  String get channelSavingsName;
+
+  /// No description provided for @channelSavingsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Month-end reviews and reminders to put money aside.'**
+  String get channelSavingsDescription;
+
+  /// No description provided for @savingsReviewNotifTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review {month}’s savings'**
+  String savingsReviewNotifTitle(String month);
+
+  /// No description provided for @savingsReviewNotifBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Check what you put aside, and adjust it if you saved outside the app.'**
+  String get savingsReviewNotifBody;
+
+  /// No description provided for @savingsNudgeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} still to put aside'**
+  String savingsNudgeTitle(String amount);
+
+  /// No description provided for @savingsNudgeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{saved} of {target} put aside this month.'**
+  String savingsNudgeBody(String saved, String target);
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

@@ -142,17 +142,9 @@ class SettingsPage extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.savings_outlined),
             title: Text(l10n.savingsTitle),
-            subtitle: Text(
-              l10n.savingsRateLabel,
-            ),
+            subtitle: Text(l10n.goalsTitle),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push(Routes.savings),
-          ),
-          ListTile(
-            leading: const Icon(Icons.flag_outlined),
-            title: Text(l10n.goalsTitle),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.push(Routes.goals),
           ),
           ListTile(
             leading: const Icon(Icons.event_outlined),
@@ -200,6 +192,24 @@ class SettingsPage extends ConsumerWidget {
             onChanged: (ref, enabled) => ref
                 .read(budgetAlertControllerProvider)
                 .setEnabled(enabled: enabled),
+          ),
+          _NotificationToggle(
+            icon: Icons.event_repeat_outlined,
+            title: l10n.savingsReviewEnable,
+            subtitle: l10n.savingsReviewEnableHint,
+            flag: savingsReviewEnabledProvider,
+            onChanged: (ref, enabled) => ref
+                .read(savingsReminderControllerProvider)
+                .setReviewEnabled(enabled: enabled),
+          ),
+          _NotificationToggle(
+            icon: Icons.savings_outlined,
+            title: l10n.savingsNudgeEnable,
+            subtitle: l10n.savingsNudgeEnableHint,
+            flag: savingsNudgeEnabledProvider,
+            onChanged: (ref, enabled) => ref
+                .read(savingsReminderControllerProvider)
+                .setNudgeEnabled(enabled: enabled),
           ),
           const Divider(),
 

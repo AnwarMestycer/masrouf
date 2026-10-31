@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masrouf/core/money/currency.dart';
 import 'package:masrouf/core/money/money.dart';
+import 'package:masrouf/core/time/ym.dart';
 import 'package:masrouf/domain/entities/savings_plan.dart';
 
 /// The whole scheme reduces to one invariant:
@@ -169,5 +170,76 @@ void main() {
       dt(300),
       reason: 'back to a normal period once square',
     );
+  });
+
+  group('a month’s window', () {
+    const october = Ym.of(2026, 10);
+
+    test('runs from the 1st when nothing earlier covers it', () {
+      expect(SavingsCalendar.windowStart(october, null), DateTime(2026, 10));
+      expect(
+        SavingsCalendar.windowStart(october, DateTime(2026, 9, 30)),
+        DateTime(2026, 10),
+      );
+    });
+
+    /// Transactions carry a day and no time, so two periods sharing a day
+    /// would both count that day's income.
+    test('starts the day after an earlier period ends inside it', () {
+      expect(
+        SavingsCalendar.windowStart(october, DateTime(2026, 10, 4)),
+        DateTime(2026, 10, 5),
+      );
+    });
+
+    test('ends today while the month runs, and on its last day after', () {
+      final start = DateTime(2026, 10);
+      expect(
+        SavingsCalendar.windowEnd(october, start, DateTime(2026, 10, 12, 18)),
+        DateTime(2026, 10, 12),
+      );
+      expect(
+        SavingsCalendar.windowEnd(october, start, DateTime(2026, 11, 3)),
+        DateTime(2026, 10, 31),
+      );
+    });
+
+    /// A window beginning tomorrow would otherwise be asked about an empty
+    /// range and report a commitment of nothing.
+    test('never ends before it starts', () {
+      final start = DateTime(2026, 10, 11);
+      expect(
+        SavingsCalendar.windowEnd(october, start, DateTime(2026, 10, 10)),
+        start,
+      );
+    });
+  });
+
+  group('this month’s status', () {
+    SavingsStatus status({required num income, required num saved, num owed = 0}) =>
+        SavingsStatus(
+          plan: plan,
+          month: const Ym.of(2026, 10),
+          startedOn: DateTime(2026, 10),
+          incomeSoFar: dt(income),
+          savedSoFar: dt(saved),
+          ledger: ledger(owed, 0),
+        );
+
+    test('holds back only what is still to be put aside', () {
+      expect(status(income: 1000, saved: 0).reserved, dt(300));
+      expect(status(income: 1000, saved: 120).reserved, dt(180));
+    });
+
+    test('holds back the catch-up too', () {
+      expect(status(income: 1000, saved: 0, owed: 100).reserved, dt(400));
+    });
+
+    test('saving more holds nothing back and reports the excess', () {
+      final s = status(income: 1000, saved: 450);
+      expect(s.remaining.isZero, isTrue);
+      expect(s.reserved.isZero, isTrue);
+      expect(s.aheadThisMonth, dt(150));
+    });
   });
 }
