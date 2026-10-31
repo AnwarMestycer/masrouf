@@ -26,7 +26,7 @@ dart run flutter_launcher_icons     # regenerates android mipmap-* from assets/i
 the app shows a configuration screen rather than failing on first request, and
 two tests in `test/unit/env_test.dart` self-skip.
 
-Baseline as of the last check: `flutter test` is 401 passing / 2 skipped and
+Baseline as of the last check: `flutter test` is 405 passing / 2 skipped and
 `flutter analyze` is clean.
 
 Codegen is **drift only**. `riverpod_annotation` / `riverpod_generator` are in
@@ -228,6 +228,14 @@ target   = plan.commitmentFor(month's income) + recovery instalment of owed
 reserved = max(0, target - moved into savings this month)
 owed     = max(0, everything committed - everything saved)   // SavingsLedger
 ```
+
+Safe-to-spend's horizon is the next payday, **except on payday itself before
+any income is recorded that day**, when it is today — otherwise the coming
+month's plans are held against a balance the salary has not reached, and the
+dashboard shows a month's deficit on payday morning. Plans count through the
+whole horizon day, as recurring bills do. The card shows the breakdown
+(balance, bills, planned, savings) because an unexplained negative reads as a
+bug. `safe_to_spend_test.dart` pins all three.
 
 Safe-to-spend leaves savings accounts out of the balance and subtracts
 `reserved` — never the whole target, or money already moved is counted out

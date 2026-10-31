@@ -831,6 +831,36 @@ abstract class L10n {
   /// **'Balance minus known bills before {date}'**
   String dashboardSafeToSpendHint(String date);
 
+  /// No description provided for @dashboardSafeToSpendPaydayHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Payday is today. Once your income is recorded, this looks ahead to the next one.'**
+  String get dashboardSafeToSpendPaydayHint;
+
+  /// No description provided for @safeToSpendBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance'**
+  String get safeToSpendBalance;
+
+  /// No description provided for @safeToSpendBills.
+  ///
+  /// In en, this message translates to:
+  /// **'Bills'**
+  String get safeToSpendBills;
+
+  /// No description provided for @safeToSpendPlanned.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned'**
+  String get safeToSpendPlanned;
+
+  /// No description provided for @safeToSpendSavings.
+  ///
+  /// In en, this message translates to:
+  /// **'Still to save this month'**
+  String get safeToSpendSavings;
+
   /// No description provided for @dashboardUpcomingBills.
   ///
   /// In en, this message translates to:

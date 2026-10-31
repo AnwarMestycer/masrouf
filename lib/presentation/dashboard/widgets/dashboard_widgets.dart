@@ -250,6 +250,11 @@ class SafeToSpendCard extends StatelessWidget {
     final money = theme.money;
     final negative = safe.amount.isNegative;
     final perDay = safe.perDay;
+    final deductions = <(String, Money)>[
+      (l10n.safeToSpendBills, safe.bills),
+      (l10n.safeToSpendPlanned, safe.reserved),
+      (l10n.safeToSpendSavings, safe.savingsReserved),
+    ].where((d) => !d.$2.isZero).toList(growable: false);
 
     return Card(
       color: negative ? money.negativeSurface : money.positiveSurface,
@@ -281,13 +286,30 @@ class SafeToSpendCard extends StatelessWidget {
             ),
             const SizedBox(height: Gap.xs),
             Text(
-              l10n.dashboardSafeToSpendHint(
-                '${safe.horizon.day}/${safe.horizon.month}',
-              ),
+              safe.awaitingPayday
+                  ? l10n.dashboardSafeToSpendPaydayHint
+                  : l10n.dashboardSafeToSpendHint(
+                      '${safe.horizon.day}/${safe.horizon.month}',
+                    ),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
+            // How the figure was reached. Without it a negative number reads
+            // as a bug rather than as "this much is already promised".
+            if (deductions.isNotEmpty) ...<Widget>[
+              const SizedBox(height: Gap.sm),
+              _SafeToSpendLine(
+                label: l10n.safeToSpendBalance,
+                value: formatter.format(safe.currentBalance),
+              ),
+              for (final (label, amount) in deductions)
+                _SafeToSpendLine(
+                  label: label,
+                  value: formatter.format(-amount),
+                  color: money.expense,
+                ),
+            ],
             if (perDay != null && !negative) ...<Widget>[
               const SizedBox(height: Gap.sm),
               Text(
@@ -364,6 +386,29 @@ class SafeToSpendCard extends StatelessWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// One row of the safe-to-spend breakdown.
+class _SafeToSpendLine extends StatelessWidget {
+  const _SafeToSpendLine({required this.label, required this.value, this.color});
+
+  final String label;
+  final String value;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.bodySmall;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1),
+      child: Row(
+        children: <Widget>[
+          Expanded(child: Text(label, style: style)),
+          Text(value, style: style?.copyWith(color: color)),
+        ],
       ),
     );
   }

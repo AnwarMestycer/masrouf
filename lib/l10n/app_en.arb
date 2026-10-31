@@ -151,6 +151,11 @@
       }
     }
   },
+  "dashboardSafeToSpendPaydayHint": "Payday is today. Once your income is recorded, this looks ahead to the next one.",
+  "safeToSpendBalance": "Balance",
+  "safeToSpendBills": "Bills",
+  "safeToSpendPlanned": "Planned",
+  "safeToSpendSavings": "Still to save this month",
   "dashboardUpcomingBills": "Upcoming bills",
   "dashboardNoUpcoming": "Nothing scheduled before next payday.",
   "analyticsTitle": "Analytics",

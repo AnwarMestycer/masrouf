@@ -398,6 +398,22 @@ class L10nEn extends L10n {
   }
 
   @override
+  String get dashboardSafeToSpendPaydayHint =>
+      'Payday is today. Once your income is recorded, this looks ahead to the next one.';
+
+  @override
+  String get safeToSpendBalance => 'Balance';
+
+  @override
+  String get safeToSpendBills => 'Bills';
+
+  @override
+  String get safeToSpendPlanned => 'Planned';
+
+  @override
+  String get safeToSpendSavings => 'Still to save this month';
+
+  @override
   String get dashboardUpcomingBills => 'Upcoming bills';
 
   @override

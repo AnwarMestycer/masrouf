@@ -171,9 +171,11 @@ class SafeToSpend {
     required this.amount,
     required this.currentBalance,
     required this.upcomingBills,
+    required this.bills,
     required this.reserved,
     required this.savingsReserved,
     required this.horizon,
+    this.awaitingPayday = false,
   });
 
   /// May be negative — that is precisely the signal worth surfacing.
@@ -183,6 +185,11 @@ class SafeToSpend {
 
   /// Recurring rules due between today and [horizon], soonest first.
   final List<UpcomingBill> upcomingBills;
+
+  /// [upcomingBills] summed in the base currency — what the card shows beside
+  /// the balance. Kept here rather than re-summed by the widget, which has no
+  /// exchange rates to convert a foreign bill with.
+  final Money bills;
 
   /// The part of the subtraction that came from planned expenses rather than
   /// recurring bills. Surfaced separately so the user can see *why* the figure
@@ -197,6 +204,14 @@ class SafeToSpend {
 
   /// The next payday.
   final DateTime horizon;
+
+  /// Today is payday and no income has been recorded today yet.
+  ///
+  /// The window then stops at today instead of reaching a month ahead: the
+  /// next stretch's bills and plans would otherwise be held against a balance
+  /// the salary has not landed in, and the figure reads as a month's deficit
+  /// on the one day it is least true.
+  final bool awaitingPayday;
 
   int get daysRemaining =>
       horizon.difference(DateTime.now()).inDays.clamp(0, 366);
@@ -215,14 +230,22 @@ class SafeToSpend {
       (other is SafeToSpend &&
           other.amount == amount &&
           other.currentBalance == currentBalance &&
+          other.bills == bills &&
+          other.reserved == reserved &&
+          other.savingsReserved == savingsReserved &&
           other.horizon == horizon &&
+          other.awaitingPayday == awaitingPayday &&
           _listEquals(other.upcomingBills, upcomingBills));
 
   @override
   int get hashCode => Object.hash(
         amount,
         currentBalance,
+        bills,
+        reserved,
+        savingsReserved,
         horizon,
+        awaitingPayday,
         Object.hashAll(upcomingBills),
       );
 }

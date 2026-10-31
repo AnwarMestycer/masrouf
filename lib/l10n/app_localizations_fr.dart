@@ -403,6 +403,22 @@ class L10nFr extends L10n {
   }
 
   @override
+  String get dashboardSafeToSpendPaydayHint =>
+      'C\'est le jour de paie. Une fois le revenu saisi, le calcul porte sur la prochaine paie.';
+
+  @override
+  String get safeToSpendBalance => 'Solde';
+
+  @override
+  String get safeToSpendBills => 'Factures';
+
+  @override
+  String get safeToSpendPlanned => 'Prévu';
+
+  @override
+  String get safeToSpendSavings => 'Reste à épargner ce mois-ci';
+
+  @override
   String get dashboardUpcomingBills => 'Factures à venir';
 
   @override

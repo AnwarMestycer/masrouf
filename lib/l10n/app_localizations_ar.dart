@@ -400,6 +400,22 @@ class L10nAr extends L10n {
   }
 
   @override
+  String get dashboardSafeToSpendPaydayHint =>
+      'اليوم يوم الراتب. بعد تسجيل دخلك، يُحسب المبلغ حتى الراتب التالي.';
+
+  @override
+  String get safeToSpendBalance => 'الرصيد';
+
+  @override
+  String get safeToSpendBills => 'الفواتير';
+
+  @override
+  String get safeToSpendPlanned => 'المخطط';
+
+  @override
+  String get safeToSpendSavings => 'المتبقي للادخار هذا الشهر';
+
+  @override
   String get dashboardUpcomingBills => 'فواتير قادمة';
 
   @override

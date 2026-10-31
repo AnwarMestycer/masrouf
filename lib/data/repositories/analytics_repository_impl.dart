@@ -23,9 +23,11 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
     required this.paydayDayOfMonth,
     required this.ratesToBase,
     this.savingsReserved = const Money(0, Currency.tnd),
+    DateTime Function()? clock,
   })  : _db = db,
         _recurring = recurring,
-        _planned = planned;
+        _planned = planned,
+        _clock = clock ?? DateTime.now;
 
   final AppDatabase _db;
   final RecurringRepository _recurring;
@@ -38,6 +40,9 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
   /// What this month has yet to put aside. Injected rather than queried
   /// so this repository keeps taking its inputs from one place.
   final Money savingsReserved;
+
+  /// Injected so tests can stand on payday.
+  final DateTime Function() _clock;
 
   @override
   Stream<MonthSummary> watchMonthSummary(Ym ym) =>
@@ -72,14 +77,29 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
   /// calendar day — a payday on the 31st still resolves in February. Only
   /// outflows are subtracted; expected income is deliberately ignored so the
   /// figure answers "what can I spend from what I actually have".
+  ///
+  /// On payday itself, until some income has been recorded that day, the
+  /// horizon is today. Skipping straight to next month's payday would hold the
+  /// whole coming month's bills and plans against a balance the salary has not
+  /// reached yet.
   @override
   Future<SafeToSpend> safeToSpend() async {
-    final horizon = _nextPayday(DateTime.now().dateOnly);
+    final today = _clock().dateOnly;
+    final isPayday =
+        dayOfMonthIn(today.year, today.month, paydayDayOfMonth) == today;
+    final awaitingPayday = isPayday &&
+        await _db.analyticsDao.incomeBetween(userId, today, today) == 0;
+    final horizon = awaitingPayday ? today : _nextPayday(today);
     final bills = await _recurring.upcomingBefore(horizon);
     // Plans are reserved on the same footing as bills: both are money already
     // committed but not yet spent. The only difference is that one repeats and
     // the other was promised once.
-    final plans = await _planned.pendingBefore(horizon);
+    // Through the end of the horizon day, as bills are: a plan carries a time
+    // of day, and against bare midnight one due later on payday would be left
+    // out — on a payday horizon of today, that is every plan due today.
+    final plans = await _planned.pendingBefore(
+      horizon.add(const Duration(days: 1)).subtract(const Duration(microseconds: 1)),
+    );
 
     final balances =
         await _db.accountDao.watchWithBalances(userId).first;
@@ -115,9 +135,11 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
       ),
       currentBalance: balance,
       upcomingBills: bills,
+      bills: Money(committed, base),
       reserved: Money(reserved, base),
       savingsReserved: savingsReserved,
       horizon: horizon,
+      awaitingPayday: awaitingPayday,
     );
   }
 
