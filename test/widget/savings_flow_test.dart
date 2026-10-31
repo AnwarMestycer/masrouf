@@ -128,4 +128,12 @@ void main() {
     expect(created.name, 'Savings');
     expect((await transfers()).single.transferAccountId, created.id);
   });
+
+  testWidgets('the dashboard says when nothing is due this week',
+      (tester) async {
+    await pumpApp(tester, db: db, sync: sync);
+    expect(find.text('Next 7 days'), findsOneWidget);
+    expect(find.text('Nothing due in the next 7 days'), findsOneWidget);
+  });
 }
+

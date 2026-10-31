@@ -1225,4 +1225,16 @@ class L10nAr extends L10n {
   String savingsNudgeBody(String saved, String target) {
     return 'ادُّخر $saved من $target هذا الشهر.';
   }
+
+  @override
+  String get dashboardNextWeek => 'الأيام السبعة القادمة';
+
+  @override
+  String get dashboardNextWeekEmpty => 'لا شيء مستحق في الأيام السبعة القادمة';
+
+  @override
+  String get dashboardTomorrow => 'غدًا';
+
+  @override
+  String get dashboardPlanned => 'مخطَّط';
 }

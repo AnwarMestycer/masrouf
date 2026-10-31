@@ -339,5 +339,9 @@
   "savingsReviewNotifTitle": "راجع ادخار {month}",
   "savingsReviewNotifBody": "تحقَّق مما ادّخرته، وعدِّله إن ادّخرت خارج التطبيق.",
   "savingsNudgeTitle": "ما زال {amount} للادخار",
-  "savingsNudgeBody": "ادُّخر {saved} من {target} هذا الشهر."
+  "savingsNudgeBody": "ادُّخر {saved} من {target} هذا الشهر.",
+  "dashboardNextWeek": "الأيام السبعة القادمة",
+  "dashboardNextWeekEmpty": "لا شيء مستحق في الأيام السبعة القادمة",
+  "dashboardTomorrow": "غدًا",
+  "dashboardPlanned": "مخطَّط"
 }

@@ -339,5 +339,9 @@
   "savingsReviewNotifTitle": "Bilan d’épargne de {month}",
   "savingsReviewNotifBody": "Vérifiez ce que vous avez mis de côté, et ajustez si vous avez épargné hors de l’application.",
   "savingsNudgeTitle": "Encore {amount} à mettre de côté",
-  "savingsNudgeBody": "{saved} sur {target} mis de côté ce mois-ci."
+  "savingsNudgeBody": "{saved} sur {target} mis de côté ce mois-ci.",
+  "dashboardNextWeek": "7 prochains jours",
+  "dashboardNextWeekEmpty": "Rien de prévu dans les 7 prochains jours",
+  "dashboardTomorrow": "Demain",
+  "dashboardPlanned": "Prévu"
 }

@@ -4,6 +4,7 @@ import 'package:masrouf/core/time/ym.dart';
 import 'package:masrouf/domain/entities/analytics/analytics.dart';
 import 'package:masrouf/domain/entities/analytics/cashflow_calendar.dart';
 import 'package:masrouf/domain/entities/analytics/forecast.dart';
+import 'package:masrouf/domain/entities/analytics/upcoming_week.dart';
 import 'package:masrouf/domain/entities/budget.dart';
 import 'package:masrouf/domain/entities/planned_expense.dart';
 import 'package:masrouf/domain/entities/txn.dart';
@@ -120,6 +121,31 @@ final duePlansProvider = Provider<List<PlannedExpenseView>>((ref) {
   final pending = ref.watch(pendingPlansProvider).value;
   if (pending == null) return const <PlannedExpenseView>[];
   return pending.where((v) => v.plan.isDue(now)).toList(growable: false);
+});
+
+/// Bills and plans due over the next seven days, for the dashboard.
+///
+/// Recomputed on every ledger change, because materialising a recurring rule
+/// moves its next date, and on every plan change through [pendingPlansProvider].
+final nextWeekProvider = FutureProvider<List<UpcomingItem>>((ref) async {
+  ref.watch(ledgerRevisionProvider);
+  ref.watch(recurringRulesProvider);
+  final plans =
+      ref.watch(pendingPlansProvider).value ?? const <PlannedExpenseView>[];
+  final recurring = ref.watch(recurringRepositoryProvider);
+  final now = DateTime.now();
+  final bills = await recurring.upcomingBefore(UpcomingWeek.lastDay(now));
+  return UpcomingWeek.from(
+    bills: bills,
+    plans: plans,
+    now: now,
+    planLabel: (view) {
+      final note = view.plan.note?.trim();
+      return note != null && note.isNotEmpty
+          ? note
+          : view.category?.name ?? '';
+    },
+  );
 });
 
 /// Ticks on every ledger change.

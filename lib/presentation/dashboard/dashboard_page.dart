@@ -38,6 +38,7 @@ class DashboardPage extends ConsumerWidget {
     final safe = ref.watch(safeToSpendProvider).value;
     final recent = ref.watch(recentTransactionsProvider).value;
     final duePlans = ref.watch(duePlansProvider);
+    final nextWeek = ref.watch(nextWeekProvider).value;
     final slices =
         ref.watch(categorySlicesProvider((ym, TxnType.expense))).value ??
             const <CategorySlice>[];
@@ -106,6 +107,16 @@ class DashboardPage extends ConsumerWidget {
                       forecast: ref.watch(forecastProvider).value,
                       onForecastTap: () => context.push(Routes.forecast),
                     ),
+                  if (nextWeek != null) ...<Widget>[
+                    const SizedBox(height: Gap.md),
+                    NextWeekCard(
+                      items: nextWeek,
+                      formatter: formatter,
+                      l10n: l10n,
+                      locale: locale,
+                      onTap: () => context.push(Routes.calendar),
+                    ),
+                  ],
                   if (slices.isNotEmpty) const SizedBox(height: Gap.md),
                   CategoryBreakdownCard(
                     slices: slices,

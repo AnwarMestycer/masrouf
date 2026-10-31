@@ -2132,6 +2132,30 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'{saved} of {target} put aside this month.'**
   String savingsNudgeBody(String saved, String target);
+
+  /// No description provided for @dashboardNextWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Next 7 days'**
+  String get dashboardNextWeek;
+
+  /// No description provided for @dashboardNextWeekEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing due in the next 7 days'**
+  String get dashboardNextWeekEmpty;
+
+  /// No description provided for @dashboardTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get dashboardTomorrow;
+
+  /// No description provided for @dashboardPlanned.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned'**
+  String get dashboardPlanned;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

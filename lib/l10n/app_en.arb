@@ -768,5 +768,9 @@
         "type": "String"
       }
     }
-  }
+  },
+  "dashboardNextWeek": "Next 7 days",
+  "dashboardNextWeekEmpty": "Nothing due in the next 7 days",
+  "dashboardTomorrow": "Tomorrow",
+  "dashboardPlanned": "Planned"
 }

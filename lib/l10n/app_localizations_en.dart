@@ -1224,4 +1224,16 @@ class L10nEn extends L10n {
   String savingsNudgeBody(String saved, String target) {
     return '$saved of $target put aside this month.';
   }
+
+  @override
+  String get dashboardNextWeek => 'Next 7 days';
+
+  @override
+  String get dashboardNextWeekEmpty => 'Nothing due in the next 7 days';
+
+  @override
+  String get dashboardTomorrow => 'Tomorrow';
+
+  @override
+  String get dashboardPlanned => 'Planned';
 }

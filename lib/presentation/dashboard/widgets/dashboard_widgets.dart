@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:masrouf/core/money/money.dart';
 import 'package:masrouf/core/money/money_formatter.dart';
 import 'package:masrouf/core/theme/app_colors.dart';
@@ -7,6 +8,7 @@ import 'package:masrouf/domain/entities/account.dart';
 import 'package:masrouf/domain/entities/budget.dart';
 import 'package:masrouf/domain/entities/analytics/analytics.dart';
 import 'package:masrouf/domain/entities/analytics/forecast.dart';
+import 'package:masrouf/domain/entities/analytics/upcoming_week.dart';
 import 'package:masrouf/domain/enums/txn_type.dart';
 import 'package:masrouf/l10n/app_localizations.dart';
 import 'package:masrouf/presentation/budgets/widgets/budget_bar.dart';
@@ -672,6 +674,129 @@ class _CategoryRow extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// What is due over the next seven days: recurring bills and plans.
+///
+/// Shown even when empty, with a line saying so. A card that vanishes reads the
+/// same as one that failed to load, and "nothing due this week" is worth
+/// knowing in its own right.
+class NextWeekCard extends StatelessWidget {
+  const NextWeekCard({
+    required this.items,
+    required this.formatter,
+    required this.l10n,
+    required this.locale,
+    required this.onTap,
+    super.key,
+  });
+
+  final List<UpcomingItem> items;
+  final MoneyFormatter formatter;
+  final L10n l10n;
+  final String locale;
+  final VoidCallback onTap;
+
+  /// Enough to cover a normal week. The calendar, one tap away, has the rest.
+  static const int _maxRows = 5;
+
+  String _day(DateTime date) {
+    final today = DateTime.now();
+    final day = DateTime(today.year, today.month, today.day);
+    final diff = date.difference(day).inDays;
+    if (diff == 0) return l10n.actionToday;
+    if (diff == 1) return l10n.dashboardTomorrow;
+    return DateFormat.MMMEd(locale).format(date);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final shown = items.take(_maxRows).toList(growable: false);
+    final total = items.isEmpty
+        ? null
+        : items.map((i) => i.amount).reduce((a, b) => a + b);
+
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(Gap.radiusMd),
+        child: Padding(
+          padding: const EdgeInsets.all(Gap.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      l10n.dashboardNextWeek,
+                      style: theme.textTheme.titleSmall,
+                    ),
+                  ),
+                  if (total != null)
+                    Text(
+                      formatter.format(total),
+                      style: theme.textTheme.titleSmall,
+                    ),
+                  Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ],
+              ),
+              const SizedBox(height: Gap.md),
+              if (items.isEmpty)
+                Text(
+                  l10n.dashboardNextWeekEmpty,
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                )
+              else
+                for (final item in shown)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: Gap.xs),
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(
+                          width: 92,
+                          child: Text(
+                            _day(item.date),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          item.isPlan ? Icons.event_outlined : Icons.repeat,
+                          size: 16,
+                          color: theme.colorScheme.onSurfaceVariant,
+                          semanticLabel:
+                              item.isPlan ? l10n.dashboardPlanned : null,
+                        ),
+                        const SizedBox(width: Gap.sm),
+                        Expanded(
+                          child: Text(
+                            item.label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                        ),
+                        Text(
+                          formatter.format(item.amount),
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+            ],
+          ),
+        ),
       ),
     );
   }
