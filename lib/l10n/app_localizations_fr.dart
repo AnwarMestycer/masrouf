@@ -523,36 +523,6 @@ class L10nFr extends L10n {
       'Supprimer ce plan ? Rien d’autre ne change.';
 
   @override
-  String get forecastTitle => 'Mois à venir';
-
-  @override
-  String forecastSavings(String amount) {
-    return 'Environ $amount économisés';
-  }
-
-  @override
-  String forecastShortfall(String amount) {
-    return 'Environ $amount manquants';
-  }
-
-  @override
-  String get forecastTypical => 'Habituel';
-
-  @override
-  String get forecastCommitted => 'Factures';
-
-  @override
-  String get forecastPlanned => 'Prévu';
-
-  @override
-  String get forecastProvisional =>
-      'Basé sur moins de 3 mois d’historique — à prendre comme indication.';
-
-  @override
-  String get forecastExplains =>
-      'Vos dépenses habituelles, plus les factures connues, plus ce que vous avez prévu.';
-
-  @override
   String get goalsTitle => 'Objectifs d’épargne';
 
   @override
@@ -582,8 +552,7 @@ class L10nFr extends L10n {
   String get goalsOnTrack => 'En bonne voie';
 
   @override
-  String get goalsBehind =>
-      'En retard — vos prévisions épargnent moins que nécessaire';
+  String get goalsBehind => 'En retard — vous épargnez moins que cela par mois';
 
   @override
   String get goalsAccount => 'Épargne sur';

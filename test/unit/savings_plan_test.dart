@@ -242,4 +242,68 @@ void main() {
       expect(s.aheadThisMonth, dt(150));
     });
   });
+
+  /// A goal's "on track" is judged against this, so what it averages decides
+  /// whether someone is told they are behind.
+  group('the pace goals are judged against', () {
+    SavingsPeriod closed(Ym month, num? saved) => SavingsPeriod(
+      id: '${month.value}',
+      startedOn: month.firstDay,
+      income: dt(1000),
+      committed: dt(300),
+      confirmedOn: month.lastDay,
+      saved: saved == null ? null : dt(saved),
+      updatedAt: month.lastDay,
+    );
+    SavingsPeriod open(Ym month) => SavingsPeriod(
+      id: 'open',
+      startedOn: month.firstDay,
+      income: dt(0),
+      committed: dt(0),
+      confirmedOn: null,
+      saved: null,
+      updatedAt: month.firstDay,
+    );
+
+    const sep = Ym(202609);
+    const oct = Ym(202610);
+    const aug = Ym(202608);
+    const jul = Ym(202607);
+
+    test('nothing closed yet says nothing, rather than zero', () {
+      expect(SavingsPace.monthly(const <SavingsPeriod>[], months: 3), isNull);
+      expect(
+        SavingsPace.monthly(<SavingsPeriod>[open(oct)], months: 3),
+        isNull,
+      );
+    });
+
+    test('the mean of the most recent closed months, whatever the order', () {
+      final periods = <SavingsPeriod>[
+        closed(aug, 100),
+        open(const Ym(202611)),
+        closed(oct, 400),
+        closed(jul, 9000), // older than the window: must not count
+        closed(sep, 100),
+      ];
+      expect(SavingsPace.monthly(periods, months: 3), dt(200));
+    });
+
+    test('fewer closed months than the window are averaged as they are', () {
+      expect(
+        SavingsPace.monthly(<SavingsPeriod>[closed(oct, 250)], months: 3),
+        dt(250),
+      );
+    });
+
+    test('a month that saved nothing pulls the pace down', () {
+      expect(
+        SavingsPace.monthly(<SavingsPeriod>[
+          closed(oct, 300),
+          closed(sep, 0),
+        ], months: 3),
+        dt(150),
+      );
+    });
+  });
 }

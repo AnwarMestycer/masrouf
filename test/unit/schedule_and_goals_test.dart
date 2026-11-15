@@ -5,9 +5,9 @@ import 'package:masrouf/domain/entities/recurring_rule.dart';
 import 'package:masrouf/domain/entities/savings_goal.dart';
 import 'package:masrouf/domain/enums/txn_type.dart';
 
-/// The forecast rests on two pieces of arithmetic that are easy to get subtly
-/// wrong and impossible to notice afterwards: enumerating a rule's occurrences,
-/// and choosing a baseline that one unusual month cannot distort.
+/// Two pieces of arithmetic that are easy to get subtly wrong and impossible to
+/// notice afterwards: enumerating a recurring rule's occurrences (what the
+/// dashboard's upcoming card lists), and what a savings goal asks for a month.
 void main() {
   group('occurrencesBetween', () {
     RecurringRule rule({
@@ -138,7 +138,7 @@ void main() {
           accountName: 'Savings',
         );
 
-    test('progress is the account balance against the target', () {
+    test('progress is what has been earmarked against the target', () {
       final p = progress(target: 1000000, saved: 250000);
       expect(p.ratio, closeTo(0.25, 0.001));
       expect(p.remaining.milli, 750000);

@@ -257,79 +257,6 @@ class AnalyticsDao extends DatabaseAccessor<AppDatabase>
     });
   }
 
-  /// Per-month totals of spend that no recurring rule generated, oldest first.
-  ///
-  /// Reads the ledger rather than `monthly_category_totals`, because the
-  /// aggregate carries no record of which rows a rule produced. Without that
-  /// split a forecast would count the rent twice — once in the historical
-  /// baseline and again in the enumerated commitments.
-  ///
-  /// A one-shot query over a personal-sized ledger, run when the forecast
-  /// screen opens rather than on every write.
-  Future<Map<int, int>> spontaneousExpenseByMonth(
-    String userId,
-    List<Ym> months,
-    Currency base,
-  ) async {
-    if (months.isEmpty) return const <int, int>{};
-
-    final first = months.first.firstDay.ymd;
-    final last = months.last.lastDay.ymd;
-
-    final rows = await (select(transactions)
-          ..where(
-            (t) =>
-                t.userId.equals(userId) &
-                t.deletedAt.isNull() &
-                t.type.equals(TxnType.expense.wire) &
-                t.recurringRuleId.isNull() &
-                t.dateYmd.isBiggerOrEqualValue(first) &
-                t.dateYmd.isSmallerOrEqualValue(last),
-          ))
-        .get();
-
-    final byMonth = <int, int>{for (final m in months) m.value: 0};
-    for (final row in rows) {
-      final ym = row.dateYmd ~/ 100;
-      if (!byMonth.containsKey(ym)) continue;
-      byMonth[ym] = byMonth[ym]! + row.baseMilliIn(base);
-    }
-    return byMonth;
-  }
-
-  /// Per-month income totals, oldest first. Recurring income is enumerated
-  /// separately, so rule-generated rows are excluded here for the same reason.
-  Future<Map<int, int>> spontaneousIncomeByMonth(
-    String userId,
-    List<Ym> months,
-    Currency base,
-  ) async {
-    if (months.isEmpty) return const <int, int>{};
-
-    final first = months.first.firstDay.ymd;
-    final last = months.last.lastDay.ymd;
-
-    final rows = await (select(transactions)
-          ..where(
-            (t) =>
-                t.userId.equals(userId) &
-                t.deletedAt.isNull() &
-                t.type.equals(TxnType.income.wire) &
-                t.recurringRuleId.isNull() &
-                t.dateYmd.isBiggerOrEqualValue(first) &
-                t.dateYmd.isSmallerOrEqualValue(last),
-          ))
-        .get();
-
-    final byMonth = <int, int>{for (final m in months) m.value: 0};
-    for (final row in rows) {
-      final ym = row.dateYmd ~/ 100;
-      if (!byMonth.containsKey(ym)) continue;
-      byMonth[ym] = byMonth[ym]! + row.baseMilliIn(base);
-    }
-    return byMonth;
-  }
-
   /// Total expense in `[from, to]`, in base currency.
   ///
   /// Reads `daily_totals`, the maintained aggregate, so a week's figure is a
@@ -352,9 +279,8 @@ class AnalyticsDao extends DatabaseAccessor<AppDatabase>
   ///
   /// A range that is not a whole calendar month cannot be answered from
   /// `monthly_category_totals`: that table is keyed by month, and a month cannot
-  /// be sliced. So this reads the ledger — deliberately, like the forecast
-  /// baseline above, and for the same reason. A personal ledger is a few hundred
-  /// rows, and the alternative is a fourth maintained aggregate paying on every
+  /// be sliced. So this reads the ledger, deliberately. A personal ledger is a
+  /// few hundred rows, and the alternative is a fourth maintained aggregate paying on every
   /// write to speed up a screen that is opened occasionally.
   ///
   /// The scan spans the comparable window as well as the selected one, so the

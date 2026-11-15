@@ -516,36 +516,6 @@ class L10nAr extends L10n {
   String get plannedRemoveConfirm => 'إزالة هذا المخطَّط؟ لن يتغيَّر شيء آخر.';
 
   @override
-  String get forecastTitle => 'الأشهر القادمة';
-
-  @override
-  String forecastSavings(String amount) {
-    return 'نحو $amount مدَّخرة';
-  }
-
-  @override
-  String forecastShortfall(String amount) {
-    return 'نحو $amount نقص';
-  }
-
-  @override
-  String get forecastTypical => 'المعتاد';
-
-  @override
-  String get forecastCommitted => 'فواتير';
-
-  @override
-  String get forecastPlanned => 'مخطَّط';
-
-  @override
-  String get forecastProvisional =>
-      'يستند إلى أقل من 3 أشهر من السجل — اعتبره تقديرًا تقريبيًا.';
-
-  @override
-  String get forecastExplains =>
-      'إنفاقك المعتاد، زائد الفواتير المعروفة، زائد ما خطَّطت له.';
-
-  @override
   String get goalsTitle => 'أهداف الادخار';
 
   @override
@@ -574,7 +544,7 @@ class L10nAr extends L10n {
   String get goalsOnTrack => 'على المسار';
 
   @override
-  String get goalsBehind => 'متأخر — تدَّخر توقُّعاتك أقل مما يتطلَّبه';
+  String get goalsBehind => 'متأخر — تدَّخر شهريًا أقل من هذا';
 
   @override
   String get goalsAccount => 'يُدَّخر في';

@@ -104,8 +104,6 @@ class DashboardPage extends ConsumerWidget {
                       safe: safe,
                       formatter: formatter,
                       l10n: l10n,
-                      forecast: ref.watch(forecastProvider).value,
-                      onForecastTap: () => context.push(Routes.forecast),
                     ),
                   if (nextWeek != null) ...<Widget>[
                     const SizedBox(height: Gap.md),

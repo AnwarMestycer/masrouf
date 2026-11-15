@@ -230,28 +230,6 @@
   "plannedWhen": "When",
   "plannedNotCounted": "Not counted in your balance until you log it",
   "plannedRemoveConfirm": "Remove this plan? Nothing else changes.",
-  "forecastTitle": "Next months",
-  "forecastSavings": "About {amount} saved",
-  "@forecastSavings": {
-    "placeholders": {
-      "amount": {
-        "type": "String"
-      }
-    }
-  },
-  "forecastShortfall": "About {amount} short",
-  "@forecastShortfall": {
-    "placeholders": {
-      "amount": {
-        "type": "String"
-      }
-    }
-  },
-  "forecastTypical": "Typical",
-  "forecastCommitted": "Bills",
-  "forecastPlanned": "Planned",
-  "forecastProvisional": "Based on less than 3 months of history — treat as a rough guide.",
-  "forecastExplains": "Your usual spending, plus the bills you know about, plus what you planned.",
   "goalsTitle": "Savings goals",
   "goalsAdd": "New goal",
   "goalsEmptyHint": "Set a target, then earmark money for it whenever you put some aside.",
@@ -274,7 +252,7 @@
   },
   "goalsReached": "Reached",
   "goalsOnTrack": "On track",
-  "goalsBehind": "Behind — your forecast saves less than this needs",
+  "goalsBehind": "Behind — you have been saving less than this a month",
   "goalsAccount": "Saves into",
   "goalsRemoveConfirm": "Remove this goal? The money set aside for it stays in your savings account.",
   "calendarTitle": "Cash-flow calendar",

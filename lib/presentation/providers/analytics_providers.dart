@@ -3,7 +3,6 @@ import 'package:masrouf/core/config/app_config.dart';
 import 'package:masrouf/core/time/ym.dart';
 import 'package:masrouf/domain/entities/analytics/analytics.dart';
 import 'package:masrouf/domain/entities/analytics/cashflow_calendar.dart';
-import 'package:masrouf/domain/entities/analytics/forecast.dart';
 import 'package:masrouf/domain/entities/analytics/upcoming_week.dart';
 import 'package:masrouf/domain/entities/budget.dart';
 import 'package:masrouf/domain/entities/planned_expense.dart';
@@ -97,15 +96,6 @@ final calendarProvider = FutureProvider.family<CashflowCalendar, Ym>(
     return ref.watch(analyticsRepositoryProvider).calendar(ym);
   },
 );
-
-/// The coming months' projection.
-///
-/// Recomputed whenever the ledger changes, like safe-to-spend: a new
-/// transaction can move the historical baseline the projection rests on.
-final forecastProvider = FutureProvider<Forecast>((ref) async {
-  ref.watch(ledgerRevisionProvider);
-  return ref.watch(analyticsRepositoryProvider).forecast();
-});
 
 /// Plans that have not been resolved, soonest first.
 final pendingPlansProvider = StreamProvider<List<PlannedExpenseView>>(

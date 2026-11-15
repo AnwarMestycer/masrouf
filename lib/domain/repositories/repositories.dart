@@ -10,7 +10,6 @@ import 'package:masrouf/domain/entities/savings_plan.dart';
 import 'package:masrouf/domain/entities/analytics/analytics.dart';
 import 'package:masrouf/domain/entities/analytics/date_range.dart';
 import 'package:masrouf/domain/entities/analytics/cashflow_calendar.dart';
-import 'package:masrouf/domain/entities/analytics/forecast.dart';
 import 'package:masrouf/domain/entities/category.dart';
 import 'package:masrouf/domain/entities/history_filter.dart';
 import 'package:masrouf/domain/entities/recurring_rule.dart';
@@ -221,10 +220,6 @@ abstract interface class AnalyticsRepository {
   );
   Stream<IncomeBreakdown> watchIncomeBreakdown(Ym latest, {int monthCount});
   Future<List<MonthSummary>> summaries(List<Ym> months);
-
-  /// Projects the coming months: what they are likely to cost and what is
-  /// likely to be left over.
-  Future<Forecast> forecast({int monthCount, int historyMonths});
 
   /// A month's expected outflows, grouped by day — plans plus enumerated
   /// recurring occurrences. Nothing in it has happened yet.

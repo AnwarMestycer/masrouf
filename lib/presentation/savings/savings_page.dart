@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:masrouf/core/config/app_config.dart';
 import 'package:masrouf/core/money/money.dart';
 import 'package:masrouf/core/money/money_formatter.dart';
 import 'package:masrouf/core/theme/app_colors.dart';
@@ -8,7 +9,6 @@ import 'package:masrouf/core/theme/spacing.dart';
 import 'package:masrouf/domain/entities/savings_goal.dart';
 import 'package:masrouf/domain/entities/savings_plan.dart';
 import 'package:masrouf/presentation/common/l10n_x.dart';
-import 'package:masrouf/presentation/providers/analytics_providers.dart';
 import 'package:masrouf/presentation/providers/data_providers.dart';
 import 'package:masrouf/presentation/providers/savings_providers.dart';
 import 'package:masrouf/presentation/savings/widgets/goal_editor.dart';
@@ -225,26 +225,25 @@ class _GoalRow extends ConsumerWidget {
     final now = DateTime.now();
 
     final perMonth = progress.requiredPerMonth(now);
-    // The forecast is what turns "you need 250 a month" into "and you are on
-    // course for that" — without it the requirement is a demand with no answer.
-    final projected = ref.watch(forecastProvider).value;
-    final monthlySavings = projected == null || projected.months.isEmpty
-        ? null
-        : Money(
-            projected.months
-                    .map((m) => m.projectedSavings.milli)
-                    .reduce((a, b) => a + b) ~/
-                projected.months.length,
-            progress.goal.target.currency,
-          );
+    // What the last closed months actually put aside is what turns "you need
+    // 250 a month" into "and you are doing that" — without it the requirement
+    // is a demand with no answer. Null until a month has closed. Thousandths
+    // of two currencies are not comparable, so a goal in another currency than
+    // the months were closed in gets no verdict rather than a wrong one.
+    final pace = SavingsPace.monthly(
+      ref.watch(confirmedPeriodsProvider).value ?? const <SavingsPeriod>[],
+      months: AppConfig.savingsPaceMonths,
+    );
 
     final String status;
     final Color statusColor;
     if (progress.isReached) {
       status = l10n.goalsReached;
       statusColor = theme.money.income;
-    } else if (perMonth != null && monthlySavings != null) {
-      final onTrack = monthlySavings.milli >= perMonth.milli;
+    } else if (perMonth != null &&
+        pace != null &&
+        pace.currency == perMonth.currency) {
+      final onTrack = pace.milli >= perMonth.milli;
       status = onTrack ? l10n.goalsOnTrack : l10n.goalsBehind;
       statusColor = onTrack ? theme.money.income : theme.colorScheme.tertiary;
     } else {

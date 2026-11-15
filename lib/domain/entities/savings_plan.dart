@@ -212,6 +212,32 @@ class SavingsLedger {
       plan.commitmentFor(income) + recoveryInstalment();
 }
 
+/// What is actually being set aside a month, read from months that closed.
+///
+/// A goal asks "250 a month"; this answers with what the last few months put
+/// into savings accounts — real transfers, frozen onto each row as it closed —
+/// rather than a projection of income minus spending, which says nothing about
+/// whether the money was ever moved.
+abstract final class SavingsPace {
+  /// The mean of `saved` over the [months] most recently closed periods, or
+  /// null when none has closed yet. Fewer than [months] are averaged as they
+  /// are: one closed month is thin evidence, but it is evidence, and nothing
+  /// is invented for the months before the plan started.
+  static Money? monthly(
+    Iterable<SavingsPeriod> periods, {
+    required int months,
+  }) {
+    final closed = periods
+        .where((p) => p.isConfirmed && p.saved != null)
+        .toList(growable: false)
+      ..sort((a, b) => b.confirmedOn!.compareTo(a.confirmedOn!));
+    if (closed.isEmpty || months < 1) return null;
+    final recent = closed.take(months).toList(growable: false);
+    final total = recent.fold<int>(0, (sum, p) => sum + p.saved!.milli);
+    return Money(total ~/ recent.length, recent.first.saved!.currency);
+  }
+}
+
 /// Everything the savings screen and safe-to-spend read, in one value.
 ///
 /// The month's income and what has been saved so far are *derived* from the

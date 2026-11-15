@@ -7,7 +7,6 @@ import 'package:masrouf/core/theme/spacing.dart';
 import 'package:masrouf/domain/entities/account.dart';
 import 'package:masrouf/domain/entities/budget.dart';
 import 'package:masrouf/domain/entities/analytics/analytics.dart';
-import 'package:masrouf/domain/entities/analytics/forecast.dart';
 import 'package:masrouf/domain/entities/analytics/upcoming_week.dart';
 import 'package:masrouf/domain/enums/txn_type.dart';
 import 'package:masrouf/l10n/app_localizations.dart';
@@ -229,20 +228,12 @@ class SafeToSpendCard extends StatelessWidget {
     required this.safe,
     required this.formatter,
     required this.l10n,
-    this.forecast,
-    this.onForecastTap,
     super.key,
   });
 
   final SafeToSpend safe;
   final MoneyFormatter formatter;
   final L10n l10n;
-
-  /// The projection, when it has been computed. Shown as one line here: this
-  /// card already answers "until payday", and the months beyond it are the
-  /// natural next question rather than a separate destination to discover.
-  final Forecast? forecast;
-  final VoidCallback? onForecastTap;
 
   @override
   Widget build(BuildContext context) {
@@ -351,38 +342,6 @@ class SafeToSpendCard extends StatelessWidget {
                     ],
                   ),
                 ),
-            ],
-            if (forecast?.totalSavings case final Money total) ...<Widget>[
-              const SizedBox(height: Gap.sm),
-              InkWell(
-                onTap: onForecastTap,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: Gap.xs),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          total.isNegative
-                              ? l10n.forecastShortfall(
-                                  formatter.format(total.abs),
-                                )
-                              : l10n.forecastSavings(formatter.format(total)),
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: total.isNegative
-                                ? money.expense
-                                : money.income,
-                          ),
-                        ),
-                      ),
-                      Icon(
-                        Icons.chevron_right,
-                        size: 18,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ],
           ],
         ),

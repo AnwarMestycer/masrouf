@@ -1,7 +1,5 @@
 import 'package:masrouf/core/error/auth_error_mapper.dart';
-import 'package:masrouf/core/config/app_config.dart';
 import 'package:masrouf/domain/entities/analytics/cashflow_calendar.dart';
-import 'package:masrouf/domain/entities/analytics/forecast.dart';
 import 'package:masrouf/core/money/currency.dart';
 import 'package:masrouf/core/money/money.dart';
 import 'package:masrouf/core/result/result.dart';
@@ -143,97 +141,6 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
     );
   }
 
-  /// Projects the next [monthCount] months.
-  ///
-  /// `projected = typical + committed + planned` per month, where *typical* is
-  /// the **median** of the last [historyMonths] months of non-rule-generated
-  /// spend. Median rather than mean because one month with a plane ticket in it
-  /// should not raise every future month's estimate — and with a handful of
-  /// samples, a mean is exactly what an outlier moves most.
-  @override
-  Future<Forecast> forecast({
-    int monthCount = AppConfig.forecastMonthWindow,
-    int historyMonths = AppConfig.analyticsMonthWindow,
-  }) async {
-    final now = DateTime.now().dateOnly;
-    final thisMonth = Ym.fromDate(now);
-
-    // History excludes the current month: it is partway through, so including
-    // it would drag every projection down by however much of it is left.
-    final past = thisMonth.previous.lastMonths(historyMonths);
-    final future = thisMonth.next.nextMonths(monthCount);
-
-    final expenseByMonth =
-        await _db.analyticsDao.spontaneousExpenseByMonth(userId, past, base);
-    final incomeByMonth =
-        await _db.analyticsDao.spontaneousIncomeByMonth(userId, past, base);
-
-    // Months before the user started are not evidence of frugality — dropping
-    // the leading empty ones stops an account opened last week from projecting
-    // near-zero spending forever.
-    final expenseSamples = _trimLeadingEmpty(
-      past.map((m) => expenseByMonth[m.value] ?? 0).toList(growable: false),
-    );
-    final incomeSamples = _trimLeadingEmpty(
-      past.map((m) => incomeByMonth[m.value] ?? 0).toList(growable: false),
-    );
-
-    // With no completed month to learn from, the projection would be all
-    // zeros — technically true and completely useless to someone who started
-    // using the app this month. Fall back to the month in progress, scaled up
-    // to a whole one. Still flagged provisional, because a week of data is a
-    // hint rather than a pattern.
-    var typicalMilli = _median(expenseSamples);
-    var typicalIncomeMilli = _median(incomeSamples);
-
-    if (expenseSamples.isEmpty && incomeSamples.isEmpty) {
-      final partial = await _proRatedCurrentMonth(thisMonth, now);
-      typicalMilli = partial.$1;
-      typicalIncomeMilli = partial.$2;
-    }
-
-    final typical = Money(typicalMilli, base);
-    final typicalIncome = Money(typicalIncomeMilli, base);
-
-    final rules = await _recurring.all();
-    final plans = await _planned.pendingBefore(future.last.lastDay);
-
-    final months = <MonthForecast>[];
-    for (final ym in future) {
-      final from = ym.firstDay;
-      final to = ym.lastDay;
-
-      var committedOut = 0;
-      var committedIn = 0;
-      for (final rule in rules) {
-        final count = rule.occurrencesBetween(from, to).length;
-        if (count == 0) continue;
-        final milli = _inBase(rule.amount) * count;
-        if (rule.type == TxnType.income) {
-          committedIn += milli;
-        } else if (!rule.type.isTransfer) {
-          committedOut += milli;
-        }
-      }
-
-      final plannedMilli = plans
-          .where((p) => !p.dueAt.isBefore(from) && !p.dueAt.isAfter(to))
-          .fold<int>(0, (sum, p) => sum + _inBase(p.amount));
-
-      months.add(
-        MonthForecast(
-          ym: ym,
-          typical: typical,
-          committed: Money(committedOut, base),
-          planned: Money(plannedMilli, base),
-          expectedIncome: Money(typicalIncome.milli + committedIn, base),
-        ),
-      );
-    }
-
-    return Forecast(months: months, historyMonths: expenseSamples.length);
-  }
-
   /// Every expected outflow in [ym], grouped by day.
   ///
   /// Combines the two things that can be known ahead of time: plans the user
@@ -294,44 +201,9 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
     return CashflowCalendar(byDay: byDay, currency: base);
   }
 
-  /// The month in progress, scaled to a full month: `(expense, income)`.
-  ///
-  /// Divided by days elapsed rather than by the whole month, so a user four
-  /// days in is not projected to spend four days' money over thirty.
-  Future<(int, int)> _proRatedCurrentMonth(Ym ym, DateTime now) async {
-    final expense = await _db.analyticsDao
-        .spontaneousExpenseByMonth(userId, <Ym>[ym], base);
-    final income = await _db.analyticsDao
-        .spontaneousIncomeByMonth(userId, <Ym>[ym], base);
-
-    final elapsed = now.day.clamp(1, ym.dayCount);
-    final scale = ym.dayCount / elapsed;
-    return (
-      ((expense[ym.value] ?? 0) * scale).round(),
-      ((income[ym.value] ?? 0) * scale).round(),
-    );
-  }
-
   int _inBase(Money amount) => amount.currency == base
       ? amount.milli
       : (amount.milli * (ratesToBase[amount.currency.code] ?? 0)).round();
-
-  /// Drops leading zero months, which represent "before this user existed"
-  /// rather than "a month they spent nothing".
-  static List<int> _trimLeadingEmpty(List<int> samples) {
-    final firstNonZero = samples.indexWhere((v) => v != 0);
-    if (firstNonZero <= 0) return firstNonZero == 0 ? samples : const <int>[];
-    return samples.sublist(firstNonZero);
-  }
-
-  static int _median(List<int> values) {
-    if (values.isEmpty) return 0;
-    final sorted = <int>[...values]..sort();
-    final middle = sorted.length ~/ 2;
-    return sorted.length.isOdd
-        ? sorted[middle]
-        : (sorted[middle - 1] + sorted[middle]) ~/ 2;
-  }
 
   @override
   Future<Result<void>> rebuild() => guard(

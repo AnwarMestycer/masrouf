@@ -26,7 +26,7 @@ dart run flutter_launcher_icons     # regenerates android mipmap-* from assets/i
 the app shows a configuration screen rather than failing on first request, and
 two tests in `test/unit/env_test.dart` self-skip.
 
-Baseline as of the last check: `flutter test` is 405 passing / 2 skipped and
+Baseline as of the last check: `flutter test` is 402 passing / 2 skipped and
 `flutter analyze` is clean.
 
 Codegen is **drift only**. `riverpod_annotation` / `riverpod_generator` are in
@@ -266,6 +266,10 @@ progress. All are derived: owed from closed periods, the rest from transactions.
   (`windowEnd`), or a period beginning tomorrow reports a commitment of nothing.
 - The month's share uses the plan as it stands at closing: a rate changed on the
   20th applies to that whole month.
+- A goal's "on track" compares what it needs per month with `SavingsPace` —
+  the mean `saved` of the last `AppConfig.savingsPaceMonths` closed months —
+  and says nothing until a month has closed. There is no spending forecast; it
+  was removed because it guessed savings as income minus spending.
 - `review(periodId, saved)` corrects a closed month for money saved outside the
   app. It is the only place `saved` is typed.
 
@@ -334,9 +338,8 @@ decide what "the previous window" means. Keep new range rules there.
 `RangeReport` comes from `AnalyticsDao.watchRangeReport`, one ledger pass
 spanning both the selected and the comparison window. **A range that is not a
 whole calendar month cannot use `monthly_category_totals`** — it is keyed by
-month and a month cannot be sliced — so this scans, deliberately, as the
-forecast baseline does. Don't add a `daily_category_totals` aggregate to avoid
-it: that moves cost onto the add flow, which has a strict instant-feel budget.
+month and a month cannot be sliced — so this scans, deliberately. Don't add a
+`daily_category_totals` aggregate to avoid it: that moves cost onto the add flow, which has a strict instant-feel budget.
 
 `DateRange.previous` is preset-aware: rolling and custom windows compare against
 the span immediately before them; calendar and pay cycles compare against the

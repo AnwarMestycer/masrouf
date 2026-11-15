@@ -1035,54 +1035,6 @@ abstract class L10n {
   /// **'Remove this plan? Nothing else changes.'**
   String get plannedRemoveConfirm;
 
-  /// No description provided for @forecastTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Next months'**
-  String get forecastTitle;
-
-  /// No description provided for @forecastSavings.
-  ///
-  /// In en, this message translates to:
-  /// **'About {amount} saved'**
-  String forecastSavings(String amount);
-
-  /// No description provided for @forecastShortfall.
-  ///
-  /// In en, this message translates to:
-  /// **'About {amount} short'**
-  String forecastShortfall(String amount);
-
-  /// No description provided for @forecastTypical.
-  ///
-  /// In en, this message translates to:
-  /// **'Typical'**
-  String get forecastTypical;
-
-  /// No description provided for @forecastCommitted.
-  ///
-  /// In en, this message translates to:
-  /// **'Bills'**
-  String get forecastCommitted;
-
-  /// No description provided for @forecastPlanned.
-  ///
-  /// In en, this message translates to:
-  /// **'Planned'**
-  String get forecastPlanned;
-
-  /// No description provided for @forecastProvisional.
-  ///
-  /// In en, this message translates to:
-  /// **'Based on less than 3 months of history — treat as a rough guide.'**
-  String get forecastProvisional;
-
-  /// No description provided for @forecastExplains.
-  ///
-  /// In en, this message translates to:
-  /// **'Your usual spending, plus the bills you know about, plus what you planned.'**
-  String get forecastExplains;
-
   /// No description provided for @goalsTitle.
   ///
   /// In en, this message translates to:
@@ -1134,7 +1086,7 @@ abstract class L10n {
   /// No description provided for @goalsBehind.
   ///
   /// In en, this message translates to:
-  /// **'Behind — your forecast saves less than this needs'**
+  /// **'Behind — you have been saving less than this a month'**
   String get goalsBehind;
 
   /// No description provided for @goalsAccount.

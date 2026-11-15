@@ -516,36 +516,6 @@ class L10nEn extends L10n {
   String get plannedRemoveConfirm => 'Remove this plan? Nothing else changes.';
 
   @override
-  String get forecastTitle => 'Next months';
-
-  @override
-  String forecastSavings(String amount) {
-    return 'About $amount saved';
-  }
-
-  @override
-  String forecastShortfall(String amount) {
-    return 'About $amount short';
-  }
-
-  @override
-  String get forecastTypical => 'Typical';
-
-  @override
-  String get forecastCommitted => 'Bills';
-
-  @override
-  String get forecastPlanned => 'Planned';
-
-  @override
-  String get forecastProvisional =>
-      'Based on less than 3 months of history — treat as a rough guide.';
-
-  @override
-  String get forecastExplains =>
-      'Your usual spending, plus the bills you know about, plus what you planned.';
-
-  @override
   String get goalsTitle => 'Savings goals';
 
   @override
@@ -575,7 +545,8 @@ class L10nEn extends L10n {
   String get goalsOnTrack => 'On track';
 
   @override
-  String get goalsBehind => 'Behind — your forecast saves less than this needs';
+  String get goalsBehind =>
+      'Behind — you have been saving less than this a month';
 
   @override
   String get goalsAccount => 'Saves into';
