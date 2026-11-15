@@ -48,8 +48,17 @@ to it, so an arm64 split build is `2001`, not `1`. A plain build is `1`, which
 is *lower* — Android refuses the install, and ColorOS (Oppo) reports it as
 **"package appears to be invalid"** rather than saying downgrade. That error
 cost two sessions and looked like a corrupt download. Check what is on the
-device and pass `--build-number` above it; the test phone has had `2001` and
-then `3001`.
+device and pass `--build-number` above it. The test phone (Oppo CPH2247) is at
+**`9001`** as of 2026-11-15 — it had a `5001` built elsewhere, which no APK on
+this machine recorded, so ask the phone rather than trusting local builds:
+
+```bash
+adb shell dumpsys package com.mestycer.masrouf | grep versionCode
+```
+
+`adb` is not on PATH: it is `~/Android/Sdk/platform-tools/adb`. Wireless
+debugging works once paired (`adb mdns services` finds the pairing and connect
+ports; `adb pair <ip:port> <code>`, then `adb connect`).
 
 Other things that are not the problem when an install fails, all verified:
 zip integrity, 16 KB page alignment (`zipalign -c -P 16 4`), the signing
