@@ -49,7 +49,7 @@ is *lower* — Android refuses the install, and ColorOS (Oppo) reports it as
 **"package appears to be invalid"** rather than saying downgrade. That error
 cost two sessions and looked like a corrupt download. Check what is on the
 device and pass `--build-number` above it. The test phone (Oppo CPH2247) is at
-**`9001`** as of 2026-11-15 — it had a `5001` built elsewhere, which no APK on
+**`9002`** as of 2026-11-15 — it had a `5001` built elsewhere, which no APK on
 this machine recorded, so ask the phone rather than trusting local builds:
 
 ```bash
