@@ -6,7 +6,6 @@ import 'package:masrouf/data/repositories/account_repository_impl.dart';
 import 'package:masrouf/data/repositories/analytics_repository_impl.dart';
 import 'package:masrouf/data/repositories/budget_repository_impl.dart';
 import 'package:masrouf/data/repositories/category_repository_impl.dart';
-import 'package:masrouf/data/repositories/goal_repository_impl.dart';
 import 'package:masrouf/data/repositories/planned_repository_impl.dart';
 import 'package:masrouf/data/repositories/recurring_repository_impl.dart';
 import 'package:masrouf/data/repositories/settings_repository_impl.dart';
@@ -143,15 +142,6 @@ final plannedRepositoryProvider = Provider<PlannedRepository>(
     db: ref.watch(appDatabaseProvider),
     sync: ref.watch(syncEngineProvider),
     transactions: ref.watch(transactionRepositoryProvider),
-    userId: ref.watch(currentUserIdProvider),
-    base: ref.watch(baseCurrencyProvider),
-  ),
-);
-
-final goalRepositoryProvider = Provider<GoalRepository>(
-  (ref) => GoalRepositoryImpl(
-    db: ref.watch(appDatabaseProvider),
-    sync: ref.watch(syncEngineProvider),
     userId: ref.watch(currentUserIdProvider),
     base: ref.watch(baseCurrencyProvider),
   ),

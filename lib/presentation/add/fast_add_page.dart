@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:masrouf/core/money/currency.dart';
 import 'package:masrouf/core/theme/spacing.dart';
 import 'package:masrouf/domain/entities/account.dart';
+import 'package:masrouf/domain/entities/txn.dart';
 import 'package:masrouf/domain/enums/txn_type.dart';
 import 'package:masrouf/l10n/app_localizations.dart';
 import 'package:masrouf/presentation/add/controllers/fast_add_controller.dart';
@@ -15,6 +16,7 @@ import 'package:masrouf/presentation/add/widgets/numpad.dart';
 import 'package:masrouf/presentation/common/feedback.dart';
 import 'package:masrouf/presentation/common/l10n_x.dart';
 import 'package:masrouf/presentation/providers/data_providers.dart';
+import 'package:masrouf/presentation/savings/widgets/savings_sheets.dart';
 
 /// The fast-add screen: amount first, then one tap for category, then save.
 ///
@@ -83,6 +85,7 @@ class _FastAddPageState extends ConsumerState<FastAddPage> {
   }
 
   Future<void> _save() async {
+    final wasEditing = ref.read(fastAddControllerProvider).isEditing;
     final result = await ref.read(fastAddControllerProvider.notifier).save();
     if (!mounted) return;
     final saved = result.report(context);
@@ -90,16 +93,44 @@ class _FastAddPageState extends ConsumerState<FastAddPage> {
     if (saved) {
       unawaited(HapticFeedback.lightImpact());
       final l10n = context.l10n;
+      final txn = result.valueOrNull!;
+      // Captured before the pop: this screen's context is gone by the time
+      // the snackbar's action is tapped, but the root navigator's overlay is
+      // still there to open the sheet from.
+      final overlay = Navigator.of(context, rootNavigator: true).overlay!;
+      final offerToSave = txn.type == TxnType.income && !wasEditing;
       context.pop();
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
           SnackBar(
             content: Text(l10n.txnSaved),
-            duration: const Duration(seconds: 2),
+            duration: Duration(seconds: offerToSave ? 5 : 2),
+            // Income is the moment a saving is easiest to make, so the offer
+            // comes then rather than waiting for the month to end.
+            action: offerToSave
+                ? SnackBarAction(
+                    label: l10n.savingsSaveSomeOfThis,
+                    onPressed: () => _offerSaving(overlay.context, txn),
+                  )
+                : null,
           ),
         );
     }
+  }
+
+  /// Opens the put-aside sheet for part of an income, prefilled with the
+  /// plan's share of it.
+  void _offerSaving(BuildContext context, Txn income) {
+    final plan = ref.read(settingsProvider).savings;
+    unawaited(
+      SavingsMoveSheet.show(
+        context,
+        intoSavings: true,
+        amount: plan.rate > 0 ? plan.commitmentFor(income.amount) : null,
+        fromAccountId: income.accountId,
+      ),
+    );
   }
 
   @override
@@ -143,6 +174,22 @@ class _FastAddPageState extends ConsumerState<FastAddPage> {
           tooltip: l10n.actionCancel,
         ),
         title: Text(state.isEditing ? l10n.actionEdit : l10n.navAdd),
+        actions: <Widget>[
+          if (state.isEditing && state.type == TxnType.income)
+            IconButton(
+              icon: const Icon(Icons.savings_outlined),
+              tooltip: l10n.savingsSaveSomeOfThis,
+              onPressed: () async {
+                final txn = widget.editingId == null
+                    ? null
+                    : await ref
+                        .read(transactionRepositoryProvider)
+                        .getById(widget.editingId!);
+                if (txn == null || !context.mounted) return;
+                _offerSaving(context, txn);
+              },
+            ),
+        ],
       ),
       body: SafeArea(
         child: Column(

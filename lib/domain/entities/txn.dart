@@ -25,6 +25,7 @@ class Txn {
     required this.recurringRuleId,
     required this.createdAt,
     required this.updatedAt,
+    this.goalId,
   });
 
   final String id;
@@ -57,6 +58,14 @@ class Txn {
   /// traced and its generated rows found.
   final String? recurringRuleId;
 
+  /// The savings goal a transfer into or out of a savings account belongs to.
+  ///
+  /// Only ever set on transfers. A goal's progress is the sum of the transfers
+  /// that name it, in minus out, so it is derived from the ledger rather than
+  /// kept as a running figure — and two goals can no longer both claim the
+  /// same money, which is what tying progress to a whole account balance did.
+  final String? goalId;
+
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -77,6 +86,7 @@ class Txn {
     String? note,
     List<String>? tags,
     DateTime? updatedAt,
+    String? goalId,
     bool clearCategory = false,
     bool clearTransferAccount = false,
     bool clearNote = false,
@@ -97,6 +107,7 @@ class Txn {
         recurringRuleId: recurringRuleId,
         createdAt: createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
+        goalId: goalId ?? this.goalId,
       );
 
   @override
@@ -112,6 +123,7 @@ class Txn {
           other.transferAccountId == transferAccountId &&
           other.date == date &&
           other.note == note &&
+          other.goalId == goalId &&
           other.updatedAt == updatedAt);
 
   @override
@@ -125,6 +137,7 @@ class Txn {
         transferAccountId,
         date,
         note,
+        goalId,
         updatedAt,
       );
 }

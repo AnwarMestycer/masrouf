@@ -54,6 +54,28 @@ void main() {
         created_at INTEGER NOT NULL
       );
     ''');
+    // Present since v1. The v6 step adds `goal_id` to it by ALTER, so like
+    // user_settings it has to exist here for the upgrade to run at all.
+    raw.execute('''
+      CREATE TABLE transactions (
+        id TEXT NOT NULL PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        updated_at INTEGER NOT NULL,
+        deleted_at INTEGER NULL,
+        type TEXT NOT NULL,
+        amount_milli INTEGER NOT NULL,
+        currency TEXT NOT NULL,
+        fx_rate_to_base REAL NOT NULL DEFAULT 1,
+        category_id TEXT NULL,
+        account_id TEXT NOT NULL,
+        transfer_account_id TEXT NULL,
+        date_ymd INTEGER NOT NULL,
+        note TEXT NULL,
+        tags TEXT NOT NULL,
+        recurring_rule_id TEXT NULL,
+        created_at INTEGER NOT NULL
+      );
+    ''');
     // Present in v1 and never created by an upgrade step, so a real v1
     // database has it. The v5 step adds the savings plan to it by ALTER, which
     // fails outright against a schema that is missing the table.
@@ -114,10 +136,10 @@ void main() {
     final db = await openMigrated();
     addTearDown(db.close);
 
-    expect(db.schemaVersion, 5);
+    expect(db.schemaVersion, 6);
     expect(
       raw.select('PRAGMA user_version').single['user_version'],
-      5,
+      6,
       reason: 'the migration must record that it ran',
     );
 
@@ -167,7 +189,7 @@ void main() {
     expect(await db.select(db.plannedExpenses).get(), isEmpty);
     expect(await db.select(db.savingsGoals).get(), isEmpty);
     expect(await db.select(db.savingsPeriods).get(), isEmpty);
-    expect(db.schemaVersion, 5);
+    expect(db.schemaVersion, 6);
   });
 
   test('reopening an already-migrated database changes nothing', () async {
@@ -220,7 +242,7 @@ void main() {
     final db = await openMigrated();
     addTearDown(db.close);
 
-    expect(raw.select('PRAGMA user_version').single['user_version'], 5);
+    expect(raw.select('PRAGMA user_version').single['user_version'], 6);
     expect(
       (await db.select(db.budgets).get()).single.amountMilli,
       200000,
@@ -228,5 +250,28 @@ void main() {
     );
     expect(await db.select(db.plannedExpenses).get(), isEmpty);
     expect(await db.select(db.savingsGoals).get(), isEmpty);
+  });
+
+  /// The v6 step adds a column to the one table holding the user's whole
+  /// ledger. Every existing row must come through it, unearmarked.
+  test('the v6 step keeps every transaction, with no goal', () async {
+    createV1();
+    raw.execute('''
+      INSERT INTO transactions (id, user_id, updated_at, type, amount_milli,
+                                currency, account_id, transfer_account_id,
+                                date_ymd, tags, created_at)
+      VALUES ('t1', 'u1', 1, 'transfer', 45000, 'TND', 'acc-1', 'acc-2',
+              20261005, '[]', 1)
+    ''');
+    raw.execute('PRAGMA user_version = 4');
+
+    final db = await openMigrated();
+    addTearDown(db.close);
+
+    expect(raw.select('PRAGMA user_version').single['user_version'], 6);
+    final row = (await db.select(db.transactions).get()).single;
+    expect(row.amountMilli, 45000);
+    expect(row.transferAccountId, 'acc-2');
+    expect(row.goalId, isNull);
   });
 }

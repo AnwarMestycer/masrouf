@@ -41,12 +41,11 @@ abstract final class AppConfig {
   /// Months of history the analytics screens keep in memory at once.
   static const int analyticsMonthWindow = 6;
 
-  /// How far ahead the forecast projects.
+  /// Closed months a goal's "on track" is judged against.
   ///
-  /// Three months, not twelve: a median drawn from six months of history says
-  /// very little about next spring, and a number presented that far out invites
-  /// more confidence than it has earned.
-  static const int forecastMonthWindow = 3;
+  /// Three: enough that one month with a bonus in it does not call every goal
+  /// on track, few enough that a change of habit shows within a season.
+  static const int savingsPaceMonths = 3;
 
   /// Debounce before a keystroke in the history search hits the database.
   static const Duration searchDebounce = Duration(milliseconds: 220);

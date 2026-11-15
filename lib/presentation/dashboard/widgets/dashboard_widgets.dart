@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:masrouf/core/money/money.dart';
 import 'package:masrouf/core/money/money_formatter.dart';
 import 'package:masrouf/core/theme/app_colors.dart';
@@ -6,7 +7,7 @@ import 'package:masrouf/core/theme/spacing.dart';
 import 'package:masrouf/domain/entities/account.dart';
 import 'package:masrouf/domain/entities/budget.dart';
 import 'package:masrouf/domain/entities/analytics/analytics.dart';
-import 'package:masrouf/domain/entities/analytics/forecast.dart';
+import 'package:masrouf/domain/entities/analytics/upcoming_week.dart';
 import 'package:masrouf/domain/enums/txn_type.dart';
 import 'package:masrouf/l10n/app_localizations.dart';
 import 'package:masrouf/presentation/budgets/widgets/budget_bar.dart';
@@ -227,8 +228,6 @@ class SafeToSpendCard extends StatelessWidget {
     required this.safe,
     required this.formatter,
     required this.l10n,
-    this.forecast,
-    this.onForecastTap,
     super.key,
   });
 
@@ -236,18 +235,17 @@ class SafeToSpendCard extends StatelessWidget {
   final MoneyFormatter formatter;
   final L10n l10n;
 
-  /// The projection, when it has been computed. Shown as one line here: this
-  /// card already answers "until payday", and the months beyond it are the
-  /// natural next question rather than a separate destination to discover.
-  final Forecast? forecast;
-  final VoidCallback? onForecastTap;
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final money = theme.money;
     final negative = safe.amount.isNegative;
     final perDay = safe.perDay;
+    final deductions = <(String, Money)>[
+      (l10n.safeToSpendBills, safe.bills),
+      (l10n.safeToSpendPlanned, safe.reserved),
+      (l10n.safeToSpendSavings, safe.savingsReserved),
+    ].where((d) => !d.$2.isZero).toList(growable: false);
 
     return Card(
       color: negative ? money.negativeSurface : money.positiveSurface,
@@ -279,13 +277,30 @@ class SafeToSpendCard extends StatelessWidget {
             ),
             const SizedBox(height: Gap.xs),
             Text(
-              l10n.dashboardSafeToSpendHint(
-                '${safe.horizon.day}/${safe.horizon.month}',
-              ),
+              safe.awaitingPayday
+                  ? l10n.dashboardSafeToSpendPaydayHint
+                  : l10n.dashboardSafeToSpendHint(
+                      '${safe.horizon.day}/${safe.horizon.month}',
+                    ),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
+            // How the figure was reached. Without it a negative number reads
+            // as a bug rather than as "this much is already promised".
+            if (deductions.isNotEmpty) ...<Widget>[
+              const SizedBox(height: Gap.sm),
+              _SafeToSpendLine(
+                label: l10n.safeToSpendBalance,
+                value: formatter.format(safe.currentBalance),
+              ),
+              for (final (label, amount) in deductions)
+                _SafeToSpendLine(
+                  label: label,
+                  value: formatter.format(-amount),
+                  color: money.expense,
+                ),
+            ],
             if (perDay != null && !negative) ...<Widget>[
               const SizedBox(height: Gap.sm),
               Text(
@@ -328,40 +343,31 @@ class SafeToSpendCard extends StatelessWidget {
                   ),
                 ),
             ],
-            if (forecast?.totalSavings case final Money total) ...<Widget>[
-              const SizedBox(height: Gap.sm),
-              InkWell(
-                onTap: onForecastTap,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: Gap.xs),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          total.isNegative
-                              ? l10n.forecastShortfall(
-                                  formatter.format(total.abs),
-                                )
-                              : l10n.forecastSavings(formatter.format(total)),
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: total.isNegative
-                                ? money.expense
-                                : money.income,
-                          ),
-                        ),
-                      ),
-                      Icon(
-                        Icons.chevron_right,
-                        size: 18,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// One row of the safe-to-spend breakdown.
+class _SafeToSpendLine extends StatelessWidget {
+  const _SafeToSpendLine({required this.label, required this.value, this.color});
+
+  final String label;
+  final String value;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.bodySmall;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1),
+      child: Row(
+        children: <Widget>[
+          Expanded(child: Text(label, style: style)),
+          Text(value, style: style?.copyWith(color: color)),
+        ],
       ),
     );
   }
@@ -672,6 +678,129 @@ class _CategoryRow extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// What is due over the next seven days: recurring bills and plans.
+///
+/// Shown even when empty, with a line saying so. A card that vanishes reads the
+/// same as one that failed to load, and "nothing due this week" is worth
+/// knowing in its own right.
+class NextWeekCard extends StatelessWidget {
+  const NextWeekCard({
+    required this.items,
+    required this.formatter,
+    required this.l10n,
+    required this.locale,
+    required this.onTap,
+    super.key,
+  });
+
+  final List<UpcomingItem> items;
+  final MoneyFormatter formatter;
+  final L10n l10n;
+  final String locale;
+  final VoidCallback onTap;
+
+  /// Enough to cover a normal week. The calendar, one tap away, has the rest.
+  static const int _maxRows = 5;
+
+  String _day(DateTime date) {
+    final today = DateTime.now();
+    final day = DateTime(today.year, today.month, today.day);
+    final diff = date.difference(day).inDays;
+    if (diff == 0) return l10n.actionToday;
+    if (diff == 1) return l10n.dashboardTomorrow;
+    return DateFormat.MMMEd(locale).format(date);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final shown = items.take(_maxRows).toList(growable: false);
+    final total = items.isEmpty
+        ? null
+        : items.map((i) => i.amount).reduce((a, b) => a + b);
+
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(Gap.radiusMd),
+        child: Padding(
+          padding: const EdgeInsets.all(Gap.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      l10n.dashboardNextWeek,
+                      style: theme.textTheme.titleSmall,
+                    ),
+                  ),
+                  if (total != null)
+                    Text(
+                      formatter.format(total),
+                      style: theme.textTheme.titleSmall,
+                    ),
+                  Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ],
+              ),
+              const SizedBox(height: Gap.md),
+              if (items.isEmpty)
+                Text(
+                  l10n.dashboardNextWeekEmpty,
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                )
+              else
+                for (final item in shown)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: Gap.xs),
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(
+                          width: 92,
+                          child: Text(
+                            _day(item.date),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          item.isPlan ? Icons.event_outlined : Icons.repeat,
+                          size: 16,
+                          color: theme.colorScheme.onSurfaceVariant,
+                          semanticLabel:
+                              item.isPlan ? l10n.dashboardPlanned : null,
+                        ),
+                        const SizedBox(width: Gap.sm),
+                        Expanded(
+                          child: Text(
+                            item.label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                        ),
+                        Text(
+                          formatter.format(item.amount),
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+            ],
+          ),
+        ),
       ),
     );
   }

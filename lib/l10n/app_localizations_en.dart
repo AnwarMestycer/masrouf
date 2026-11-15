@@ -398,6 +398,22 @@ class L10nEn extends L10n {
   }
 
   @override
+  String get dashboardSafeToSpendPaydayHint =>
+      'Payday is today. Once your income is recorded, this looks ahead to the next one.';
+
+  @override
+  String get safeToSpendBalance => 'Balance';
+
+  @override
+  String get safeToSpendBills => 'Bills';
+
+  @override
+  String get safeToSpendPlanned => 'Planned';
+
+  @override
+  String get safeToSpendSavings => 'Still to save this month';
+
+  @override
   String get dashboardUpcomingBills => 'Upcoming bills';
 
   @override
@@ -500,47 +516,14 @@ class L10nEn extends L10n {
   String get plannedRemoveConfirm => 'Remove this plan? Nothing else changes.';
 
   @override
-  String get forecastTitle => 'Next months';
-
-  @override
-  String forecastSavings(String amount) {
-    return 'About $amount saved';
-  }
-
-  @override
-  String forecastShortfall(String amount) {
-    return 'About $amount short';
-  }
-
-  @override
-  String get forecastTypical => 'Typical';
-
-  @override
-  String get forecastCommitted => 'Bills';
-
-  @override
-  String get forecastPlanned => 'Planned';
-
-  @override
-  String get forecastProvisional =>
-      'Based on less than 3 months of history — treat as a rough guide.';
-
-  @override
-  String get forecastExplains =>
-      'Your usual spending, plus the bills you know about, plus what you planned.';
-
-  @override
   String get goalsTitle => 'Savings goals';
 
   @override
   String get goalsAdd => 'New goal';
 
   @override
-  String get goalsEmpty => 'No goals yet';
-
-  @override
   String get goalsEmptyHint =>
-      'Set a target and the account that holds it, and progress tracks that account’s real balance.';
+      'Set a target, then earmark money for it whenever you put some aside.';
 
   @override
   String get goalsTarget => 'Target';
@@ -562,14 +545,15 @@ class L10nEn extends L10n {
   String get goalsOnTrack => 'On track';
 
   @override
-  String get goalsBehind => 'Behind — your forecast saves less than this needs';
+  String get goalsBehind =>
+      'Behind — you have been saving less than this a month';
 
   @override
-  String get goalsAccount => 'Held in';
+  String get goalsAccount => 'Saves into';
 
   @override
   String get goalsRemoveConfirm =>
-      'Remove this goal? The account and its balance are untouched.';
+      'Remove this goal? The money set aside for it stays in your savings account.';
 
   @override
   String get calendarTitle => 'Cash-flow calendar';
@@ -1073,23 +1057,10 @@ class L10nEn extends L10n {
 
   @override
   String get savingsNoPlanHint =>
-      'Commit a share of what comes in. It is held back from safe to spend until you confirm what you actually saved.';
+      'Set a share of income to put aside each month. Until it is in a savings account, it is held back from safe to spend.';
 
   @override
   String get savingsRateLabel => 'Share of income';
-
-  @override
-  String get savingsPlanSaved => 'Savings plan updated';
-
-  @override
-  String get savingsNoPeriod => 'No period open';
-
-  @override
-  String get savingsNoPeriodHint =>
-      'Start one and the share will be set aside as income arrives.';
-
-  @override
-  String get savingsStart => 'Start a period';
 
   @override
   String savingsSince(String date) {
@@ -1106,9 +1077,6 @@ class L10nEn extends L10n {
   String get savingsCatchUp => 'Catching up';
 
   @override
-  String get savingsTarget => 'Target';
-
-  @override
   String get savingsOwed => 'Owed to yourself';
 
   @override
@@ -1117,20 +1085,10 @@ class L10nEn extends L10n {
   }
 
   @override
-  String get savingsConfirm => 'Confirm what you saved';
+  String get savingsSaved => 'Put aside';
 
   @override
-  String get savingsConfirmTitle => 'What did you actually save?';
-
-  @override
-  String get savingsConfirmHint =>
-      'Less is fine. The difference is added to what you owe yourself and asked for next period.';
-
-  @override
-  String get savingsSaved => 'Saved';
-
-  @override
-  String get savingsHistory => 'Past periods';
+  String get savingsHistory => 'Past months';
 
   @override
   String savingsShortBy(String amount) {
@@ -1144,4 +1102,125 @@ class L10nEn extends L10n {
 
   @override
   String get savingsOnTarget => 'On target';
+
+  @override
+  String get savingsSavedSoFar => 'Put aside so far';
+
+  @override
+  String get savingsStillToSave => 'Still to put aside';
+
+  @override
+  String get savingsPutAside => 'Put aside';
+
+  @override
+  String get savingsTakeBack => 'Take back';
+
+  @override
+  String get savingsFrom => 'From';
+
+  @override
+  String get savingsTo => 'To';
+
+  @override
+  String get savingsForGoal => 'For a goal';
+
+  @override
+  String get savingsNoGoal => 'No goal';
+
+  @override
+  String savingsPutAsideDone(String amount) {
+    return '$amount put aside';
+  }
+
+  @override
+  String savingsTakeBackDone(String amount) {
+    return '$amount taken back';
+  }
+
+  @override
+  String savingsGoalHolds(String amount) {
+    return 'That goal holds $amount';
+  }
+
+  @override
+  String savingsNewAccount(String name) {
+    return 'A savings account called “$name” will be created for this.';
+  }
+
+  @override
+  String get savingsDefaultAccountName => 'Savings';
+
+  @override
+  String get savingsNoOrdinaryAccount =>
+      'Add an everyday account to save from first.';
+
+  @override
+  String get savingsNothingToTakeBack => 'Nothing is in a savings account yet.';
+
+  @override
+  String get savingsReview => 'Adjust';
+
+  @override
+  String savingsReviewTitle(String month) {
+    return 'What did $month really put aside?';
+  }
+
+  @override
+  String get savingsReviewHint =>
+      'This starts at what you moved into savings accounts. Change it to include money set aside outside the app.';
+
+  @override
+  String get savingsSaveSomeOfThis => 'Save some of this';
+
+  @override
+  String get savingsReviewEnable => 'Month-end savings review';
+
+  @override
+  String get savingsReviewEnableHint =>
+      'On the 1st, a reminder to check what last month put aside.';
+
+  @override
+  String get savingsNudgeEnable => 'Weekly savings reminder';
+
+  @override
+  String get savingsNudgeEnableHint =>
+      'Friday evening, while this month still has some to put aside.';
+
+  @override
+  String get channelSavingsName => 'Savings';
+
+  @override
+  String get channelSavingsDescription =>
+      'Month-end reviews and reminders to put money aside.';
+
+  @override
+  String savingsReviewNotifTitle(String month) {
+    return 'Review $month’s savings';
+  }
+
+  @override
+  String get savingsReviewNotifBody =>
+      'Check what you put aside, and adjust it if you saved outside the app.';
+
+  @override
+  String savingsNudgeTitle(String amount) {
+    return '$amount still to put aside';
+  }
+
+  @override
+  String savingsNudgeBody(String saved, String target) {
+    return '$saved of $target put aside this month.';
+  }
+
+  @override
+  String get dashboardNextWeek => 'Next 7 days';
+
+  @override
+  String get dashboardNextWeekEmpty => 'Nothing due in the next 7 days';
+
+  @override
+  String get dashboardTomorrow => 'Tomorrow';
+
+  @override
+  String get dashboardPlanned => 'Planned';
 }

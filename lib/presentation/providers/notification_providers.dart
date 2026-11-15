@@ -2,22 +2,26 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:masrouf/core/money/money.dart';
 import 'package:masrouf/core/money/money_formatter.dart';
 import 'package:masrouf/core/notifications/budget_alert.dart';
 import 'package:masrouf/core/notifications/notification_service.dart';
 import 'package:masrouf/core/notifications/reminder_schedule.dart';
+import 'package:masrouf/core/notifications/savings_reminders.dart';
 import 'package:masrouf/core/time/date_x.dart';
 import 'package:masrouf/core/time/ym.dart';
 import 'package:masrouf/data/local/daos/kv_dao.dart';
 import 'package:masrouf/domain/entities/budget.dart';
+import 'package:masrouf/domain/entities/savings_plan.dart';
 import 'package:masrouf/l10n/app_localizations.dart';
 import 'package:masrouf/presentation/providers/analytics_providers.dart';
 import 'package:masrouf/presentation/providers/auth_providers.dart';
 import 'package:masrouf/presentation/providers/core_providers.dart';
 import 'package:masrouf/presentation/providers/data_providers.dart';
+import 'package:masrouf/presentation/providers/savings_providers.dart';
 
-/// One service for all three notification kinds, so the plugin is initialised
+/// One service for every notification kind, so the plugin is initialised
 /// once and the permission state is shared rather than queried three times.
 final notificationServiceProvider = Provider<NotificationService>(
   (ref) => NotificationService(),
@@ -25,7 +29,7 @@ final notificationServiceProvider = Provider<NotificationService>(
 
 // ------------------------------------------------------------- device flags --
 
-/// The three switches, as stored on this device.
+/// The switches, as stored on this device.
 ///
 /// Device-local rather than synced: a notification schedule belongs to the phone
 /// it fires on, not to the account. Signing in on a tablet should not start
@@ -44,6 +48,16 @@ final remindersEnabledProvider = FutureProvider<bool>(
 final budgetAlertsEnabledProvider = FutureProvider<bool>(
   (ref) async =>
       ref.watch(appDatabaseProvider).kvDao.getFlag(KvDao.budgetAlerts),
+);
+
+final savingsReviewEnabledProvider = FutureProvider<bool>(
+  (ref) async =>
+      ref.watch(appDatabaseProvider).kvDao.getFlag(KvDao.savingsReview),
+);
+
+final savingsNudgeEnabledProvider = FutureProvider<bool>(
+  (ref) async =>
+      ref.watch(appDatabaseProvider).kvDao.getFlag(KvDao.savingsNudge),
 );
 
 /// Loads the user's chosen language outside the widget tree.
@@ -360,6 +374,135 @@ final budgetAlertWatcherProvider = Provider<void>((ref) {
       final progress = next.value;
       if (progress == null) return;
       unawaited(ref.read(budgetAlertControllerProvider).check(progress, ym));
+    },
+    fireImmediately: true,
+  );
+});
+
+// --------------------------------------------------------- savings reminders --
+
+/// Schedules the month-end review and the weekly nudge.
+///
+/// [SavingsReminders] decides which and when; this reads the switches, writes
+/// the strings and hands them to the plugin. Both are cancelled and re-created
+/// on every pass, like the planned-expense block.
+class SavingsReminderController {
+  SavingsReminderController(this._ref);
+
+  final Ref _ref;
+
+  Future<void> setReviewEnabled({required bool enabled}) async {
+    await _ref
+        .read(appDatabaseProvider)
+        .kvDao
+        .setFlag(KvDao.savingsReview, value: enabled);
+    _ref.invalidate(savingsReviewEnabledProvider);
+    await _refreshFromCurrent();
+  }
+
+  Future<void> setNudgeEnabled({required bool enabled}) async {
+    await _ref
+        .read(appDatabaseProvider)
+        .kvDao
+        .setFlag(KvDao.savingsNudge, value: enabled);
+    _ref.invalidate(savingsNudgeEnabledProvider);
+    await _refreshFromCurrent();
+  }
+
+  Future<void> _refreshFromCurrent() async {
+    final status = _ref.read(savingsStatusProvider).value;
+    final service = _ref.read(notificationServiceProvider);
+    if (status == null) {
+      await service.cancelIds(SavingsReminders.allIds);
+      return;
+    }
+    await refresh(status);
+  }
+
+  /// Takes the status rather than reading it, for the same reason as the
+  /// budget check: the caller is a listener, and re-reading could act on a
+  /// different snapshot than the one that triggered it.
+  Future<void> refresh(SavingsStatus status) async {
+    final db = _ref.read(appDatabaseProvider);
+    final service = _ref.read(notificationServiceProvider);
+
+    final reviewOn = await db.kvDao.getFlag(KvDao.savingsReview);
+    final nudgeOn = await db.kvDao.getFlag(KvDao.savingsNudge);
+
+    // Cancelled first and always: a switch turned off, a plan removed or a
+    // month fully saved all mean "no reminder", and only a cancel says so.
+    await service.cancelIds(SavingsReminders.allIds);
+    if (!reviewOn && !nudgeOn) return;
+    if (!await service.hasPermission()) return;
+
+    final reminders = SavingsReminders.plan(
+      now: DateTime.now(),
+      hasPlan: status.hasPlan,
+      stillToSave: status.remaining.isPositive,
+      reviewEnabled: reviewOn,
+      nudgeEnabled: nudgeOn,
+    );
+    if (reminders.isEmpty) return;
+
+    final l10n = await _l10nFor(_ref);
+    final formatter = _ref.read(moneyFormatterProvider);
+    final month = DateFormat.MMMM(_ref.read(settingsProvider).locale)
+        .format(status.month.firstDay);
+
+    for (final reminder in reminders) {
+      final (title, body) = switch (reminder.kind) {
+        SavingsReminderKind.monthReview => (
+            l10n.savingsReviewNotifTitle(month),
+            l10n.savingsReviewNotifBody,
+          ),
+        SavingsReminderKind.weeklyNudge => (
+            l10n.savingsNudgeTitle(formatter.format(status.remaining)),
+            l10n.savingsNudgeBody(
+              formatter.format(status.savedSoFar),
+              formatter.format(status.target),
+            ),
+          ),
+      };
+      await service.scheduleAt(
+        id: reminder.id,
+        channel: NotificationChannel.savings,
+        when: reminder.fireAt,
+        title: title,
+        body: body,
+        channelName: l10n.channelSavingsName,
+        channelDescription: l10n.channelSavingsDescription,
+      );
+    }
+  }
+}
+
+final savingsReminderControllerProvider = Provider<SavingsReminderController>(
+  SavingsReminderController.new,
+);
+
+/// Reschedules the savings reminders whenever the month's figures change.
+///
+/// A listener rather than calls at each write site, for the reason the budget
+/// watcher gives: a transfer typed on the add screen, one made from the savings
+/// screen, a pull from another device and the month rolling over all arrive
+/// through this one stream.
+final savingsReminderWatcherProvider = Provider<void>((ref) {
+  ref.listen(
+    savingsStatusProvider,
+    (previous, next) {
+      final status = next.value;
+      if (status == null) return;
+      // The nudge quotes the remaining amount, so a change in it matters; most
+      // other emissions (an unrelated expense) leave both reminders identical.
+      final before = previous?.value;
+      if (before != null &&
+          before.month == status.month &&
+          before.remaining == status.remaining &&
+          before.savedSoFar == status.savedSoFar &&
+          before.hasPlan == status.hasPlan) {
+        return;
+      }
+      unawaited(ref.read(savingsReminderControllerProvider).refresh(status));
     },
     fireImmediately: true,
   );

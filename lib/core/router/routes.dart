@@ -21,8 +21,6 @@ abstract final class Routes {
   static const String recurring = '/recurring';
   static const String budgets = '/budgets';
   static const String planned = '/planned';
-  static const String forecast = '/forecast';
-  static const String goals = '/goals';
   static const String savings = '/savings';
   static const String calendar = '/calendar';
   static const String exchangeRates = '/settings/rates';

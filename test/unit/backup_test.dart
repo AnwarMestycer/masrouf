@@ -159,6 +159,52 @@ void main() {
     expect(await db.select(db.categories).get(), hasLength(1));
   });
 
+  /// A goal's progress is the transfers that name it, so a field the wire
+  /// format drops is a goal that restores empty. Backup and sync share the
+  /// mappers and the row writer, so this covers a pull as well.
+  test('a savings transfer keeps its goal through a round-trip', () async {
+    await db.accountDao.upsert(
+      userId,
+      Account(
+        id: 'acc-save',
+        name: 'Savings',
+        type: AccountType.savings,
+        currency: base,
+        openingBalance: const Money(0, base),
+        sortOrder: 1,
+        archived: false,
+        updatedAt: DateTime(2026, 10, 1),
+      ),
+    );
+    await db.transactionDao.insertTxn(
+      userId,
+      Txn(
+        id: 's1',
+        type: TxnType.transfer,
+        amount: const Money(30000, base),
+        fxRateToBase: 1,
+        categoryId: null,
+        accountId: 'acc-cash',
+        transferAccountId: 'acc-save',
+        date: DateTime(2026, 10, 3),
+        note: null,
+        tags: const <String>[],
+        recurringRuleId: null,
+        createdAt: DateTime(2026, 10, 3),
+        updatedAt: DateTime(2026, 10, 3),
+        goalId: 'goal-car',
+      ),
+      base,
+    );
+
+    final file = await service.create();
+    await db.clearSyncedData();
+    await service.restore(file!);
+
+    final row = (await db.select(db.transactions).get()).single;
+    expect(row.goalId, 'goal-car');
+  });
+
   /// Dropping tombstones would make a restore resurrect everything the user had
   /// deleted — the same failure a hard delete causes in sync.
   test('deleted rows survive as tombstones', () async {

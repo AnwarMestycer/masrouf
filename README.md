@@ -25,8 +25,8 @@ supabase db push
 ```
 
 If you'd rather not wire up the CLI, paste **`supabase/apply_all.sql`** into the
-SQL editor and run it once — it is the same four files concatenated in order,
-followed by a query that lists the six tables and confirms RLS is on for each.
+SQL editor and run it once — it is the executable migrations concatenated in
+order, followed by a query that lists the tables and confirms RLS is on for each.
 It is not idempotent, so run it exactly once on a fresh project.
 
 | File | What it does |
@@ -35,6 +35,15 @@ It is not idempotent, so run it exactly once on a fresh project.
 | `0002_indexes.sql` | Query and sync indexes |
 | `0003_rls.sql` | Row-level security — **required**, the app cannot read without it |
 | `0004_defaults_reference.sql` | Documentation only; seeding happens client-side |
+| `0005_budgets.sql` | Monthly spending caps |
+| `0006_planned_expenses.sql` | One-off planned expenses |
+| `0007_savings_goals.sql` | Savings goals |
+| `0008_savings_periods.sql` | Savings periods, and the savings plan on `user_settings` |
+| `0009_transaction_goal.sql` | `transactions.goal_id`: a savings transfer earmarked for a goal |
+
+An existing project only needs the files it has not run yet. **Run `0009`
+before installing a build that includes it**: until the column exists, every
+transaction the app pushes is refused by the server and stays in the outbox.
 
 `0003_rls.sql` generates the same four policies for every table rather than
 listing them by hand: a table missed in a hand-written list is a data leak, not a

@@ -12,6 +12,7 @@ import 'package:masrouf/presentation/providers/core_providers.dart';
 import 'package:masrouf/presentation/providers/data_providers.dart';
 import 'package:masrouf/presentation/providers/notification_providers.dart';
 import 'package:masrouf/presentation/providers/range_providers.dart';
+import 'package:masrouf/presentation/providers/savings_providers.dart';
 
 /// Everything that has to happen when a user signs in, and be undone when they
 /// sign out.
@@ -38,6 +39,18 @@ class SessionLifecycle extends Notifier<void> {
         }
       },
       fireImmediately: true,
+    );
+
+    // Switching a plan on mid-month opens this month's period at once. The
+    // figures on screen do not need the row, but closing the month does: a
+    // month with no row is a month the rollover has no record of running.
+    // Read after the change, so the repository already carries the new plan.
+    ref.listen<bool>(
+      settingsProvider.select((s) => s.savings.rate > 0),
+      (previous, next) {
+        if (!next || previous != false || _activeUserId == null) return;
+        unawaited(ref.read(savingsRepositoryProvider).rollOver());
+      },
     );
   }
 
@@ -89,6 +102,11 @@ class SessionLifecycle extends Notifier<void> {
     // one scan of a personal-sized ledger and guarantees the dashboard agrees
     // with the rows even if a previous run was killed mid-write.
     await db.transactionDao.rebuildAggregates(userId, base);
+
+    // After the rebuild, because closing a month reads its income from the
+    // aggregates. Before safe-to-spend is recomputed, because what this month
+    // holds back depends on which month is open.
+    await ref.read(savingsRepositoryProvider).rollOver();
 
     ref.invalidate(safeToSpendProvider);
 
@@ -174,6 +192,15 @@ class AppLifecycleWatcher with WidgetsBindingObserver {
     // scan and most resumes happen within the same day.
     if (_ref.read(analyticsTodayProvider) != DateTime.now().dateOnly) {
       _ref.invalidate(analyticsTodayProvider);
+      // A new day may be a new month: close the old one, open the new one,
+      // and rebuild the status, which resolves its month when it is built.
+      // Same-day resumes skip it: the month cannot have changed.
+      unawaited(
+        _ref
+            .read(savingsRepositoryProvider)
+            .rollOver()
+            .then((_) => _ref.invalidate(savingsStatusProvider)),
+      );
     }
   }
 }

@@ -12,4 +12,14 @@ abstract final class Ids {
   /// instead of scattering random pages the way v4 does. Matters on the
   /// `transactions` primary key, which grows forever.
   static String newId() => _uuid.v7();
+
+  /// The id of [userId]'s savings period for the month `yyyyMM`.
+  ///
+  /// Derived rather than minted: a month's period is opened and closed by
+  /// whichever device notices first, often both. A fresh id on each would be
+  /// two Octobers, each claiming the same income and each reserving against
+  /// the same balance. A name-based UUIDv5 means both devices write the same
+  /// row, and last-write-wins settles the rest.
+  static String savingsMonthId(String userId, int yyyymm) =>
+      _uuid.v5(Namespace.url.value, 'masrouf:savings-month:$userId:$yyyymm');
 }

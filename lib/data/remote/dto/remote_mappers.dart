@@ -138,6 +138,7 @@ Json txnToJson(String userId, Txn txn, {DateTime? deletedAt}) => <String, dynami
       'note': txn.note,
       'tags': txn.tags,
       'recurring_rule_id': txn.recurringRuleId,
+      'goal_id': txn.goalId,
       'created_at': txn.createdAt.toUtc().toIso8601String(),
       'updated_at': txn.updatedAt.toUtc().toIso8601String(),
       'deleted_at': deletedAt?.toUtc().toIso8601String(),
@@ -160,6 +161,7 @@ Txn txnFromJson(Json row) {
             .toList(growable: false) ??
         const <String>[],
     recurringRuleId: row['recurring_rule_id'] as String?,
+    goalId: row['goal_id'] as String?,
     createdAt: _readTimestamp(row['created_at']),
     updatedAt: _readTimestamp(row['updated_at']),
   );

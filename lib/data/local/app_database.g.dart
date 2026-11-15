@@ -1489,6 +1489,15 @@ class $TransactionsTable extends Transactions
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _goalIdMeta = const VerificationMeta('goalId');
+  @override
+  late final GeneratedColumn<String> goalId = GeneratedColumn<String>(
+    'goal_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -1517,6 +1526,7 @@ class $TransactionsTable extends Transactions
     note,
     tags,
     recurringRuleId,
+    goalId,
     createdAt,
   ];
   @override
@@ -1640,6 +1650,12 @@ class $TransactionsTable extends Transactions
         ),
       );
     }
+    if (data.containsKey('goal_id')) {
+      context.handle(
+        _goalIdMeta,
+        goalId.isAcceptableOrUnknown(data['goal_id']!, _goalIdMeta),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -1719,6 +1735,10 @@ class $TransactionsTable extends Transactions
         DriftSqlType.string,
         data['${effectivePrefix}recurring_rule_id'],
       ),
+      goalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}goal_id'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -1759,6 +1779,10 @@ class TxnRow extends DataClass implements Insertable<TxnRow> {
   final String? note;
   final List<String> tags;
   final String? recurringRuleId;
+
+  /// The savings goal a transfer is earmarked for. Transfers only; added in
+  /// schema v6.
+  final String? goalId;
   final DateTime createdAt;
   const TxnRow({
     required this.id,
@@ -1776,6 +1800,7 @@ class TxnRow extends DataClass implements Insertable<TxnRow> {
     this.note,
     required this.tags,
     this.recurringRuleId,
+    this.goalId,
     required this.createdAt,
   });
   @override
@@ -1810,6 +1835,9 @@ class TxnRow extends DataClass implements Insertable<TxnRow> {
     if (!nullToAbsent || recurringRuleId != null) {
       map['recurring_rule_id'] = Variable<String>(recurringRuleId);
     }
+    if (!nullToAbsent || goalId != null) {
+      map['goal_id'] = Variable<String>(goalId);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
@@ -1839,6 +1867,9 @@ class TxnRow extends DataClass implements Insertable<TxnRow> {
       recurringRuleId: recurringRuleId == null && nullToAbsent
           ? const Value.absent()
           : Value(recurringRuleId),
+      goalId: goalId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(goalId),
       createdAt: Value(createdAt),
     );
   }
@@ -1868,6 +1899,7 @@ class TxnRow extends DataClass implements Insertable<TxnRow> {
         serializer.fromJson<String>(json['tags']),
       ),
       recurringRuleId: serializer.fromJson<String?>(json['recurringRuleId']),
+      goalId: serializer.fromJson<String?>(json['goalId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -1892,6 +1924,7 @@ class TxnRow extends DataClass implements Insertable<TxnRow> {
         $TransactionsTable.$convertertags.toJson(tags),
       ),
       'recurringRuleId': serializer.toJson<String?>(recurringRuleId),
+      'goalId': serializer.toJson<String?>(goalId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -1912,6 +1945,7 @@ class TxnRow extends DataClass implements Insertable<TxnRow> {
     Value<String?> note = const Value.absent(),
     List<String>? tags,
     Value<String?> recurringRuleId = const Value.absent(),
+    Value<String?> goalId = const Value.absent(),
     DateTime? createdAt,
   }) => TxnRow(
     id: id ?? this.id,
@@ -1933,6 +1967,7 @@ class TxnRow extends DataClass implements Insertable<TxnRow> {
     recurringRuleId: recurringRuleId.present
         ? recurringRuleId.value
         : this.recurringRuleId,
+    goalId: goalId.present ? goalId.value : this.goalId,
     createdAt: createdAt ?? this.createdAt,
   );
   TxnRow copyWithCompanion(TransactionsCompanion data) {
@@ -1962,6 +1997,7 @@ class TxnRow extends DataClass implements Insertable<TxnRow> {
       recurringRuleId: data.recurringRuleId.present
           ? data.recurringRuleId.value
           : this.recurringRuleId,
+      goalId: data.goalId.present ? data.goalId.value : this.goalId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -1984,6 +2020,7 @@ class TxnRow extends DataClass implements Insertable<TxnRow> {
           ..write('note: $note, ')
           ..write('tags: $tags, ')
           ..write('recurringRuleId: $recurringRuleId, ')
+          ..write('goalId: $goalId, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -2006,6 +2043,7 @@ class TxnRow extends DataClass implements Insertable<TxnRow> {
     note,
     tags,
     recurringRuleId,
+    goalId,
     createdAt,
   );
   @override
@@ -2027,6 +2065,7 @@ class TxnRow extends DataClass implements Insertable<TxnRow> {
           other.note == this.note &&
           other.tags == this.tags &&
           other.recurringRuleId == this.recurringRuleId &&
+          other.goalId == this.goalId &&
           other.createdAt == this.createdAt);
 }
 
@@ -2046,6 +2085,7 @@ class TransactionsCompanion extends UpdateCompanion<TxnRow> {
   final Value<String?> note;
   final Value<List<String>> tags;
   final Value<String?> recurringRuleId;
+  final Value<String?> goalId;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
   const TransactionsCompanion({
@@ -2064,6 +2104,7 @@ class TransactionsCompanion extends UpdateCompanion<TxnRow> {
     this.note = const Value.absent(),
     this.tags = const Value.absent(),
     this.recurringRuleId = const Value.absent(),
+    this.goalId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -2083,6 +2124,7 @@ class TransactionsCompanion extends UpdateCompanion<TxnRow> {
     this.note = const Value.absent(),
     required List<String> tags,
     this.recurringRuleId = const Value.absent(),
+    this.goalId = const Value.absent(),
     required DateTime createdAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -2111,6 +2153,7 @@ class TransactionsCompanion extends UpdateCompanion<TxnRow> {
     Expression<String>? note,
     Expression<String>? tags,
     Expression<String>? recurringRuleId,
+    Expression<String>? goalId,
     Expression<DateTime>? createdAt,
     Expression<int>? rowid,
   }) {
@@ -2130,6 +2173,7 @@ class TransactionsCompanion extends UpdateCompanion<TxnRow> {
       if (note != null) 'note': note,
       if (tags != null) 'tags': tags,
       if (recurringRuleId != null) 'recurring_rule_id': recurringRuleId,
+      if (goalId != null) 'goal_id': goalId,
       if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -2151,6 +2195,7 @@ class TransactionsCompanion extends UpdateCompanion<TxnRow> {
     Value<String?>? note,
     Value<List<String>>? tags,
     Value<String?>? recurringRuleId,
+    Value<String?>? goalId,
     Value<DateTime>? createdAt,
     Value<int>? rowid,
   }) {
@@ -2170,6 +2215,7 @@ class TransactionsCompanion extends UpdateCompanion<TxnRow> {
       note: note ?? this.note,
       tags: tags ?? this.tags,
       recurringRuleId: recurringRuleId ?? this.recurringRuleId,
+      goalId: goalId ?? this.goalId,
       createdAt: createdAt ?? this.createdAt,
       rowid: rowid ?? this.rowid,
     );
@@ -2225,6 +2271,9 @@ class TransactionsCompanion extends UpdateCompanion<TxnRow> {
     if (recurringRuleId.present) {
       map['recurring_rule_id'] = Variable<String>(recurringRuleId.value);
     }
+    if (goalId.present) {
+      map['goal_id'] = Variable<String>(goalId.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -2252,6 +2301,7 @@ class TransactionsCompanion extends UpdateCompanion<TxnRow> {
           ..write('note: $note, ')
           ..write('tags: $tags, ')
           ..write('recurringRuleId: $recurringRuleId, ')
+          ..write('goalId: $goalId, ')
           ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -4867,7 +4917,8 @@ class SavingsGoalRow extends DataClass implements Insertable<SavingsGoalRow> {
   final int targetMilli;
   final String currency;
 
-  /// The account whose balance is the progress.
+  /// The savings account this goal's money goes to by default. Not where its
+  /// progress comes from.
   final String accountId;
 
   /// Optional. With one, the goal can say what it needs per month; without one
@@ -5516,14 +5567,14 @@ class SavingsPeriodRow extends DataClass
   final DateTime? deletedAt;
   final DateTime startedOn;
 
-  /// Income counted into the period so far. Grows until the period is closed.
+  /// Income counted into the period, frozen when it closes. Zero while open.
   final int incomeMilli;
 
   /// The share of [incomeMilli] the plan asked for, frozen when it closed.
   final int committedMilli;
 
-  /// Null until confirmed. The period is open until then, and at most one may
-  /// be open at a time.
+  /// The last day the period covers, set when it closes; for a month, its last
+  /// day. Null while open, and at most one may be open at a time.
   final DateTime? confirmedOn;
 
   /// What was actually set aside. Null until confirmed.
@@ -9540,6 +9591,7 @@ typedef $$TransactionsTableCreateCompanionBuilder =
       Value<String?> note,
       required List<String> tags,
       Value<String?> recurringRuleId,
+      Value<String?> goalId,
       required DateTime createdAt,
       Value<int> rowid,
     });
@@ -9560,6 +9612,7 @@ typedef $$TransactionsTableUpdateCompanionBuilder =
       Value<String?> note,
       Value<List<String>> tags,
       Value<String?> recurringRuleId,
+      Value<String?> goalId,
       Value<DateTime> createdAt,
       Value<int> rowid,
     });
@@ -9646,6 +9699,11 @@ class $$TransactionsTableFilterComposer
 
   ColumnFilters<String> get recurringRuleId => $composableBuilder(
     column: $table.recurringRuleId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get goalId => $composableBuilder(
+    column: $table.goalId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -9739,6 +9797,11 @@ class $$TransactionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get goalId => $composableBuilder(
+    column: $table.goalId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -9809,6 +9872,9 @@ class $$TransactionsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get goalId =>
+      $composableBuilder(column: $table.goalId, builder: (column) => column);
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 }
@@ -9856,6 +9922,7 @@ class $$TransactionsTableTableManager
                 Value<String?> note = const Value.absent(),
                 Value<List<String>> tags = const Value.absent(),
                 Value<String?> recurringRuleId = const Value.absent(),
+                Value<String?> goalId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => TransactionsCompanion(
@@ -9874,6 +9941,7 @@ class $$TransactionsTableTableManager
                 note: note,
                 tags: tags,
                 recurringRuleId: recurringRuleId,
+                goalId: goalId,
                 createdAt: createdAt,
                 rowid: rowid,
               ),
@@ -9894,6 +9962,7 @@ class $$TransactionsTableTableManager
                 Value<String?> note = const Value.absent(),
                 required List<String> tags,
                 Value<String?> recurringRuleId = const Value.absent(),
+                Value<String?> goalId = const Value.absent(),
                 required DateTime createdAt,
                 Value<int> rowid = const Value.absent(),
               }) => TransactionsCompanion.insert(
@@ -9912,6 +9981,7 @@ class $$TransactionsTableTableManager
                 note: note,
                 tags: tags,
                 recurringRuleId: recurringRuleId,
+                goalId: goalId,
                 createdAt: createdAt,
                 rowid: rowid,
               ),

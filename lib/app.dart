@@ -14,13 +14,14 @@ class MasroufApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Instantiating these here starts the session lifecycle, the resume watcher
-    // and the two notification watchers for the lifetime of the app, without
+    // and the notification watchers for the lifetime of the app, without
     // giving any of them a place in the widget tree where a rebuild could
     // restart them.
     ref.watch(sessionLifecycleProvider);
     ref.watch(appLifecycleProvider);
     ref.watch(plannedReminderWatcherProvider);
     ref.watch(budgetAlertWatcherProvider);
+    ref.watch(savingsReminderWatcherProvider);
 
     final settings = ref.watch(settingsProvider);
     final router = ref.watch(routerProvider);

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:masrouf/core/money/money.dart';
 import 'package:masrouf/data/repositories/savings_repository_impl.dart';
+import 'package:masrouf/domain/entities/savings_goal.dart';
 import 'package:masrouf/domain/entities/savings_plan.dart';
 import 'package:masrouf/domain/repositories/repositories.dart';
 import 'package:masrouf/presentation/providers/auth_providers.dart';
@@ -11,6 +12,8 @@ final savingsRepositoryProvider = Provider<SavingsRepository>(
   (ref) => SavingsRepositoryImpl(
     db: ref.watch(appDatabaseProvider),
     sync: ref.watch(syncEngineProvider),
+    transactions: ref.watch(transactionRepositoryProvider),
+    accounts: ref.watch(accountRepositoryProvider),
     userId: ref.watch(currentUserIdProvider),
     base: ref.watch(baseCurrencyProvider),
     plan: ref.watch(settingsProvider.select((s) => s.savings)),
@@ -25,7 +28,12 @@ final confirmedPeriodsProvider = StreamProvider<List<SavingsPeriod>>(
   (ref) => ref.watch(savingsRepositoryProvider).watchConfirmed(),
 );
 
-/// What safe-to-spend must hold back for the open period.
+final goalsProvider = StreamProvider<List<SavingsGoalProgress>>(
+  (ref) => ref.watch(savingsRepositoryProvider).watchGoals(),
+);
+
+/// What safe-to-spend must hold back: this month's target, less what has
+/// already been put aside.
 ///
 /// Resolved to zero while the status is still loading rather than exposing an
 /// `AsyncValue`: a safe-to-spend figure that flickers upward for one frame is

@@ -22,6 +22,8 @@ class KvDao extends DatabaseAccessor<AppDatabase> with _$KvDaoMixin {
   static const String weeklyDigest = 'weekly_digest_enabled';
   static const String plannedReminders = 'planned_reminders_enabled';
   static const String budgetAlerts = 'budget_alerts_enabled';
+  static const String savingsReview = 'savings_review_enabled';
+  static const String savingsNudge = 'savings_nudge_enabled';
 
   /// Backup bookkeeping. Also device-local: a backup file lives on one phone, so
   /// when it was last written says nothing about any other device.

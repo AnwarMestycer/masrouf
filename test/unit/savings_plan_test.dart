@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masrouf/core/money/currency.dart';
 import 'package:masrouf/core/money/money.dart';
+import 'package:masrouf/core/time/ym.dart';
 import 'package:masrouf/domain/entities/savings_plan.dart';
 
 /// The whole scheme reduces to one invariant:
@@ -169,5 +170,140 @@ void main() {
       dt(300),
       reason: 'back to a normal period once square',
     );
+  });
+
+  group('a month’s window', () {
+    const october = Ym.of(2026, 10);
+
+    test('runs from the 1st when nothing earlier covers it', () {
+      expect(SavingsCalendar.windowStart(october, null), DateTime(2026, 10));
+      expect(
+        SavingsCalendar.windowStart(october, DateTime(2026, 9, 30)),
+        DateTime(2026, 10),
+      );
+    });
+
+    /// Transactions carry a day and no time, so two periods sharing a day
+    /// would both count that day's income.
+    test('starts the day after an earlier period ends inside it', () {
+      expect(
+        SavingsCalendar.windowStart(october, DateTime(2026, 10, 4)),
+        DateTime(2026, 10, 5),
+      );
+    });
+
+    test('ends today while the month runs, and on its last day after', () {
+      final start = DateTime(2026, 10);
+      expect(
+        SavingsCalendar.windowEnd(october, start, DateTime(2026, 10, 12, 18)),
+        DateTime(2026, 10, 12),
+      );
+      expect(
+        SavingsCalendar.windowEnd(october, start, DateTime(2026, 11, 3)),
+        DateTime(2026, 10, 31),
+      );
+    });
+
+    /// A window beginning tomorrow would otherwise be asked about an empty
+    /// range and report a commitment of nothing.
+    test('never ends before it starts', () {
+      final start = DateTime(2026, 10, 11);
+      expect(
+        SavingsCalendar.windowEnd(october, start, DateTime(2026, 10, 10)),
+        start,
+      );
+    });
+  });
+
+  group('this month’s status', () {
+    SavingsStatus status({required num income, required num saved, num owed = 0}) =>
+        SavingsStatus(
+          plan: plan,
+          month: const Ym.of(2026, 10),
+          startedOn: DateTime(2026, 10),
+          incomeSoFar: dt(income),
+          savedSoFar: dt(saved),
+          ledger: ledger(owed, 0),
+        );
+
+    test('holds back only what is still to be put aside', () {
+      expect(status(income: 1000, saved: 0).reserved, dt(300));
+      expect(status(income: 1000, saved: 120).reserved, dt(180));
+    });
+
+    test('holds back the catch-up too', () {
+      expect(status(income: 1000, saved: 0, owed: 100).reserved, dt(400));
+    });
+
+    test('saving more holds nothing back and reports the excess', () {
+      final s = status(income: 1000, saved: 450);
+      expect(s.remaining.isZero, isTrue);
+      expect(s.reserved.isZero, isTrue);
+      expect(s.aheadThisMonth, dt(150));
+    });
+  });
+
+  /// A goal's "on track" is judged against this, so what it averages decides
+  /// whether someone is told they are behind.
+  group('the pace goals are judged against', () {
+    SavingsPeriod closed(Ym month, num? saved) => SavingsPeriod(
+      id: '${month.value}',
+      startedOn: month.firstDay,
+      income: dt(1000),
+      committed: dt(300),
+      confirmedOn: month.lastDay,
+      saved: saved == null ? null : dt(saved),
+      updatedAt: month.lastDay,
+    );
+    SavingsPeriod open(Ym month) => SavingsPeriod(
+      id: 'open',
+      startedOn: month.firstDay,
+      income: dt(0),
+      committed: dt(0),
+      confirmedOn: null,
+      saved: null,
+      updatedAt: month.firstDay,
+    );
+
+    const sep = Ym(202609);
+    const oct = Ym(202610);
+    const aug = Ym(202608);
+    const jul = Ym(202607);
+
+    test('nothing closed yet says nothing, rather than zero', () {
+      expect(SavingsPace.monthly(const <SavingsPeriod>[], months: 3), isNull);
+      expect(
+        SavingsPace.monthly(<SavingsPeriod>[open(oct)], months: 3),
+        isNull,
+      );
+    });
+
+    test('the mean of the most recent closed months, whatever the order', () {
+      final periods = <SavingsPeriod>[
+        closed(aug, 100),
+        open(const Ym(202611)),
+        closed(oct, 400),
+        closed(jul, 9000), // older than the window: must not count
+        closed(sep, 100),
+      ];
+      expect(SavingsPace.monthly(periods, months: 3), dt(200));
+    });
+
+    test('fewer closed months than the window are averaged as they are', () {
+      expect(
+        SavingsPace.monthly(<SavingsPeriod>[closed(oct, 250)], months: 3),
+        dt(250),
+      );
+    });
+
+    test('a month that saved nothing pulls the pace down', () {
+      expect(
+        SavingsPace.monthly(<SavingsPeriod>[
+          closed(oct, 300),
+          closed(sep, 0),
+        ], months: 3),
+        dt(150),
+      );
+    });
   });
 }

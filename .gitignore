@@ -61,3 +61,6 @@ masrouf.env
 
 # ZCode session data (plans, scratch) — tooling, not project code.
 .zcode/
+
+# Supabase CLI local state
+supabase/.temp/

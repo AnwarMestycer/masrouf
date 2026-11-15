@@ -82,7 +82,14 @@ class TransactionRepositoryImpl implements TransactionRepository {
               debugMessage: 'Transaction disappeared before the edit landed',
             );
           }
-          final stamped = txn.copyWith(updatedAt: DateTime.now());
+          // The edit screen knows nothing of goals and builds a fresh Txn, so
+          // a savings transfer's earmark is carried over from the row being
+          // replaced. Dropped only if the edit made it something other than a
+          // transfer, which a goal cannot belong to.
+          final stamped = txn.copyWith(
+            updatedAt: DateTime.now(),
+            goalId: txn.isTransfer ? previous.goalId : null,
+          );
           await _db.transactionDao.updateTxn(userId, previous, stamped, base);
           await _db.syncQueueDao
               .enqueue(SyncEntity.transactions, stamped.id, SyncOp.upsert);
@@ -144,6 +151,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
             recurringRuleId: null,
             createdAt: now,
             updatedAt: now,
+            goalId: original.goalId,
           );
           await _db.transactionDao.insertTxn(userId, copy, base);
           await _db.syncQueueDao

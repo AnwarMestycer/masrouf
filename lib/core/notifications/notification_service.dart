@@ -5,7 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
-/// The three things this app is allowed to interrupt someone for.
+/// The four things this app is allowed to interrupt someone for.
 ///
 /// Separate Android channels rather than one: the system settings screen lets a
 /// user silence budget alerts while keeping bill reminders, and a single channel
@@ -21,7 +21,11 @@ enum NotificationChannel {
 
   /// A budget crossing 80% or 100%. Deliberately quieter than a bill reminder —
   /// it is information, not a deadline.
-  budgetAlert('masrouf_budget_alerts', Importance.defaultImportance);
+  budgetAlert('masrouf_budget_alerts', Importance.defaultImportance),
+
+  /// The month-end review and the weekly nudge. Information, like a budget
+  /// alert, so no louder than one.
+  savings('masrouf_savings', Importance.defaultImportance);
 
   const NotificationChannel(this.id, this.importance);
 
@@ -33,6 +37,10 @@ enum NotificationChannel {
 /// without touching another's.
 abstract final class NotificationIds {
   static const int weeklyDigest = 1001;
+
+  /// One each, because each is rebuilt whole whenever the month's figures move.
+  static const int savingsReview = 1002;
+  static const int savingsNudge = 1003;
 
   /// Planned-expense reminders occupy `2000..2000 + maxPlannedReminders - 1`.
   /// Index-based rather than derived from the plan id, because the whole block is

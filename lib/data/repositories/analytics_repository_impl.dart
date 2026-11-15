@@ -1,7 +1,5 @@
 import 'package:masrouf/core/error/auth_error_mapper.dart';
-import 'package:masrouf/core/config/app_config.dart';
 import 'package:masrouf/domain/entities/analytics/cashflow_calendar.dart';
-import 'package:masrouf/domain/entities/analytics/forecast.dart';
 import 'package:masrouf/core/money/currency.dart';
 import 'package:masrouf/core/money/money.dart';
 import 'package:masrouf/core/result/result.dart';
@@ -23,9 +21,11 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
     required this.paydayDayOfMonth,
     required this.ratesToBase,
     this.savingsReserved = const Money(0, Currency.tnd),
+    DateTime Function()? clock,
   })  : _db = db,
         _recurring = recurring,
-        _planned = planned;
+        _planned = planned,
+        _clock = clock ?? DateTime.now;
 
   final AppDatabase _db;
   final RecurringRepository _recurring;
@@ -35,9 +35,12 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
   final int paydayDayOfMonth;
   final Map<String, double> ratesToBase;
 
-  /// What the open savings period is holding back. Injected rather than queried
+  /// What this month has yet to put aside. Injected rather than queried
   /// so this repository keeps taking its inputs from one place.
   final Money savingsReserved;
+
+  /// Injected so tests can stand on payday.
+  final DateTime Function() _clock;
 
   @override
   Stream<MonthSummary> watchMonthSummary(Ym ym) =>
@@ -72,20 +75,40 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
   /// calendar day — a payday on the 31st still resolves in February. Only
   /// outflows are subtracted; expected income is deliberately ignored so the
   /// figure answers "what can I spend from what I actually have".
+  ///
+  /// On payday itself, until some income has been recorded that day, the
+  /// horizon is today. Skipping straight to next month's payday would hold the
+  /// whole coming month's bills and plans against a balance the salary has not
+  /// reached yet.
   @override
   Future<SafeToSpend> safeToSpend() async {
-    final horizon = _nextPayday(DateTime.now().dateOnly);
+    final today = _clock().dateOnly;
+    final isPayday =
+        dayOfMonthIn(today.year, today.month, paydayDayOfMonth) == today;
+    final awaitingPayday = isPayday &&
+        await _db.analyticsDao.incomeBetween(userId, today, today) == 0;
+    final horizon = awaitingPayday ? today : _nextPayday(today);
     final bills = await _recurring.upcomingBefore(horizon);
     // Plans are reserved on the same footing as bills: both are money already
     // committed but not yet spent. The only difference is that one repeats and
     // the other was promised once.
-    final plans = await _planned.pendingBefore(horizon);
+    // Through the end of the horizon day, as bills are: a plan carries a time
+    // of day, and against bare midnight one due later on payday would be left
+    // out — on a payday horizon of today, that is every plan due today.
+    final plans = await _planned.pendingBefore(
+      horizon.add(const Duration(days: 1)).subtract(const Duration(microseconds: 1)),
+    );
 
     final balances =
         await _db.accountDao.watchWithBalances(userId).first;
 
     var totalMilli = 0;
     for (final entry in balances) {
+      // Savings accounts hold money already put away. Counting them would offer
+      // back last month's savings as this week's spending money — and a saving
+      // would never lower the figure, since moving money between two counted
+      // accounts changes nothing.
+      if (entry.account.type == AccountType.savings) continue;
       final code = entry.account.currency.code;
       final rate = code == base.code ? 1.0 : (ratesToBase[code] ?? 0.0);
       totalMilli += (entry.balance.milli * rate).round();
@@ -100,111 +123,22 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
     final reserved = plans.fold<int>(0, (sum, p) => sum + inBase(p.amount));
 
     return SafeToSpend(
-      // Savings come out too. The money for the open period is still sitting in
-      // the account it arrived in, so without this the app would be offering
-      // back what has already been promised — which is the whole reason the
-      // commitment is reserved rather than merely recorded.
+      // Savings come out too: whatever this month has yet to put aside. It is
+      // still sitting in the account it arrived in, so without this the app
+      // would offer back what has already been promised. What has been put
+      // aside is out of the balance above already and is not taken twice.
       amount: Money(
         balance.milli - committed - reserved - savingsReserved.milli,
         base,
       ),
       currentBalance: balance,
       upcomingBills: bills,
+      bills: Money(committed, base),
       reserved: Money(reserved, base),
       savingsReserved: savingsReserved,
       horizon: horizon,
+      awaitingPayday: awaitingPayday,
     );
-  }
-
-  /// Projects the next [monthCount] months.
-  ///
-  /// `projected = typical + committed + planned` per month, where *typical* is
-  /// the **median** of the last [historyMonths] months of non-rule-generated
-  /// spend. Median rather than mean because one month with a plane ticket in it
-  /// should not raise every future month's estimate — and with a handful of
-  /// samples, a mean is exactly what an outlier moves most.
-  @override
-  Future<Forecast> forecast({
-    int monthCount = AppConfig.forecastMonthWindow,
-    int historyMonths = AppConfig.analyticsMonthWindow,
-  }) async {
-    final now = DateTime.now().dateOnly;
-    final thisMonth = Ym.fromDate(now);
-
-    // History excludes the current month: it is partway through, so including
-    // it would drag every projection down by however much of it is left.
-    final past = thisMonth.previous.lastMonths(historyMonths);
-    final future = thisMonth.next.nextMonths(monthCount);
-
-    final expenseByMonth =
-        await _db.analyticsDao.spontaneousExpenseByMonth(userId, past, base);
-    final incomeByMonth =
-        await _db.analyticsDao.spontaneousIncomeByMonth(userId, past, base);
-
-    // Months before the user started are not evidence of frugality — dropping
-    // the leading empty ones stops an account opened last week from projecting
-    // near-zero spending forever.
-    final expenseSamples = _trimLeadingEmpty(
-      past.map((m) => expenseByMonth[m.value] ?? 0).toList(growable: false),
-    );
-    final incomeSamples = _trimLeadingEmpty(
-      past.map((m) => incomeByMonth[m.value] ?? 0).toList(growable: false),
-    );
-
-    // With no completed month to learn from, the projection would be all
-    // zeros — technically true and completely useless to someone who started
-    // using the app this month. Fall back to the month in progress, scaled up
-    // to a whole one. Still flagged provisional, because a week of data is a
-    // hint rather than a pattern.
-    var typicalMilli = _median(expenseSamples);
-    var typicalIncomeMilli = _median(incomeSamples);
-
-    if (expenseSamples.isEmpty && incomeSamples.isEmpty) {
-      final partial = await _proRatedCurrentMonth(thisMonth, now);
-      typicalMilli = partial.$1;
-      typicalIncomeMilli = partial.$2;
-    }
-
-    final typical = Money(typicalMilli, base);
-    final typicalIncome = Money(typicalIncomeMilli, base);
-
-    final rules = await _recurring.all();
-    final plans = await _planned.pendingBefore(future.last.lastDay);
-
-    final months = <MonthForecast>[];
-    for (final ym in future) {
-      final from = ym.firstDay;
-      final to = ym.lastDay;
-
-      var committedOut = 0;
-      var committedIn = 0;
-      for (final rule in rules) {
-        final count = rule.occurrencesBetween(from, to).length;
-        if (count == 0) continue;
-        final milli = _inBase(rule.amount) * count;
-        if (rule.type == TxnType.income) {
-          committedIn += milli;
-        } else if (!rule.type.isTransfer) {
-          committedOut += milli;
-        }
-      }
-
-      final plannedMilli = plans
-          .where((p) => !p.dueAt.isBefore(from) && !p.dueAt.isAfter(to))
-          .fold<int>(0, (sum, p) => sum + _inBase(p.amount));
-
-      months.add(
-        MonthForecast(
-          ym: ym,
-          typical: typical,
-          committed: Money(committedOut, base),
-          planned: Money(plannedMilli, base),
-          expectedIncome: Money(typicalIncome.milli + committedIn, base),
-        ),
-      );
-    }
-
-    return Forecast(months: months, historyMonths: expenseSamples.length);
   }
 
   /// Every expected outflow in [ym], grouped by day.
@@ -267,44 +201,9 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
     return CashflowCalendar(byDay: byDay, currency: base);
   }
 
-  /// The month in progress, scaled to a full month: `(expense, income)`.
-  ///
-  /// Divided by days elapsed rather than by the whole month, so a user four
-  /// days in is not projected to spend four days' money over thirty.
-  Future<(int, int)> _proRatedCurrentMonth(Ym ym, DateTime now) async {
-    final expense = await _db.analyticsDao
-        .spontaneousExpenseByMonth(userId, <Ym>[ym], base);
-    final income = await _db.analyticsDao
-        .spontaneousIncomeByMonth(userId, <Ym>[ym], base);
-
-    final elapsed = now.day.clamp(1, ym.dayCount);
-    final scale = ym.dayCount / elapsed;
-    return (
-      ((expense[ym.value] ?? 0) * scale).round(),
-      ((income[ym.value] ?? 0) * scale).round(),
-    );
-  }
-
   int _inBase(Money amount) => amount.currency == base
       ? amount.milli
       : (amount.milli * (ratesToBase[amount.currency.code] ?? 0)).round();
-
-  /// Drops leading zero months, which represent "before this user existed"
-  /// rather than "a month they spent nothing".
-  static List<int> _trimLeadingEmpty(List<int> samples) {
-    final firstNonZero = samples.indexWhere((v) => v != 0);
-    if (firstNonZero <= 0) return firstNonZero == 0 ? samples : const <int>[];
-    return samples.sublist(firstNonZero);
-  }
-
-  static int _median(List<int> values) {
-    if (values.isEmpty) return 0;
-    final sorted = <int>[...values]..sort();
-    final middle = sorted.length ~/ 2;
-    return sorted.length.isOdd
-        ? sorted[middle]
-        : (sorted[middle - 1] + sorted[middle]) ~/ 2;
-  }
 
   @override
   Future<Result<void>> rebuild() => guard(

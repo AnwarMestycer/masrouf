@@ -76,8 +76,9 @@ class AppDatabase extends _$AppDatabase {
 
   /// 1 -> 2: `budgets`. 2 -> 3: `planned_expenses`. 3 -> 4: `savings_goals`.
   /// 4 -> 5: `savings_periods`, and the savings plan on `user_settings`.
+  /// 5 -> 6: `transactions.goal_id`, earmarking a savings transfer for a goal.
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -114,6 +115,11 @@ class AppDatabase extends _$AppDatabase {
               userSettingsRows,
               userSettingsRows.savingsRecoveryPeriods,
             );
+          }
+          if (from < 6) {
+            // Nullable, so every existing row upgrades into "no goal" — which
+            // is exactly what it was.
+            await m.addColumn(transactions, transactions.goalId);
           }
         },
         beforeOpen: (OpeningDetails details) async {

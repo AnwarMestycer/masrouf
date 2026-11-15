@@ -10,7 +10,6 @@ import 'package:masrouf/domain/entities/savings_plan.dart';
 import 'package:masrouf/domain/entities/analytics/analytics.dart';
 import 'package:masrouf/domain/entities/analytics/date_range.dart';
 import 'package:masrouf/domain/entities/analytics/cashflow_calendar.dart';
-import 'package:masrouf/domain/entities/analytics/forecast.dart';
 import 'package:masrouf/domain/entities/category.dart';
 import 'package:masrouf/domain/entities/history_filter.dart';
 import 'package:masrouf/domain/entities/recurring_rule.dart';
@@ -151,25 +150,65 @@ abstract interface class PlannedRepository {
   Future<Result<void>> remove(String id);
 }
 
-/// Savings targets, each backed by a real account's balance.
-abstract interface class GoalRepository {
-  Stream<List<SavingsGoalProgress>> watchProgress();
-  Future<Result<SavingsGoal>> save(SavingsGoal goal);
-  Future<Result<void>> remove(String id);
-}
-
+/// Pay-yourself-first, by calendar month, and the goals it feeds.
+///
+/// One module where there used to be two books: a plan whose "saved" was a
+/// typed number, and goals whose progress was a whole account balance. Now a
+/// saving is a real transfer into a savings account. The month counts it
+/// toward its target, a goal counts it if it is earmarked, and safe-to-spend
+/// stops counting it the moment it leaves an ordinary account.
 abstract interface class SavingsRepository {
-  /// The plan, the open period and the running account, in one value.
+  /// This month's plan, income and progress, and the running account.
   Stream<SavingsStatus> watchStatus();
+
+  /// Closed months (and older hand-confirmed periods), newest first.
   Stream<List<SavingsPeriod>> watchConfirmed();
 
-  /// Opens a period starting today. Fails when one is already open.
-  Future<Result<SavingsPeriod>> start();
+  Stream<List<SavingsGoalProgress>> watchGoals();
 
-  /// Closes the open period with what was actually set aside.
-  Future<Result<SavingsPeriod>> confirm(Money saved);
+  /// Closes every month that has ended and opens the current one.
+  ///
+  /// Idempotent and cheap; run at launch and whenever the app comes back to the
+  /// foreground. A month the app was never opened in is still closed, with
+  /// whatever its income and transfers were.
+  Future<Result<void>> rollOver();
 
-  Future<Result<void>> remove(String id);
+  /// Moves [amount] from an ordinary account into a savings account.
+  Future<Result<Txn>> putAside({
+    required String fromAccountId,
+    required String toAccountId,
+    required Money amount,
+    required double fxRateToBase,
+    String? goalId,
+    DateTime? date,
+    String? note,
+  });
+
+  /// Moves [amount] from a savings account back into an ordinary one.
+  ///
+  /// With a [goalId], refuses to take out more than the goal holds.
+  Future<Result<Txn>> takeBack({
+    required String fromAccountId,
+    required String toAccountId,
+    required Money amount,
+    required double fxRateToBase,
+    String? goalId,
+    DateTime? date,
+    String? note,
+  });
+
+  /// Corrects what a closed month saved — for money set aside outside the app.
+  Future<Result<SavingsPeriod>> review(String periodId, Money saved);
+
+  Future<Result<void>> removePeriod(String id);
+
+  /// The first savings account, creating one called [name] if there is none.
+  Future<Result<Account>> ensureSavingsAccount(String name);
+
+  Future<Result<SavingsGoal>> saveGoal(SavingsGoal goal);
+
+  /// Removes the goal only. Transfers earmarked for it stay where they are.
+  Future<Result<void>> removeGoal(String id);
 }
 
 abstract interface class AnalyticsRepository {
@@ -181,10 +220,6 @@ abstract interface class AnalyticsRepository {
   );
   Stream<IncomeBreakdown> watchIncomeBreakdown(Ym latest, {int monthCount});
   Future<List<MonthSummary>> summaries(List<Ym> months);
-
-  /// Projects the coming months: what they are likely to cost and what is
-  /// likely to be left over.
-  Future<Forecast> forecast({int monthCount, int historyMonths});
 
   /// A month's expected outflows, grouped by day — plans plus enumerated
   /// recurring occurrences. Nothing in it has happened yet.
