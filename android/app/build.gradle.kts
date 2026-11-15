@@ -18,7 +18,6 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.mestycer.masrouf"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
@@ -30,6 +29,31 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Package native libraries only for the ABIs Flutter was asked to build.
+        // Flutter's plugin sets abiFilters to every ABI it supports regardless of
+        // --target-platform, so plugin libraries (sqlite3, jni, datastore) shipped
+        // for armeabi-v7a and x86_64 inside an arm64-only APK. A 32-bit phone
+        // would then accept the install and crash on launch for want of
+        // libflutter.so. Left alone under --split-per-abi, where filters would
+        // conflict with the split configuration.
+        val targetAbis = (project.findProperty("target-platform") as String?)
+            ?.split(",")
+            ?.mapNotNull {
+                when (it.trim()) {
+                    "android-arm" -> "armeabi-v7a"
+                    "android-arm64" -> "arm64-v8a"
+                    "android-x64" -> "x86_64"
+                    else -> null
+                }
+            }
+            .orEmpty()
+        if (targetAbis.isNotEmpty() && project.findProperty("split-per-abi") != "true") {
+            ndk {
+                abiFilters.clear()
+                abiFilters.addAll(targetAbis)
+            }
+        }
     }
 
     buildTypes {
